@@ -1,21 +1,29 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useCurrentUser } from "../features/auth/services/index";
+import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ allowedRole }) => {
-  const { data, isLoading } = useCurrentUser();
+  const { loading, isAuthenticated, user } = useAuth();
 
-  const user = data?.user;
-
-  // while loading user
-  if (isLoading) return null;
+  // auth loading
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
 
   // not logged in
-  if (!user) {
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
 
   // role check
-  if (allowedRole && user.role !== allowedRole) {
+  if (
+    allowedRole &&
+    user?.role?.toLowerCase() !==
+      allowedRole?.toLowerCase()
+  ) {
     return <Navigate to="/login" replace />;
   }
 
