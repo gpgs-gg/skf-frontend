@@ -27,7 +27,7 @@ export const generateOrderNo = (orders = []) => {
 
 export const calculateOrderTotal = (products) => {
   return products
-    .reduce((sum, p) => sum + (parseInt(p.quantity) || 1) * 5000, 0)
+    .reduce((sum, p) => sum + (parseInt(p.quantity) || 1) * 0, 0)
     .toString();
 };
 

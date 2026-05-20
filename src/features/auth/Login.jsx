@@ -5,6 +5,7 @@ import { useLogin } from "./services/index";
 import SignupPage from "./SignupPage";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import SetPassword from "./SetPassword";
 
 const Login = () => {
   const { user } = useAuth();
@@ -202,7 +203,8 @@ const Login = () => {
           </div>
         </form>
       </div>
-
+   {/* Password Modal */}
+      <SetPassword isOpen={isOpen} setIsOpen={setIsOpen}  />
       {/* <style>{`
         .loader {
           border: 3px solid #e5e5e5;
