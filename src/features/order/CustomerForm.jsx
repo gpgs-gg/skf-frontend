@@ -185,9 +185,9 @@ const AddCustomer = ({
       toast.dismiss();
       toast.success(customer ? "Customer Updated" : "Customer Saved");
 
-      const loggedInUser = {
-        name: "Pooja",
-        empId: "240008",
+     const loggedInUser = {
+        name: currentUser?.user?.name || "Unknown User",
+        empId: currentUser?.user?.id || "",
       };
 
       let WorkLog = "";
