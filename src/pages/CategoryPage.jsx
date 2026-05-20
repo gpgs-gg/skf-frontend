@@ -15,7 +15,7 @@ const SubCategoryCard = ({ item, onClick }) => {
           src={item.image}
           alt={item.name}
           loading="lazy"
-          className="w-full h-32 lg:h-[350px]  object-cover rounded-t-xl  transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-32 lg:h-[350px]  object-cover rounded-t-xl  transition-transform duration-500 group-hover:scale-97"
         />
       </div>
 
@@ -73,8 +73,8 @@ const CategoryPage = () => {
   return (
     <section className="bg-[#f7f7f5] min-h-screen">
       {/* 🔥 HERO BANNER */}
-      <div className="max-w-7xl mx-auto px-4 pt-6">
-        <div className="relative rounded-2xl overflow-hidden h-[220px] bg-gray-200 flex items-center">
+      {/* <div className="max-w-7xl mx-auto px-4 pt-6">
+        <div className="relative rounded-2xl overflow-hidden h-[220px] bg-white lg:bg-gray-200 flex items-center">
           <img
             src={category?.bannerImage}
             className="absolute inset-0 w-full h-full object-cover"
@@ -86,7 +86,28 @@ const CategoryPage = () => {
             <p className=" text-sm mt-2 max-w-md">{bannerTitle}</p>
           </div>
         </div>
-      </div>
+      </div> */}
+      <div className="max-w-7xl mx-auto px-4 pt-6">
+  <div className="relative rounded-2xl overflow-hidden h-[220px] bg-white lg:bg-gray-200 flex items-center">
+    
+    <img
+      src={category?.bannerImage}
+      className="absolute inset-0 w-full h-full object-cover  scale-105  lg:scale-100"
+    />
+
+    <div className="absolute inset-0 bg-black/40 lg:bg-black/20" />
+
+    <div className="relative z-10 px-8 text-white lg:text-black">
+      <h1 className="text-3xl md:text-4xl font-semibold">
+        {title}
+      </h1>
+
+      <p className="text-sm mt-2 max-w-md">
+        {bannerTitle}
+      </p>
+    </div>
+  </div>
+</div>
 
       {/* 🔥 FILTER BAR */}
       <div className="max-w-7xl mx-auto px-4 mt-6 flex flex-wrap items-center justify-between gap-4">

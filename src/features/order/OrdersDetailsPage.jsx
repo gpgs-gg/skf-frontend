@@ -149,7 +149,7 @@ const CustomerSnapshot = ({
         </div>
       </div>
       {/* all customers details */}
-      <div className="flex-1 min-h-0   bg-black p-4 rounded-xl">
+      <div className="flex-1 min-h-0   bg-black p-4 rounded-xl ">
         <div className=" lg:px-3   ">
           <div className="flex justify-between gap-3 flex-wrap items-start h-full ">
             <div>
@@ -214,7 +214,7 @@ const CustomerSnapshot = ({
         </div>
       </div>
       {/* all orders */}
-      <div className="lg:flex-1 lg:overflow-y-auto min-h-0 bg-[#fbfbfb] max-h-screen px-3 sm:px-5 pb-5 space-y-3 pt-2">
+      <div className="lg:flex-1 lg:overflow-y-auto  min-h-0 bg-[#fbfbfb] lg:h-[550px] px-3 sm:px-5 pb-5  space-y-3 pt-2">
         {filteredOrders.map((order) => (
           <div key={order._id} className="md::border rounded-2xl p-4 ">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:items-center">
@@ -286,10 +286,10 @@ const CustomerSnapshot = ({
 
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
               <div className="bg-white rounded-xl p-3 border border-gray-200">
-                <small className="text-gray-800  lg:text-[17px]   block">
+                <small className="text-gray-800  lg:text-[15px]   block">
                   Total
                 </small>
-                <strong className="text-base sm:text-lg">
+                <strong className="text-base sm:text-md">
                   ₹
                   {parseInt(
                     order.totalAmount || order.total || 0,
@@ -297,26 +297,26 @@ const CustomerSnapshot = ({
                 </strong>
               </div>
               <div className="bg-white rounded-xl p-3 border border-gray-200">
-                <small className="text-gray-800  lg:text-[17px]   block">
+                <small className="text-gray-800  lg:text-[15px]   block">
                   Received Amount
                 </small>
-                <strong className="text-base sm:text-lg">
+                <strong className="text-base sm:text-md">
                   ₹{parseInt(order.receivedAmount || 0).toLocaleString()}
                 </strong>
               </div>
               <div className="bg-white rounded-xl p-3 border border-gray-200">
-                <small className="text-gray-800  lg:text-[17px]  block">
+                <small className="text-gray-800  lg:text-[15px]  block">
                   Delivery
                 </small>
-                <strong className="text-base sm:text-lg">
+                <strong className="text-base sm:text-md">
                   {formatDate(order.deliveryDate)}
                 </strong>
               </div>
               <div className="bg-white rounded-xl p-3 border border-gray-200">
-                <small className="text-gray-800  lg:text-[17px]  block">
+                <small className="text-gray-800  lg:text-[15px]  block">
                   Due Amount
                 </small>
-                <strong className="text-base sm:text-lg">
+                <strong className="text-base sm:text-md">
                   ₹{parseInt(order.dueAmount || 0).toLocaleString()}
                 </strong>
               </div>
@@ -391,7 +391,8 @@ const CustomerSnapshot = ({
                       </button>
                     </div>
                   </div>
-                  <div className="mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-gray-900">
+                  <div  className={`  ${isEditingActive() ? "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1  lg:grid-cols-2 gap-x-4 gap-y-2 text-gray-900" : "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-gray-900"
+              }`}>
                     {Object.entries(product.attributes || {}).map(
                       ([key, value]) => (
                         <div key={key} className="flex gap-1">
@@ -688,7 +689,7 @@ const OrderDetailsPage = ({
           className={`transition-all duration-500 ease-in-out 
 ${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
   w-full rounded-2xl border bg-white shadow-sm 
-  lg:h-[calc(100vh-2rem)] flex flex-col min-h-0`}
+  flex-col min-h-0`}
         >
           <div
             className={`transition-opacity duration-300 flex-1   ${isEditingActive() ? "opacity-100" : "opacity-100"

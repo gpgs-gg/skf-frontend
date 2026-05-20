@@ -641,7 +641,7 @@ const products = [
         ],
       },
       {
-        name: "Murals & Scenic",
+        name: "Murals & Scenic Wallpapers",
         slug: "murals-scenic- Wallpapers",
         images: [IMAGES.MuralsScenicWallpaper],
         products: [
@@ -658,7 +658,7 @@ const products = [
         ],
       },
       {
-        name: "Plain & Texture",
+        name: "Plain & Texture Wallpapers",
         slug: "plain-texture- Wallpapers",
         images: [IMAGES.PlainTextureWallpaper],
         products: [
@@ -726,7 +726,8 @@ const products = [
         ],
       },
       {
-        name: "Stripes & Checkered",
+        name: "Spiritual  Wallpapers Wallpapers",
+        name: "Stripes & Checkered ",
         slug: "stripes-checkered- Wallpapers",
         images: [IMAGES.StripesCheckeredWallpaper],
         products: [
@@ -739,7 +740,8 @@ const products = [
         ],
       },
       {
-        name: "Wood & Marble Finish",
+        name: "Spiritual  Wallpapers Wallpapers",
+        name: "Wood & Marble Finish ",
         slug: "wood-marble- Wallpapers",
         images: [IMAGES.WoodMarbleWallpaper],
         products: [
@@ -1062,7 +1064,7 @@ const products = [
         ],
       },
       {
-        name: "One Way Privacy Films",
+        name: "One Way / Privacy Films",
         slug: "one-way-privacy-films",
         images: [IMAGES.OneWayPrivacyFilms],
         products: [

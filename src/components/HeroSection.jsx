@@ -128,18 +128,25 @@ const HeroSection = ({
         <div className="absolute inset-0 bg-black/40 z-0" />
 
         {/* 🔥 TEXT CONTENT */}
-        <div className="relative z-10 flex items-center justify-start h-full px-6 md:px-16 lg:px-24">
-          <div>
+        <div className="relative z-10 flex  items-center justify-center md:justify-start h-full px-6 md:px-16 lg:px-24">
+          <div className="">
             {/* <h1 className="text-white leading-none tracking-tighter font-plex text-[32px] lg:mb-4 sm:text-[48px] md:text-[64px] lg:text-[90px] ">
               Your <br />
               Home, <br />
               Designed.
             </h1> */}
-            <h1 className="text-white leading-tight lg:leading-none tracking-tight lg:tracking-tighter font-plex text-[26px] sm:text-[34px] md:text-[64px] lg:text-[90px] mt-20">
+            <h1 className="text-white hidden md:block leading-tight lg:leading-none tracking-tight lg:tracking-tighter font-plex text-[26px] sm:text-[34px] md:text-[64px] lg:text-[90px] mt-20">
               Your <br />
               Home, <br />
               Designed.
             </h1>
+         <div className="flex items-center justify-center md:hidden">
+  <h1 className="text-center text-white leading-tight lg:leading-none tracking-tight lg:tracking-tighter font-plex text-[26px] sm:text-[34px] md:text-[64px] lg:text-[90px] mt-20">
+    Your <br />
+    Home, <br />
+    Designed.
+  </h1>
+</div>
             <button
               onClick={() => handleNavigation(link)}
               className="mt-6 cursor-pointer lg:mt-12 px-6 py-3 border-2  border-white text-white tracking-widest text-sm md:text-base lg:text-xl hover:bg-white hover:text-black transition duration-300 mb-6 "

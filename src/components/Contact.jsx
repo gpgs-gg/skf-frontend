@@ -25,7 +25,7 @@ const Contact = () => {
           <img
             src={IMAGES.contactUsImg}
             alt="Flower vase"
-            className="w-full h-[300px] sm:h-[400px] lg:h-[480px] lg:mb-8 object-cover rounded-lg"
+            className="w-full h-[300px] sm:h-[400px] lg:h-[480px] lg:mb-8 object-cover lg:rounded-lg"
           />
         </div>
 
@@ -62,7 +62,7 @@ const Contact = () => {
               EMAIL
             </h3>
             <p className="mt-2 text-sm sm:text-base md:text-lg lg:text-xl break-all">
-              sadgurukrupafurnishing@gmail.com
+              skf.nerul@gmail.com
             </p>
           </div>
 

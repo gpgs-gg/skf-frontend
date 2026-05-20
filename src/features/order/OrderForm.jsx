@@ -478,7 +478,7 @@ const AddOrder = ({
             hideRemove
           />
 
-          <div className="flex flex-col gap-4 mt-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-4 my-4 md:flex-row md:items-center md:justify-between">
             {/* ADD PRODUCT BUTTON */}
             <div className="w-full md:w-auto">
               <button

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { FiTrash2, FiPlus } from "react-icons/fi";
 import ConfirmModal from "./common/ConfirmModal";
 import { FiSearch, FiMapPin, FiX, FiChevronDown } from "react-icons/fi";
@@ -244,9 +244,9 @@ const CustomerList = ({
             </div>
           </div>
           {/* 🔥 SCROLLABLE CONTENT */}
-          <div className="flex-1 overflow-y-auto">
+         <div className="flex-1 overflow-visible">
             {/* DESKTOP TABLE */}
-            <div className="hidden h-auto md:block overflow-x-auto bg">
+        <div className="hidden h-auto md:block overflow-visible">
               <table className="w-full table-fixed text-lg">
                 <thead className="bg-black text-white sticky top-0 z-[40]">
                   <tr>
@@ -283,7 +283,7 @@ const CustomerList = ({
                     return (
                       <tr
                         key={customer._id || customer.id}
-                        className="hover:bg-gray-50 h-[60px] "
+                        className="border-t text-sm border-gray-200 hover:bg-gray-50"
                       >
                         <td className="text-center">{customer.name}</td>
 
@@ -297,47 +297,44 @@ const CustomerList = ({
                           </span>
                         </td>
                         {/* worklog */}
-                        <td className="px-4 py-2 max-w-[280px]">
-                          <CellWithTooltip value={customer.WorkLog} />
-                        </td>
+    <td
+  className="px-4 py-2 align-middle"
+  style={{
+    width: "280px",
+    minWidth: "280px",
+    maxWidth: "280px",
+  }}
+>
+  <CellWithTooltip value={customer.WorkLog} />
+</td>
                         {/* actions */}
-                        <td className="flex items-center justify-center pt-4">
-                          <div className="flex text-center gap-4">
-                            <button
-                              onClick={() => onViewOrders(customer)}
-                              className="cursor-pointer"
-                            >
-                              <FiEye size={22} />
-                            </button>
-                            <button
-                              className="text-lg   "
-                              onClick={() => onViewOrders(customer)}
-                            >
-                              <i className="fas fa-edit  cursor-pointer"></i>
-                            </button>
-                            {/* <button
-                              className="px-3 py-1.5 text-sm bg-gray-900 text-white rounded-md cursor-pointer hover:bg-black transition"
-                              onClick={() => onViewOrders(customer)}
-                            >
-                              View Orders
-                            </button> */}
-                            <button
-                              className=" rounded-md text-xl cursor-pointer hover:bg-gray-50  transition"
-                              onClick={() => {
-                                setCustomerToDelete(customer);
-                                setShowDeleteModal(true);
-                              }}
-                            >
-                              <FiTrash2 size={20} />
-                            </button>
-                            {/* <button
-                        className="p-2 rounded-md cursor-pointer hover:bg-gray-50 text-gray-500 transition"
-                        onClick={() => onDeleteCustomer(customer.id)}
-                      >
-                        <FiTrash2 size={16} />
-                      </button> */}
-                          </div>
-                        </td>
+                       <td className="text-center align-middle">
+  <div className="flex items-center justify-center gap-4 py-3">
+    <button
+      onClick={() => onViewOrders(customer)}
+      className="cursor-pointer"
+    >
+      <FiEye size={22} />
+    </button>
+
+    <button
+      className="text-lg"
+      onClick={() => onViewOrders(customer)}
+    >
+      <i className="fas fa-edit cursor-pointer"></i>
+    </button>
+
+    <button
+      className="rounded-md text-xl cursor-pointer hover:bg-gray-50 transition"
+      onClick={() => {
+        setCustomerToDelete(customer);
+        setShowDeleteModal(true);
+      }}
+    >
+      <FiTrash2 size={20} />
+    </button>
+  </div>
+</td>
                       </tr>
                     );
                   })}

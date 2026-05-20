@@ -150,14 +150,14 @@ const OrderList = ({
       {/* =========================
     🔹 DESKTOP TABLE VIEW
 ========================= */}
-      <div className="hidden md:block overflow-x-auto ">
-        <table className="w-full table-fixed text-lg">
+      <div className="hidden md:block lg:block overflow-x-auto">
+        <table className="min-w-[1100px] w-full table-fixed text-lg mb-1">
           <thead className="bg-black text-white sticky top-0 z-[40]">
             <tr>
-              <th className="px-4 border py-3  text-center font-semibold text-white  whitespace-nowrap  bg-black">
+              <th className="sticky left-0 z-[60] bg-black px-4 border py-3 text-center font-semibold text-white whitespace-nowrap min-w-[120px]">
                 Order No
               </th>
-              <th className="px-4 border py-3  text-center font-semibold text-white  whitespace-nowrap  bg-black">
+             <th className="sticky left-[120px] z-[60] bg-black px-4 border py-3 text-center font-semibold text-white whitespace-nowrap min-w-[180px]">
                 Customer
               </th>
               <th className="px-4 border py-3  text-center font-semibold text-white  whitespace-nowrap  bg-black">
@@ -178,7 +178,7 @@ const OrderList = ({
               <th className="px-4 border py-3 text-center font-semibold text-white whitespace-nowrap bg-black">
                 WorkLog
               </th>
-              <th className="px-4 py-3 font-bold text-lg sticky right-0 z-[120] bg-black shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.1)]">
+             <th className="sticky right-0 z-[120] bg-black px-4 py-3 text-center font-bold text-lg whitespace-nowrap">
                 Actions
               </th>
             </tr>
@@ -186,8 +186,17 @@ const OrderList = ({
           <tbody>
             {paginatedOrders.map((order) => (
               <tr key={order._id} className="border-t text-sm border-gray-200">
-                <td className="text-center ">{order.orderNo}</td>
-                <td className="text-center">{order.customer?.name || "N/A"}</td>
+                <td className="sticky bg-gray-100 lg:bg-white left-0 z-40  text-center min-w-[120px] ">
+                  {order.orderNo}
+                </td>
+       <td className="sticky bg-gray-100 lg:bg-white left-[120px] z-40 text-center min-w-[180px]">
+  <span
+    className="block truncate"
+    title={order.customer?.name || "N/A"}
+  >
+    {order.customer?.name || "N/A"}
+  </span>
+</td>
                 <td className="text-center">
                   {" "}
                   {formatDateTime(order.orderDate)}
@@ -199,26 +208,22 @@ const OrderList = ({
                 <td className="text-center">
                   <span
                     className={`px-3 py-1 rounded-full text-xs lg:text-[14px] font-semibold border
-    ${
-      order.orderStatus === "Cancelled"
-        ? "text-red-600 bg-red-50 border-red-200"
-        : ""
-    }
-    ${
-      order.orderStatus === "Pending"
-        ? "text-yellow-700 bg-yellow-50 border-yellow-200"
-        : ""
-    }
-    ${
-      order.orderStatus === "Completed"
-        ? "text-green-600 bg-green-50 border-green-200"
-        : ""
-    }
-    ${
-      order.orderStatus === "Processing"
-        ? "text-blue-600 bg-blue-50 border-blue-200"
-        : ""
-    }
+    ${order.orderStatus === "Cancelled"
+                        ? "text-red-600 bg-red-50 border-red-200"
+                        : ""
+                      }
+    ${order.orderStatus === "Pending"
+                        ? "text-yellow-700 bg-yellow-50 border-yellow-200"
+                        : ""
+                      }
+    ${order.orderStatus === "Completed"
+                        ? "text-green-600 bg-green-50 border-green-200"
+                        : ""
+                      }
+    ${order.orderStatus === "Processing"
+                        ? "text-blue-600 bg-blue-50 border-blue-200"
+                        : ""
+                      }
   `}
                   >
                     {order.orderStatus}
@@ -264,14 +269,21 @@ const OrderList = ({
                   </div>
                 </td>
                 {/* worklog */}
-                <td className="px-4 py-2 max-w-[280px]">
-                  <CellWithTooltip value={order.WorkLog} />
-                </td>
+                <td
+  className="px-4 py-2"
+  style={{
+    width: "280px",
+    minWidth: "280px",
+    maxWidth: "280px",
+  }}
+>
+  <CellWithTooltip value={order.WorkLog} />
+</td>
                 {/* actions */}
-                <td className="p-3">
+               <td className="sticky right-0 z-50 bg-gray-100  lg:bg-white text-center min-w-[160px]  shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">
                   <div className="flex gap-2  ] rounded-md px-2 py-1 cursor-pointer">
                     <button
-                      className="px-3 py-1.5 text-sm bg-gray-900 text-white rounded-md cursor-pointer hover:bg-black transition"
+                      className="px-3 py-1.5 text-sm bg-gray-900 text-white  rounded-md cursor-pointer hover:bg-black transition"
                       onClick={() => {
                         const customer = customers.find(
                           (c) =>
@@ -292,19 +304,19 @@ const OrderList = ({
                 </td>
               </tr>
             ))}
-    
+
           </tbody>
         </table>
-                {filteredOrders.length === 0 && (
-              
-                  <div className="flex flex-col items-center justify-center">
-                    <img
-                      src="https://itcresorts.com/img/other/NoRecordFound.png"
-                      alt="No Orders Found"
-                      // className="w-52 sm:w-64 md:w-72 object-contain"
-                    />
-                  </div>
-            )}
+        {filteredOrders.length === 0 && (
+
+          <div className="flex flex-col items-center justify-center">
+            <img
+              src="https://itcresorts.com/img/other/NoRecordFound.png"
+              alt="No Orders Found"
+            // className="w-52 sm:w-64 md:w-72 object-contain"
+            />
+          </div>
+        )}
       </div>
       {/* =========================
     🔹 MOBILE CARD VIEW

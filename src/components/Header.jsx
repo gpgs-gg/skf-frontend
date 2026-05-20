@@ -309,12 +309,12 @@ const Header = () => {
                   onClick={() => setMenuOpen(false)}
                   to="/login"
                   className={` py-1 text-md ${
-                    isWhiteBg ? "text-black" : "text-white"
+                    isWhiteBg ? "text-gray-700" : "text-gray-700"
                   }`}
                 >
                   <span
                     className={`text-xl cursor-pointer ${
-                      isWhiteBg ? "text-black" : "text-white"
+                      isWhiteBg ? "text-gray-700" : "text-gray-700"
                     } pr-2`}
                   ></span>{" "}
                   My Account

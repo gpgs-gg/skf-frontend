@@ -29,7 +29,8 @@
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { queryClient } from "../../../../src/queryClient.js";
+import { queryClient as appQueryClient } from "../../../../src/queryClient.js";
+import { CloudCog } from "lucide-react";
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL || "http://localhost:5000/api",
   withCredentials: true, // IMPORTANT for refresh token cookies
@@ -88,149 +89,177 @@ const apiClient = axios.create({
  *
  * =========================================================
  */
+let isRefreshing = false;
+let refreshPromise = null;
+
 apiClient.interceptors.response.use(
-  /**
-   * =========================================================
-   * SUCCESS HANDLER
-   * =========================================================
-   * If request succeeds normally,
-   * simply return the response.
-   * =========================================================
-   */
   (response) => response,
-  /**
-   * =========================================================
-   * ERROR HANDLER
-   * =========================================================
-   * Runs whenever any API request fails.
-   * Used mainly for handling expired tokens.
-   * =========================================================
-   */
+
   async (error) => {
-    /**
-     * Stores the original failed request.
-     *
-     * Example:
-     * GET /orders
-     *
-     * We save it so we can retry it later
-     * after refreshing the access token.
-     */
     const originalRequest = error.config;
 
-    /**
-     * Check whether the failed request
-     * itself was the refresh-token API.
-     *
-     * Important:
-     * If refresh-token API also returns 401,
-     * we should NOT retry again,
-     * otherwise infinite loop will happen.
-     */
-
-    const isRefreshRequest = originalRequest.url?.includes(
+    const excludedUrls = [
+      "/auth/login",
+      "/auth/register",
       "/auth/refresh-token",
+      "/auth/me",
+    ];
+
+    const shouldSkipRefresh = excludedUrls.some((url) =>
+      originalRequest.url?.includes(url)
     );
-    /**
-     * Conditions for auto refresh:
-     *
-     * 1. Server returned 401 Unauthorized
-     * 2. Request has NOT already been retried
-     * 3. Failed request is NOT refresh-token API
-     */
+
+    // Skip if already on login page
+    if (window.location.pathname === "/login") {
+      return Promise.reject(error);
+    }
+
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !isRefreshRequest
+      !shouldSkipRefresh
     ) {
-      /**
-       * Mark request as retried
-       * to prevent infinite retry loops.
-       */
       originalRequest._retry = true;
 
       try {
-        /**
-         * =====================================================
-         * STEP 1:
-         * Request new access token using refresh token
-         * =====================================================
-         *
-         * Refresh token is usually stored in:
-         * - HTTP-only secure cookie
-         *
-         * Backend validates refresh token and:
-         * - generates new access token
-         * - sends updated cookie/token
-         */
-        await apiClient.post("/auth/refresh-token");
-        /**
-         * =====================================================
-         * STEP 2:
-         * Retry the original failed request
-         * =====================================================
-         *
-         * Example:
-         * Original failed request:
-         * GET /orders
-         *
-         * After refresh succeeds:
-         * GET /orders again
-         */
+        if (!isRefreshing) {
+          isRefreshing = true;
+
+          refreshPromise = apiClient
+            .post("/auth/refresh-token")
+            .finally(() => {
+              isRefreshing = false;
+            });
+        }
+
+        await refreshPromise;
+
         return apiClient(originalRequest);
       } catch (refreshError) {
-        /**
-         * =====================================================
-         * REFRESH TOKEN FAILED
-         * =====================================================
-         *
-         * Possible reasons:
-         * - Refresh token expired
-         * - User logged out
-         * - Invalid refresh token
-         * - Cookie missing
-         *
-         * In this case:
-         * - Clear React Query cache
-         * - Optionally redirect user to login page
-         */
-        queryClient.clear();
-        /**
-         * Optional:
-         * Redirect user to login screen
-         */
-        // window.location.href = "/login";
+        localStorage.clear();
+        sessionStorage.clear();
 
-        /**
-         * Reject promise so calling component
-         * can handle the error properly.
-         */
+        // remove cookies manually if needed
+        document.cookie =
+          "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie =
+          "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        // hard redirect
+        window.location.replace("/login");
 
         return Promise.reject(refreshError);
       }
     }
 
-    /**
-     * =========================================================
-     * NORMAL ERROR HANDLING
-     * =========================================================
-     *
-     * If error is NOT related to token expiry,
-     * simply forward the error.
-     * =========================================================
-     */
-    const message =
-      error?.response?.data?.message ||
-      error?.message ||
-      "Something went wrong";
+    // direct logout if /auth/me fails
+    if (
+      error.response?.status === 401 &&
+      originalRequest.url?.includes("/auth/me")
+    ) {
+      localStorage.clear();
+      sessionStorage.clear();
 
-    if (!error.config?.silentError) {
-      toast.dismiss();
-      toast.error(message);
+      window.location.replace("/login");
     }
+
     return Promise.reject(error);
-  },
+  }
 );
+// apiClient.interceptors.response.use(
+//   (response) => response,
+
+//   async (error) => {
+//     const originalRequest = error.config;
+
+//     const excludedUrls = [
+//       "/auth/login",
+//       "/auth/register",
+//       "/auth/refresh-token",
+//       "/auth/me",
+//     ];
+
+//     const shouldSkipRefresh = excludedUrls.some((url) =>
+//       originalRequest.url?.includes(url)
+//     );
+
+//     if (
+//       error.response?.status === 401 &&
+//       !originalRequest._retry &&
+//       !shouldSkipRefresh
+//     ) {
+//       originalRequest._retry = true;
+
+//       try {
+//         await apiClient.post("/auth/refresh-token");
+
+//         return apiClient(originalRequest);
+//       } catch (refreshError) {
+//         await apiClient.post("/auth/logout").catch(() => { });
+
+//         appQueryClient.setQueryData(["currentUser"], null);
+
+//         localStorage.clear();
+//         sessionStorage.clear();
+
+//         window.location.href = "/login";
+//         // appQueryClient.clear();
+
+//         // localStorage.clear();
+//         // sessionStorage.clear();
+
+//         // window.location.href = "/login";
+
+//         return Promise.reject(refreshError);
+//       }
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
+// apiClient.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     const originalRequest = error.config;
+
+//     const isRefreshRequest =
+//       originalRequest.url?.includes("/auth/refresh-token");
+
+//     if (
+//       error.response?.status === 401 &&
+//       !originalRequest._retry &&
+//       !isRefreshRequest
+//     ) {
+//       originalRequest._retry = true;
+
+//       try {
+//         if (!isRefreshing) {
+//           isRefreshing = true;
+
+//           refreshPromise = apiClient
+//             .post("/auth/refresh-token")
+//             .finally(() => {
+//               isRefreshing = false;
+//             });
+//         }
+
+//         await refreshPromise;
+
+//         return apiClient(originalRequest);
+//       } catch (refreshError) {
+//         appQueryClient.clear();
+//         localStorage.clear();
+//         sessionStorage.clear();
+//         console.log('refresh token expired', refreshError)
+//         // window.location.href = "/login";
+
+//         return Promise.reject(refreshError);
+//       }
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
 /* =========================================================
    REGISTER API
 ========================================================= */
@@ -362,14 +391,15 @@ const getCurrentUser = async () => {
 
 export const useCurrentUser = () => {
   return useQuery({
-    queryKey: ["currentUser"], // ✅ FIXED (was "current-user")
+    queryKey: ["currentUser"],
     queryFn: getCurrentUser,
     retry: false,
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 };
-
 /* =========================================================
    EXPORT API CLIENT
 ========================================================= */
