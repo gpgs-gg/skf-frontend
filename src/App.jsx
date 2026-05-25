@@ -44,6 +44,8 @@ const App = () => {
           {/* ORDERS */}
           <Route path="/skf-action/orders" element={<ShowroomCRM />} />
         </Route>
+        {/* USERS */}
+        <Route path="/skf-action/users" element={<UsersPage />} />
         {/* PRODUCTS */}
         <Route path="/skf-action/products" element={<CategoryManager />} />
       </Routes>
