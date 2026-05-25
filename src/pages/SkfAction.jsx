@@ -18,6 +18,20 @@ const SkfAction = () => {
   return (
     <section className="py-10 lg:py-20 px-4 md:px-6 flex items-center justify-center">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-5xl">
+        {/* USERS */}
+        <Link to="/skf-action/users">
+          <div className={cardClasses}>
+            <div className={`${iconClasses} bg-green-100 text-purple-600`}>
+              <Users size={28} />
+            </div>
+
+            <h3 className={titleClasses}>Users</h3>
+
+            <button className={`${btnClasses} bg-purple-600`}>
+              View Users
+            </button>
+          </div>
+        </Link>
         {/* ORDERS */}
         <Link to="/skf-action/orders">
           <div className={cardClasses}>
@@ -30,21 +44,9 @@ const SkfAction = () => {
             </button>
           </div>
         </Link>
-        {/* CUSTOMERS */}
-        {/* <Link to="/skf-action/customers">
-          <div className={cardClasses}>
-            <div className={`${iconClasses} bg-blue-100 text-blue-600`}>
-              <Users size={28} />
-            </div>
-            <h3 className={titleClasses}>Customers</h3>
-            <button className={`${btnClasses} bg-blue-600`}>
-              View Customers
-            </button>
-          </div>
-        </Link> */}
 
         {/* PRODUCTS */}
-        {/* <Link to="/skf-action/products">
+        <Link to="/skf-action/products">
           <div className={cardClasses}>
             <div className={`${iconClasses} bg-purple-100 text-purple-600`}>
               <Package size={28} />
@@ -54,7 +56,7 @@ const SkfAction = () => {
               View Products
             </button>
           </div>
-        </Link> */}
+        </Link>
 
         {/* LEADS */}
         {/* <Link to="/skf-action/leads">

@@ -27,7 +27,7 @@
  * =========================================================
  */
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { FiArrowLeft, FiSearch, FiX } from "react-icons/fi";
 import AddOrder from "./OrderForm";
 import AddCustomer from "./CustomerForm";
@@ -37,6 +37,7 @@ import { toast } from "react-toastify";
 import { FiEye } from "react-icons/fi";
 import FIELD_CONFIG from "../../constants/inputFieldConfig";
 import ProductDetailsModal from "./common/ProductDetailsModal";
+import { getStatusStyle } from "../../constants/Config";
 
 /**
  * =========================================================
@@ -56,7 +57,8 @@ const CustomerSnapshot = ({
   filteredOrders,
   selectedCustomer,
   customerOrders,
-  onBack,
+  handleBackAction,
+  products,
   searchTerm,
   setSearchTerm,
   closeAllPanels,
@@ -88,8 +90,9 @@ const CustomerSnapshot = ({
         {/* DESKTOP TITLE */}
         <div className="hidden lg:flex pb-2 justify-center flex-1">
           <h2
-            className={`text-xl font-medium  ${isEditingActive() ? "block" : "hidden"
-              }`}
+            className={`text-xl font-medium  ${
+              isEditingActive() ? "block" : "hidden"
+            }`}
           >
             Customer and Order Details
           </h2>
@@ -98,7 +101,7 @@ const CustomerSnapshot = ({
           {/* LEFT SIDE */}
           <div className="flex items-center justify-between gap-3">
             <button
-              onClick={onBack}
+              onClick={handleBackAction}
               className="flex items-center gap-2 text-sm px-3 py-2 bg-gray-900 hover:bg-black text-white rounded-lg cursor-pointer shrink-0"
             >
               <FiArrowLeft />
@@ -114,8 +117,9 @@ const CustomerSnapshot = ({
           {/* DESKTOP TITLE */}
           <div className="hidden lg:flex justify-center flex-1">
             <h2
-              className={`text-xl font-medium  ${isEditingActive() ? "hidden" : "block"
-                }`}
+              className={`text-xl font-medium  ${
+                isEditingActive() ? "hidden" : "block"
+              }`}
             >
               Customer and Order Details
             </h2>
@@ -149,7 +153,7 @@ const CustomerSnapshot = ({
         </div>
       </div>
       {/* all customers details */}
-      <div className="flex-1 min-h-0   bg-black p-4 rounded-xl ">
+      <div className="flex-1 min-h-0   bg-black p-4  ">
         <div className=" lg:px-3   ">
           <div className="flex justify-between gap-3 flex-wrap items-start h-full ">
             <div>
@@ -184,8 +188,9 @@ const CustomerSnapshot = ({
             </div>
 
             <div
-              className={`flex justify-between gap-3 mb-1 md:mb-0  mt-0   ${isEditingActive() ? "" : "mt-4"
-                }`}
+              className={`flex justify-between gap-3 mb-1 md:mb-0  mt-0   ${
+                isEditingActive() ? "" : "mt-4"
+              }`}
             >
               <div>
                 <button
@@ -219,13 +224,15 @@ const CustomerSnapshot = ({
           <div key={order._id} className="md::border rounded-2xl p-4 ">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:items-center">
               <div className="flex items-start justify-between gap-3 w-full sm:w-auto">
-                <div className="font-extrabold text-base sm:text-xl break-all">
-                  {order.orderNo}
+                <div className="font-extrabold bg-black p-2 rounded-xl text-white text-base sm:text-xl break-all">
+                  <span>Order Code : </span> {order.orderNo}
                 </div>
 
                 {/* MOBILE STATUS */}
                 <div
-                  className={`sm:hidden  flex px-3 lg:py-1 py-1 border rounded-full text-xs lg:text-[16px] `}
+                  className={`sm:hidden flex px-3 py-1 border rounded-full text-xs  ${getStatusStyle(
+                    order.orderStatus,
+                  )}`}
                 >
                   {order.orderStatus}
                 </div>
@@ -238,10 +245,10 @@ const CustomerSnapshot = ({
                         closeAllPanels(); // ✅ reset everything first
                         setEditingOrder(order);
                       }}
-                    // onClick={() => {
-                    //   setEditingOrder(order);
-                    //   setEditingProductState(null);
-                    // }}
+                      // onClick={() => {
+                      //   setEditingOrder(order);
+                      //   setEditingProductState(null);
+                      // }}
                     >
                       <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
                     </button>
@@ -255,9 +262,9 @@ const CustomerSnapshot = ({
                 </div>
               </div>
               <div
-                className={`px-3 hidden md:flex lg:py-1 py-2 rounded-full text-xs lg:text-[16px]   border 
-
-  `}
+                className={`px-3 hidden md:flex py-2 rounded-full text-xs  border ${getStatusStyle(
+                  order.orderStatus,
+                )}`}
               >
                 {order.orderStatus}
               </div>
@@ -268,10 +275,10 @@ const CustomerSnapshot = ({
                     closeAllPanels(); // ✅ reset everything first
                     setEditingOrder(order);
                   }}
-                // onClick={() => {
-                //   setEditingOrder(order);
-                //   setEditingProductState(null);
-                // }}
+                  // onClick={() => {
+                  //   setEditingOrder(order);
+                  //   setEditingProductState(null);
+                  // }}
                 >
                   <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
                 </button>
@@ -332,6 +339,9 @@ const CustomerSnapshot = ({
                 >
                   <div className="flex flex-col sm:flex-row justify-between gap-3 sm:items-center">
                     <p className="font-semibold text-base sm:text-[18px] break-words">
+                      <span className="bg-black rounded-full mr-2 text-white py-2 px-3">
+                        {idx + 1}
+                      </span>
                       {product.category?.charAt(0).toUpperCase() +
                         product.category?.slice(1)}
 
@@ -349,15 +359,9 @@ const CustomerSnapshot = ({
                     <div>
                       {/* Order Status */}
                       <span
-                        className={`px-3 py-1 rounded-full text-xs lg:text-[16px]   border
-      
-    `}
-                      //                     className={`px-2 py-1 rounded-full text-xs font-semibold border
-                      //   ${product?.orderStatus === "Cancelled" ? " text-red-700 " : ""}
-                      //   ${product?.orderStatus === "Pending" ? "text-yellow-700 " : ""}
-                      //   ${product?.orderStatus === "Completed" ? " text-green-700 " : ""}
-                      //   ${product?.orderStatus === "Processing" ? " text-blue-700 " : ""}
-                      // `}
+                        className={`px-3 py-1 rounded-full text-xs  border ${getStatusStyle(
+                          product?.orderStatus,
+                        )}`}
                       >
                         {product?.orderStatus}
                       </span>
@@ -391,9 +395,37 @@ const CustomerSnapshot = ({
                       </button>
                     </div>
                   </div>
-                  <div  className={`  ${isEditingActive() ? "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1  lg:grid-cols-2 gap-x-4 gap-y-2 text-gray-900" : "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-gray-900"
-              }`}>
-                    {Object.entries(product.attributes || {}).map(
+                  <div
+                    className={`  ${
+                      isEditingActive()
+                        ? "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1  lg:grid-cols-2 gap-x-4 gap-y-2 text-gray-900"
+                        : "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-gray-900"
+                    }`}
+                  >
+                    {Object.keys(product.attributes || {}).length > 0 && (
+                      <div
+                        className={`${
+                          isEditingActive()
+                            ? "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-2 text-gray-900"
+                            : "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-gray-900"
+                        }`}
+                      >
+                        {Object.entries(product.attributes || {}).map(
+                          ([key, value]) => (
+                            <div key={key} className="flex gap-1">
+                              <span className="text-gray-600 whitespace-nowrap">
+                                {FIELD_CONFIG[key]?.label || key}:
+                              </span>
+
+                              <span className="font-medium text-gray-800 break-words">
+                                {value || "-"}
+                              </span>
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    )}
+                    {/* {Object.entries(product.attributes || {}).map(
                       ([key, value]) => (
                         <div key={key} className="flex gap-1">
                           <span className="text-gray-600 whitespace-nowrap">
@@ -404,7 +436,7 @@ const CustomerSnapshot = ({
                           </span>
                         </div>
                       ),
-                    )}
+                    )} */}
                   </div>
                 </div>
               ))}
@@ -414,6 +446,7 @@ const CustomerSnapshot = ({
     </div>
   );
 };
+
 const OrderDetailsPage = ({
   customer,
   orders,
@@ -450,6 +483,11 @@ const OrderDetailsPage = ({
 
   const [showProductModal, setShowProductModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const [products, setProducts] = useState([]);
+  // console.log(11111111, products.length);
+  const [showBackConfirmModal, setShowBackConfirmModal] = useState(false);
+
   /**
    * Closes all active editing panels/forms
    * Used before opening another panel to avoid UI conflicts
@@ -461,13 +499,34 @@ const OrderDetailsPage = ({
     setEditingProductOrderId(null);
     setShowAddOrderForm(false);
   };
+  const hasUnsavedProducts = () => {
+    return (products?.length || 0) > 0;
+  };
+  const handleBackAction = () => {
+    if (hasUnsavedProducts()) {
+      setShowBackConfirmModal(true);
+      return;
+    }
+
+    onBack();
+  };
+
+  const confirmBack = () => {
+    setShowBackConfirmModal(false);
+    onBack();
+  };
+
+  const cancelBack = () => {
+    setShowBackConfirmModal(false);
+  };
+
   /**
    * Handles newly created order
    * Adds metadata and updates parent state
    */
   const handleOrderCreated = (newOrder) => {
     setShowAddOrderForm(false);
-
+    setProducts([]);
     const completeOrder = {
       ...newOrder,
       orderNo: newOrder.orderNo || `ORD-${Date.now()}`,
@@ -479,6 +538,8 @@ const OrderDetailsPage = ({
       onAddNewOrder(completeOrder);
     }
   };
+
+  const addOrderRef = useRef(null);
   /**
    * Opens delete confirmation modal for selected order
    */
@@ -546,6 +607,7 @@ const OrderDetailsPage = ({
 
     // ✅ CLOSE FORM ONLY AFTER SAVE
     setEditingOrder(null);
+    setProducts([]);
   };
   useEffect(() => {
     const handleEsc = (e) => {
@@ -602,6 +664,11 @@ const OrderDetailsPage = ({
   };
 
   const cancelProductEdit = () => {
+    if (hasUnsavedProducts()) {
+      setShowBackConfirmModal(true);
+      return;
+    }
+
     setEditingProductState(null);
     setEditingProductOrderId(null);
   };
@@ -692,14 +759,17 @@ ${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
   flex-col min-h-0`}
         >
           <div
-            className={`transition-opacity duration-300 flex-1   ${isEditingActive() ? "opacity-100" : "opacity-100"
-              }`}
+            className={`transition-opacity duration-300 flex-1   ${
+              isEditingActive() ? "opacity-100" : "opacity-100"
+            }`}
           >
             <CustomerSnapshot
               filteredOrders={filteredOrders}
               selectedCustomer={selectedCustomer}
               customerOrders={customerOrders}
+              handleBackAction={handleBackAction}
               onBack={onBack}
+              products={products}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               closeAllPanels={closeAllPanels}
@@ -719,10 +789,11 @@ ${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
         {/* RIGHT SECTION → Dynamic forms/edit panels */}
         <div
           className={`transition-all duration-500 ease-in-out  lg:h-[calc(90vh-2rem)]  transform  min-h-0
-  ${isEditingActive()
-              ? "w-full lg:w-[60%] lg:translate-x-0 opacity-100"
-              : "hidden lg:block lg:w-0 lg:translate-x-10 opacity-0"
-            } 
+  ${
+    isEditingActive()
+      ? "w-full lg:w-[60%] lg:translate-x-0 opacity-100"
+      : "hidden lg:block lg:w-0 lg:translate-x-10 opacity-0"
+  } 
   w-full  mt-4 lg:mt-0`}
         >
           <div className="h-full  rounded-2xl shadow-sm md:border md:border-gray-100 animate-slideInRight  flex flex-col  lg:overflow-y-auto">
@@ -730,7 +801,18 @@ ${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
               {isEditingActive() && (
                 <div className="sticky top-0 bg-white  z-10 flex justify-end px-3 lg:pt-1 pt-3">
                   <button
-                    onClick={closeAllPanels}
+                    onClick={() => {
+                      if (hasUnsavedProducts()) {
+                        setShowBackConfirmModal(true);
+                        return;
+                      }
+
+                      if (addOrderRef.current?.handleClose) {
+                        addOrderRef.current.handleClose();
+                      } else {
+                        closeAllPanels();
+                      }
+                    }}
                     className=" rounded-full hover:bg-gray-100 transition cursor-pointer"
                   >
                     <FiX size={23} />
@@ -763,10 +845,11 @@ ${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
                 />
               ) : editingOrder ? (
                 <AddOrder
-                  // Force form re-render when editing different order
                   key={editingOrder?._id}
                   order={{ ...editingOrder, products: [] }}
                   customers={customers}
+                  setProducts={setProducts}
+                  products={products}
                   selectedCustomerId={
                     selectedCustomer._id || selectedCustomer._id
                   }
@@ -820,6 +903,8 @@ ${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
               ) : showAddOrderForm ? (
                 <AddOrder
                   key="create-order"
+                  products={products}
+                  setProducts={setProducts}
                   selectedCustomerId={selectedCustomer._id}
                   customers={customers}
                   onSave={handleOrderCreated}
@@ -866,13 +951,50 @@ ${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
           setProductOrderId(null);
         }}
       />
+
+      <ConfirmModal
+        isOpen={showBackConfirmModal}
+        title="Unsaved Products"
+        message="You have products in this order. If you go back now, changes may be lost. Do you want to continue?"
+        onConfirm={confirmBack}
+        onCancel={cancelBack}
+      />
     </div>
   );
 };
 
 export default OrderDetailsPage;
 
-// import React, { useState, useEffect, useMemo } from "react";
+// /**
+//  * =========================================================
+//  * OrderDetailsPage.jsx
+//  * =========================================================
+//  * Handles complete customer order management workflow:
+//  *
+//  * Features:
+//  * - View customer order history
+//  * - Search/filter customer orders
+//  * - Edit customer details
+//  * - Create new orders
+//  * - Edit existing orders
+//  * - Edit individual products inside orders
+//  * - Delete orders/products with confirmation
+//  * - Product detail modal
+//  * - Responsive split-screen layout
+//  *
+//  * Architecture:
+//  * - Left Panel  → Customer + Orders Snapshot
+//  * - Right Panel → Dynamic Edit/Create Forms
+//  *
+//  * Optimizations:
+//  * - useMemo for filtered order calculations
+//  * - Debounced search input
+//  * - Centralized panel state management
+
+//  * =========================================================
+//  */
+
+// import React, { useState, useEffect, useMemo, useRef } from "react";
 // import { FiArrowLeft, FiSearch, FiX } from "react-icons/fi";
 // import AddOrder from "./OrderForm";
 // import AddCustomer from "./CustomerForm";
@@ -882,11 +1004,28 @@ export default OrderDetailsPage;
 // import { FiEye } from "react-icons/fi";
 // import FIELD_CONFIG from "../../constants/inputFieldConfig";
 // import ProductDetailsModal from "./common/ProductDetailsModal";
+// import { emptyProduct, migrateProductToNewFormat } from "./orderUtils";
+
+// /**
+//  * =========================================================
+//  * CustomerSnapshot Component
+//  * =========================================================
+//  * Displays:
+//  * - Customer profile details
+//  * - Order summary cards
+//  * - Product listing for each order
+//  * - Edit/Delete actions
+//  *
+//  * This component is purely presentational and receives
+//  * all state/actions from parent component.
+//  * =========================================================
+//  */
 // const CustomerSnapshot = ({
 //   filteredOrders,
 //   selectedCustomer,
 //   customerOrders,
-//   onBack,
+//   handleBackAction,
+//   products,
 //   searchTerm,
 //   setSearchTerm,
 //   closeAllPanels,
@@ -929,7 +1068,7 @@ export default OrderDetailsPage;
 //           {/* LEFT SIDE */}
 //           <div className="flex items-center justify-between gap-3">
 //             <button
-//               onClick={onBack}
+//               onClick={handleBackAction}
 //               className="flex items-center gap-2 text-sm px-3 py-2 bg-gray-900 hover:bg-black text-white rounded-lg cursor-pointer shrink-0"
 //             >
 //               <FiArrowLeft />
@@ -981,7 +1120,7 @@ export default OrderDetailsPage;
 //         </div>
 //       </div>
 //       {/* all customers details */}
-//       <div className="flex-1 min-h-0 px-5 pb-1  bg-black ">
+//       <div className="flex-1 min-h-0   bg-black p-4 rounded-xl ">
 //         <div className=" lg:px-3   ">
 //           <div className="flex justify-between gap-3 flex-wrap items-start h-full ">
 //             <div>
@@ -1047,7 +1186,7 @@ export default OrderDetailsPage;
 //         </div>
 //       </div>
 //       {/* all orders */}
-//       <div className="lg:flex-1 lg:overflow-y-auto min-h-0 bg-[#fbfbfb] lg:h-[350px] px-3 sm:px-5 pb-5 space-y-3 pt-2">
+//       <div className="lg:flex-1 lg:overflow-y-auto  min-h-0 bg-[#fbfbfb] lg:h-[550px] px-3 sm:px-5 pb-5  space-y-3 pt-2">
 //         {filteredOrders.map((order) => (
 //           <div key={order._id} className="md::border rounded-2xl p-4 ">
 //             <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:items-center">
@@ -1119,10 +1258,10 @@ export default OrderDetailsPage;
 
 //             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
 //               <div className="bg-white rounded-xl p-3 border border-gray-200">
-//                 <small className="text-gray-800  lg:text-[17px]   block">
+//                 <small className="text-gray-800  lg:text-[15px]   block">
 //                   Total
 //                 </small>
-//                 <strong className="text-base sm:text-lg">
+//                 <strong className="text-base sm:text-md">
 //                   ₹
 //                   {parseInt(
 //                     order.totalAmount || order.total || 0,
@@ -1130,26 +1269,26 @@ export default OrderDetailsPage;
 //                 </strong>
 //               </div>
 //               <div className="bg-white rounded-xl p-3 border border-gray-200">
-//                 <small className="text-gray-800  lg:text-[17px]   block">
+//                 <small className="text-gray-800  lg:text-[15px]   block">
 //                   Received Amount
 //                 </small>
-//                 <strong className="text-base sm:text-lg">
+//                 <strong className="text-base sm:text-md">
 //                   ₹{parseInt(order.receivedAmount || 0).toLocaleString()}
 //                 </strong>
 //               </div>
 //               <div className="bg-white rounded-xl p-3 border border-gray-200">
-//                 <small className="text-gray-800  lg:text-[17px]  block">
+//                 <small className="text-gray-800  lg:text-[15px]  block">
 //                   Delivery
 //                 </small>
-//                 <strong className="text-base sm:text-lg">
+//                 <strong className="text-base sm:text-md">
 //                   {formatDate(order.deliveryDate)}
 //                 </strong>
 //               </div>
 //               <div className="bg-white rounded-xl p-3 border border-gray-200">
-//                 <small className="text-gray-800  lg:text-[17px]  block">
+//                 <small className="text-gray-800  lg:text-[15px]  block">
 //                   Due Amount
 //                 </small>
-//                 <strong className="text-base sm:text-lg">
+//                 <strong className="text-base sm:text-md">
 //                   ₹{parseInt(order.dueAmount || 0).toLocaleString()}
 //                 </strong>
 //               </div>
@@ -1224,7 +1363,13 @@ export default OrderDetailsPage;
 //                       </button>
 //                     </div>
 //                   </div>
-//                   <div className="mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-gray-900">
+//                   <div
+//                     className={`  ${
+//                       isEditingActive()
+//                         ? "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1  lg:grid-cols-2 gap-x-4 gap-y-2 text-gray-900"
+//                         : "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-gray-900"
+//                     }`}
+//                   >
 //                     {Object.entries(product.attributes || {}).map(
 //                       ([key, value]) => (
 //                         <div key={key} className="flex gap-1">
@@ -1246,6 +1391,7 @@ export default OrderDetailsPage;
 //     </div>
 //   );
 // };
+
 // const OrderDetailsPage = ({
 //   customer,
 //   orders,
@@ -1258,21 +1404,39 @@ export default OrderDetailsPage;
 //   onUpdateOrder,
 //   onUpdateProduct,
 // }) => {
+//   // Controls different editing panels/forms
 //   const [showAddOrderForm, setShowAddOrderForm] = useState(false);
-//   const [selectedCustomer, setSelectedCustomer] = useState(customer);
 //   const [editingCustomer, setEditingCustomer] = useState(null);
 //   const [editingOrder, setEditingOrder] = useState(null);
+
+//   const [selectedCustomer, setSelectedCustomer] = useState(customer);
+
+//   // Stores currently editing product + parent order id
 //   const [editingProductState, setEditingProductState] = useState(null); // Track product being edited
 //   const [editingProductOrderId, setEditingProductOrderId] = useState(null); // Track which order contains the product
+
+//   // Delete confirmation states
 //   const [showDeleteModal, setShowDeleteModal] = useState(false);
 //   const [orderToDelete, setOrderToDelete] = useState(null);
 //   const [productToDelete, setProductToDelete] = useState(null);
 //   const [productOrderId, setProductOrderId] = useState(null);
 //   const [showProductDeleteModal, setShowProductDeleteModal] = useState(false);
+
+//   // Search state with debounce optimization
 //   const [searchTerm, setSearchTerm] = useState("");
+//   const [debouncedSearch, setDebouncedSearch] = useState("");
+
 //   const [showProductModal, setShowProductModal] = useState(false);
 //   const [selectedProduct, setSelectedProduct] = useState(null);
-//   const [debouncedSearch, setDebouncedSearch] = useState("");
+
+//   const [products, setProducts] = useState([]);
+//   console.log(11111111, products.length);
+//   const [showBackConfirmModal, setShowBackConfirmModal] = useState(false);
+
+//   /**
+//    * Closes all active editing panels/forms
+//    * Used before opening another panel to avoid UI conflicts
+//    */
 //   const closeAllPanels = () => {
 //     setEditingCustomer(null);
 //     setEditingOrder(null);
@@ -1280,9 +1444,38 @@ export default OrderDetailsPage;
 //     setEditingProductOrderId(null);
 //     setShowAddOrderForm(false);
 //   };
+
+//   const handleBackAction = () => {
+//     // if (isEditingActive()) {
+//     //   closeAllPanels();
+//     //   return;
+//     // }
+
+//     if (products?.length > 0) {
+//       setShowBackConfirmModal(true);
+//       console.log("skjdshkdjfhskjdhf");
+//       return;
+//     }
+
+//     onBack();
+//   };
+
+//   const confirmBack = () => {
+//     setShowBackConfirmModal(false);
+//     onBack();
+//   };
+
+//   const cancelBack = () => {
+//     setShowBackConfirmModal(false);
+//   };
+
+//   /**
+//    * Handles newly created order
+//    * Adds metadata and updates parent state
+//    */
 //   const handleOrderCreated = (newOrder) => {
 //     setShowAddOrderForm(false);
-
+//     setProducts([]);
 //     const completeOrder = {
 //       ...newOrder,
 //       orderNo: newOrder.orderNo || `ORD-${Date.now()}`,
@@ -1295,10 +1488,17 @@ export default OrderDetailsPage;
 //     }
 //   };
 
+//   const addOrderRef = useRef(null);
+//   /**
+//    * Opens delete confirmation modal for selected order
+//    */
 //   const deleteOrder = (orderId) => {
 //     setOrderToDelete(orderId);
 //     setShowDeleteModal(true);
 //   };
+//   /**
+//    * Confirms order deletion and resets modal state
+//    */
 //   const confirmDeleteOrder = () => {
 //     if (onDeleteOrder && orderToDelete) {
 //       onDeleteOrder(orderToDelete);
@@ -1307,11 +1507,18 @@ export default OrderDetailsPage;
 //     setOrderToDelete(null);
 //     setEditingOrder(null);
 //   };
+//   /**
+//    * Opens delete confirmation modal for product
+//    */
 //   const deleteProduct = (orderId, productId) => {
 //     setProductOrderId(orderId);
 //     setProductToDelete(productId);
 //     setShowProductDeleteModal(true);
 //   };
+//   /**
+//    * Deletes selected product from order
+//    * Also clears editing state if same product is being edited
+//    */
 //   const confirmDeleteProduct = () => {
 //     if (onDeleteProduct && productOrderId && productToDelete) {
 //       onDeleteProduct(productOrderId, productToDelete);
@@ -1328,6 +1535,10 @@ export default OrderDetailsPage;
 //       setEditingProductOrderId(null);
 //     }
 //   };
+//   /**
+//    * Updates existing order
+//    * Merges old + new products before saving
+//    */
 //   const handleUpdateOrder = async (updatedOrder) => {
 //     if (onUpdateOrder) {
 //       const originalOrder = orders.find((o) => o._id === updatedOrder._id);
@@ -1345,6 +1556,7 @@ export default OrderDetailsPage;
 
 //     // ✅ CLOSE FORM ONLY AFTER SAVE
 //     setEditingOrder(null);
+//     setProducts([]);
 //   };
 //   useEffect(() => {
 //     const handleEsc = (e) => {
@@ -1358,6 +1570,10 @@ export default OrderDetailsPage;
 
 //     return () => window.removeEventListener("keydown", handleEsc);
 //   }, []);
+//   /**
+//    * Opens product edit form
+//    * Closes other panels before opening
+//    */
 //   const startProductEdit = (orderId, product) => {
 //     closeAllPanels(); // ✅ important
 //     setEditingProductState(product);
@@ -1369,6 +1585,10 @@ export default OrderDetailsPage;
 
 //     setEditingProductState(updatedProduct);
 //   };
+//   /**
+//    * Saves inline product changes
+//    * Calls parent update handler
+//    */
 //   const saveProductEdit = () => {
 //     console.log("editingProductOrderId:", editingProductOrderId);
 //     console.log("editingProductState:", editingProductState);
@@ -1396,7 +1616,10 @@ export default OrderDetailsPage;
 //     setEditingProductState(null);
 //     setEditingProductOrderId(null);
 //   };
-
+//   /**
+//    * Debounces search input
+//    * Prevents expensive filtering on every keystroke
+//    */
 //   useEffect(() => {
 //     const timer = setTimeout(() => {
 //       setDebouncedSearch(searchTerm);
@@ -1410,6 +1633,10 @@ export default OrderDetailsPage;
 //       editingCustomer || editingOrder || editingProductState || showAddOrderForm
 //     );
 //   };
+//   /**
+//    * Memoized customer orders
+//    * Prevents unnecessary recalculations
+//    */
 //   const customerOrders = useMemo(() => {
 //     return orders.filter(
 //       (o) =>
@@ -1417,17 +1644,24 @@ export default OrderDetailsPage;
 //         o.customer === selectedCustomer._id,
 //     );
 //   }, [orders, selectedCustomer._id]);
-
+//   /**
+//    * Filters orders/products based on search term
+//    * Supports searching:
+//    * - Order number
+//    * - Order status
+//    * - Product attributes
+//    */
 //   const filteredOrders = useMemo(() => {
 //     if (!debouncedSearch.trim()) return customerOrders;
 
 //     const term = debouncedSearch.toLowerCase();
 
 //     return customerOrders.filter((order) => {
+//       // Match order-level fields
 //       const orderMatch =
 //         order.orderNo?.toLowerCase().includes(term) ||
 //         order.orderStatus?.toLowerCase().includes(term);
-
+//       // Match product-level searchable fields
 //       const productMatch = order.products?.some((p) =>
 //         [p.category, p.roomName, p.fabricName, p.fabricType, p.curtainRod]
 //           .filter(Boolean)
@@ -1449,16 +1683,24 @@ export default OrderDetailsPage;
 //       year: "numeric",
 //     });
 //   };
-
+//   /**
+//    * =========================================================
+//    * MAIN LAYOUT
+//    * =========================================================
+//    * Left  → Customer snapshot + orders
+//    * Right → Dynamic editing forms
+//    * =========================================================
+//    */
 //   return (
-//     <div className=" lg:h-[600px] overflow-hidden">
+//     <div className="overflow-hidden">
 //       <div className="flex flex-col lg:flex-row w-full h-full p-2 sm:p-3 lg:p-4 gap-3 lg:gap-6 overflow-hidden">
-//         {/* Left Section - Order Details */}
+//         {/* LEFT SECTION → Customer snapshot + order listing */}
+
 //         <div
 //           className={`transition-all duration-500 ease-in-out
 // ${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
 //   w-full rounded-2xl border bg-white shadow-sm
-//   lg:h-[calc(100vh-2rem)] flex flex-col min-h-0`}
+//   flex-col min-h-0`}
 //         >
 //           <div
 //             className={`transition-opacity duration-300 flex-1   ${
@@ -1469,7 +1711,9 @@ export default OrderDetailsPage;
 //               filteredOrders={filteredOrders}
 //               selectedCustomer={selectedCustomer}
 //               customerOrders={customerOrders}
+//               handleBackAction={handleBackAction}
 //               onBack={onBack}
+//               products={products}
 //               searchTerm={searchTerm}
 //               setSearchTerm={setSearchTerm}
 //               closeAllPanels={closeAllPanels}
@@ -1486,7 +1730,7 @@ export default OrderDetailsPage;
 //             />
 //           </div>
 //         </div>
-//         {/* Right Section - Editing Forms (Slide in animation) */}
+//         {/* RIGHT SECTION → Dynamic forms/edit panels */}
 //         <div
 //           className={`transition-all duration-500 ease-in-out  lg:h-[calc(90vh-2rem)]  transform  min-h-0
 //   ${
@@ -1501,10 +1745,16 @@ export default OrderDetailsPage;
 //               {isEditingActive() && (
 //                 <div className="sticky top-0 bg-white  z-10 flex justify-end px-3 lg:pt-1 pt-3">
 //                   <button
-//                     onClick={closeAllPanels}
+//                     onClick={() => {
+//                       if (addOrderRef.current?.handleClose) {
+//                         addOrderRef.current.handleClose();
+//                       } else {
+//                         closeAllPanels();
+//                       }
+//                     }}
 //                     className=" rounded-full hover:bg-gray-100 transition cursor-pointer"
 //                   >
-//                     <FiX size={18} />
+//                     <FiX size={23} />
 //                   </button>
 //                 </div>
 //               )}
@@ -1537,6 +1787,8 @@ export default OrderDetailsPage;
 //                   key={editingOrder?._id}
 //                   order={{ ...editingOrder, products: [] }}
 //                   customers={customers}
+//                   setProducts={setProducts}
+//                   products={products}
 //                   selectedCustomerId={
 //                     selectedCustomer._id || selectedCustomer._id
 //                   }
@@ -1590,6 +1842,8 @@ export default OrderDetailsPage;
 //               ) : showAddOrderForm ? (
 //                 <AddOrder
 //                   key="create-order"
+//                   products={products}
+//                   setProducts={setProducts}
 //                   selectedCustomerId={selectedCustomer._id}
 //                   customers={customers}
 //                   onSave={handleOrderCreated}
@@ -1603,7 +1857,7 @@ export default OrderDetailsPage;
 //           </div>
 //         </div>
 //       </div>
-//       {/* Product Details Modal */}
+//       {/* Product full details modal */}
 //       <ProductDetailsModal
 //         product={selectedProduct}
 //         isOpen={showProductModal}
@@ -1613,6 +1867,7 @@ export default OrderDetailsPage;
 //         }}
 //         formatDate={formatDate}
 //       />
+//       {/* Order delete confirmation modal */}
 //       <ConfirmModal
 //         isOpen={showDeleteModal}
 //         title="Delete Order"
@@ -1623,6 +1878,7 @@ export default OrderDetailsPage;
 //           setOrderToDelete(null);
 //         }}
 //       />
+//       {/* Product delete confirmation modal */}
 //       <ConfirmModal
 //         isOpen={showProductDeleteModal}
 //         title="Delete Product"
@@ -1633,6 +1889,14 @@ export default OrderDetailsPage;
 //           setProductToDelete(null);
 //           setProductOrderId(null);
 //         }}
+//       />
+
+//       <ConfirmModal
+//         isOpen={showBackConfirmModal}
+//         title="Unsaved Products"
+//         message="You have products in this order. If you go back now, changes may be lost. Do you want to continue?"
+//         onConfirm={confirmBack}
+//         onCancel={cancelBack}
 //       />
 //     </div>
 //   );

@@ -3,11 +3,12 @@ import { FiTrash2, FiSearch, FiX } from "react-icons/fi";
 import { useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import TableSkeleton from "./common/TableSkeleton";
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 20;
 import { FiChevronDown } from "react-icons/fi";
 import OrderCard from "./common/OrderCard";
 import { formatDateTime } from "../../constants/Config.js";
 import CellWithTooltip from "./common/CellWithTooltip";
+import { getStatusStyle } from "../../constants/Config.js";
 const statusOptions = [
   { label: "All Orders", value: "all" },
   { label: "Open", value: "open" },
@@ -157,7 +158,7 @@ const OrderList = ({
               <th className="sticky left-0 z-[60] bg-black px-4 border py-3 text-center font-semibold text-white whitespace-nowrap min-w-[120px]">
                 Order No
               </th>
-             <th className="sticky left-[120px] z-[60] bg-black px-4 border py-3 text-center font-semibold text-white whitespace-nowrap min-w-[180px]">
+              <th className="sticky left-[120px] z-[60] bg-black px-4 border py-3 text-center font-semibold text-white whitespace-nowrap min-w-[180px]">
                 Customer
               </th>
               <th className="px-4 border py-3  text-center font-semibold text-white  whitespace-nowrap  bg-black">
@@ -178,7 +179,7 @@ const OrderList = ({
               <th className="px-4 border py-3 text-center font-semibold text-white whitespace-nowrap bg-black">
                 WorkLog
               </th>
-             <th className="sticky right-0 z-[120] bg-black px-4 py-3 text-center font-bold text-lg whitespace-nowrap">
+              <th className="sticky right-0 z-[120] bg-black px-4 py-3 text-center font-bold text-lg whitespace-nowrap">
                 Actions
               </th>
             </tr>
@@ -189,14 +190,14 @@ const OrderList = ({
                 <td className="sticky bg-gray-100 lg:bg-white left-0 z-40  text-center min-w-[120px] ">
                   {order.orderNo}
                 </td>
-       <td className="sticky bg-gray-100 lg:bg-white left-[120px] z-40 text-center min-w-[180px]">
-  <span
-    className="block truncate"
-    title={order.customer?.name || "N/A"}
-  >
-    {order.customer?.name || "N/A"}
-  </span>
-</td>
+                <td className="sticky bg-gray-100 lg:bg-white left-[120px] z-40 text-center min-w-[180px]">
+                  <span
+                    className="block truncate"
+                    title={order.customer?.name || "N/A"}
+                  >
+                    {order.customer?.name || "N/A"}
+                  </span>
+                </td>
                 <td className="text-center">
                   {" "}
                   {formatDateTime(order.orderDate)}
@@ -207,28 +208,41 @@ const OrderList = ({
                 </td>
                 <td className="text-center">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs lg:text-[14px] font-semibold border
-    ${order.orderStatus === "Cancelled"
-                        ? "text-red-600 bg-red-50 border-red-200"
-                        : ""
-                      }
-    ${order.orderStatus === "Pending"
-                        ? "text-yellow-700 bg-yellow-50 border-yellow-200"
-                        : ""
-                      }
-    ${order.orderStatus === "Completed"
-                        ? "text-green-600 bg-green-50 border-green-200"
-                        : ""
-                      }
-    ${order.orderStatus === "Processing"
-                        ? "text-blue-600 bg-blue-50 border-blue-200"
-                        : ""
-                      }
-  `}
+                    className={`inline-flex items-center justify-center min-w-[90px]
+  px-3 py-1 rounded-full text-xs lg:text-sm font-semibold border
+  ${getStatusStyle(order.orderStatus)}`}
                   >
                     {order.orderStatus}
                   </span>
                 </td>
+                {/* <td className="text-center">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs lg:text-[14px] font-semibold border
+    ${
+      order.orderStatus === "Cancelled"
+        ? "text-red-600 bg-red-50 border-red-200"
+        : ""
+    }
+    ${
+      order.orderStatus === "Pending"
+        ? "text-yellow-700 bg-yellow-50 border-yellow-200"
+        : ""
+    }
+    ${
+      order.orderStatus === "Completed"
+        ? "text-green-600 bg-green-50 border-green-200"
+        : ""
+    }
+    ${
+      order.orderStatus === "Processing"
+        ? "text-blue-600 bg-blue-50 border-blue-200"
+        : ""
+    }
+  `}
+                  >
+                    {order.orderStatus}
+                  </span>
+                </td> */}
                 <td className="p-3 text-center">
                   ₹
                   {parseInt(
@@ -270,17 +284,17 @@ const OrderList = ({
                 </td>
                 {/* worklog */}
                 <td
-  className="px-4 py-2"
-  style={{
-    width: "280px",
-    minWidth: "280px",
-    maxWidth: "280px",
-  }}
->
-  <CellWithTooltip value={order.WorkLog} />
-</td>
+                  className="px-4 py-2"
+                  style={{
+                    width: "280px",
+                    minWidth: "280px",
+                    maxWidth: "280px",
+                  }}
+                >
+                  <CellWithTooltip value={order.WorkLog} />
+                </td>
                 {/* actions */}
-               <td className="sticky right-0 z-50 bg-gray-100  lg:bg-white text-center min-w-[160px]  shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">
+                <td className="sticky right-0 z-50 bg-gray-100  lg:bg-white text-center min-w-[160px]  shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">
                   <div className="flex gap-2  ] rounded-md px-2 py-1 cursor-pointer">
                     <button
                       className="px-3 py-1.5 text-sm bg-gray-900 text-white  rounded-md cursor-pointer hover:bg-black transition"
@@ -304,16 +318,14 @@ const OrderList = ({
                 </td>
               </tr>
             ))}
-
           </tbody>
         </table>
         {filteredOrders.length === 0 && (
-
           <div className="flex flex-col items-center justify-center">
             <img
               src="https://itcresorts.com/img/other/NoRecordFound.png"
               alt="No Orders Found"
-            // className="w-52 sm:w-64 md:w-72 object-contain"
+              // className="w-52 sm:w-64 md:w-72 object-contain"
             />
           </div>
         )}

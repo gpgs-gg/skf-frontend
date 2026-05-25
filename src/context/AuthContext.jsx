@@ -1,9 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
@@ -22,8 +17,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("user");
-      const storedToken =
-        localStorage.getItem("accessToken");
+      const storedToken = localStorage.getItem("accessToken");
 
       if (storedUser) {
         setAuth({
@@ -47,16 +41,10 @@ export const AuthProvider = ({ children }) => {
   // =========================
   const login = (user, accessToken) => {
     try {
-      localStorage.setItem(
-        "user",
-        JSON.stringify(user)
-      );
+      localStorage.setItem("user", JSON.stringify(user));
 
       if (accessToken) {
-        localStorage.setItem(
-          "accessToken",
-          accessToken
-        );
+        localStorage.setItem("accessToken", accessToken);
       }
 
       setAuth({
@@ -73,10 +61,7 @@ export const AuthProvider = ({ children }) => {
   // UPDATE TOKEN
   // =========================
   const updateAccessToken = (accessToken) => {
-    localStorage.setItem(
-      "accessToken",
-      accessToken
-    );
+    localStorage.setItem("accessToken", accessToken);
 
     setAuth((prev) => ({
       ...prev,

@@ -9,19 +9,22 @@ import { ToastContainer } from "react-toastify";
 import { AppProvider } from "@/context/AppProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import { queryClient } from "./queryClient.js";
-import { registerSW } from 'virtual:pwa-register'
-registerSW({ immediate: true })
+import { registerSW } from "virtual:pwa-register";
+// import { UnsavedChangesProvider } from "./context/UnsavedChangesContext";
+registerSW({ immediate: true });
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppProvider>
-          <AuthProvider>
-            <ToastContainer className="mt-20" />
-            <App />
-          </AuthProvider>
-        </AppProvider>
-      </BrowserRouter>
+      <>
+        <BrowserRouter>
+          <AppProvider>
+            <AuthProvider>
+              <ToastContainer className="mt-20" />
+              <App />
+            </AuthProvider>
+          </AppProvider>
+        </BrowserRouter>
+      </>
     </QueryClientProvider>
   </React.StrictMode>,
 );

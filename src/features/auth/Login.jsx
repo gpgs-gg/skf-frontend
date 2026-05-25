@@ -54,7 +54,7 @@ const Login = () => {
         reset();
         setIsSubmitting(false);
 
-       if (user?.role === "admin") {
+        if (user?.role === "admin") {
           console.log(user);
           navigate("/skf-action");
         } else {
@@ -96,7 +96,7 @@ const Login = () => {
   };
   return (
     <>
-      <div className="py-12 lg:py-20 flex items-center justify-center bg-gray-100 px-4">
+      <div className="py-12 lg:py-20 flex items-center justify-center lg:bg-gray-100 px-4">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg border"
@@ -203,8 +203,8 @@ const Login = () => {
           </div>
         </form>
       </div>
-   {/* Password Modal */}
-      <SetPassword isOpen={isOpen} setIsOpen={setIsOpen}  />
+      {/* Password Modal */}
+      <SetPassword isOpen={isOpen} setIsOpen={setIsOpen} />
       {/* <style>{`
         .loader {
           border: 3px solid #e5e5e5;

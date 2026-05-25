@@ -1,13 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL || "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   withCredentials: true, // IMPORTANT for refresh token cookies
 });
 
-
-
-const login= async (data) => {
+const login = async (data) => {
   const response = await apiClient.post("/login", data);
   return response.data;
 };
@@ -38,7 +36,6 @@ export const useEmployeeDetails = () => {
   });
 };
 
-
 // fecting data for clients
 const fetchClientDetailsData = async () => {
   const response = await apiClient.get("/Clients-details");
@@ -54,7 +51,7 @@ export const useClientDetails = () => {
 };
 
 // ✅ Update Ticket Sheet
-const changePassword= async (data) => {
+const changePassword = async (data) => {
   const response = await apiClient.post("/auth/update-password", data);
   return response.data;
 };
@@ -70,9 +67,7 @@ export const useChangePassword = () => {
   });
 };
 
-
-
-const getOtp= async (data) => {
+const getOtp = async (data) => {
   const response = await apiClient.post("/otp/send-otp", data);
   return response.data;
 };
@@ -89,8 +84,7 @@ export const useGetOtp = () => {
   });
 };
 
-
-const verifyOtp= async (data) => {
+const verifyOtp = async (data) => {
   const response = await apiClient.post("/otp/verify-otp", data);
   return response.data;
 };

@@ -9,29 +9,43 @@ import Login from "./features/auth/Login";
 import ShowroomCRM from "./features/order/ShowroomCRM";
 import SkfAction from "./pages/SkfAction";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
+// USERS PAGE
+import UsersPage from "./features/users/UsersPage";
+// PRODUCTS PAGE
+import CategoryManager from "./features/product/CategoryManager";
 const App = () => {
   return (
     <>
       <Header />
 
       <Routes>
-        {/* ✅ Home route */}
+        {/* HOME ROUTE */}
         <Route path="/" element={<Home />} />
 
         {/* <Route path="/products" element={<ProductTab />} /> */}
-        <Route path="/login" element={<Login />} />
+        {/* AUTH ROUTES */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
         <Route path="/register" element={<SignupPage />} />
 
-        {/* create order route */}
-
-        {/* ✅ Category route */}
-
+        {/* CATEGORY ROUTE */}
         <Route path="/category/:slug" element={<CategoryPage />} />
 
+        {/* ADMIN PROTECTED ROUTES */}
         <Route element={<ProtectedRoute allowedRole="admin" />}>
           <Route path="/skf-action" element={<SkfAction />} />
+          {/* ORDERS */}
           <Route path="/skf-action/orders" element={<ShowroomCRM />} />
         </Route>
+        {/* PRODUCTS */}
+        <Route path="/skf-action/products" element={<CategoryManager />} />
       </Routes>
     </>
   );

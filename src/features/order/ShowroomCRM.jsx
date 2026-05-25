@@ -6,6 +6,7 @@ import AddCustomer from "./CustomerForm.jsx";
 import OrderList from "./OrderList";
 import ConfirmModal from "./common/ConfirmModal";
 import OrderDetailsPage from "./OrdersDetailsPage";
+import Dashboard from "./Dashboard.jsx";
 // import react query hooks for customers
 import {
   useCustomers,
@@ -25,13 +26,14 @@ import {
 } from "./services/orderApi.js";
 // component for adding and editing order
 import AddOrder from "./OrderForm.jsx";
+import { FiGrid, FiUsers, FiShoppingCart } from "react-icons/fi";
 // Main Component
 const ShowroomCRM = () => {
   // =========================
   // 🔹 STATE MANAGEMENT
   // =========================
   // controls which tab is open
-  const [activeTab, setActiveTab] = useState("customerList");
+  const [activeTab, setActiveTab] = useState("dashboard");
   // stores current selected customer
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   // stores current selected order
@@ -254,14 +256,38 @@ const ShowroomCRM = () => {
   // 🔹 TABS CONFIGURATION
   // =========================
   const tabs = [
-    { id: "customerList", label: "Customer List", icon: "FiUsers" },
-    { id: "orderList", label: "Order List", icon: "FiShoppingCart" },
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: <FiGrid size={18} />,
+    },
+
+    {
+      id: "customerList",
+      label: "Customers",
+      icon: <FiUsers size={18} />,
+    },
+
+    {
+      id: "orderList",
+      label: "Orders",
+      icon: <FiShoppingCart size={18} />,
+    },
   ];
 
   // =========================
   // 🔹 MAIN RENDER LOGIC
   // =========================
   const renderContent = () => {
+    if (activeTab === "dashboard") {
+      return (
+        <Dashboard
+          orders={orders}
+          customers={customers}
+          loading={ordersLoading || customersLoading}
+        />
+      );
+    }
     if (activePage === "details" && selectedCustomer) {
       return (
         <OrderDetailsPage
@@ -394,6 +420,7 @@ export default ShowroomCRM;
 // import OrderList from "./OrderList";
 // import ConfirmModal from "./common/ConfirmModal";
 // import OrderDetailsPage from "./OrdersDetailsPage";
+// // import react query hooks for customers
 // import {
 //   useCustomers,
 //   useCreateCustomer,
@@ -401,6 +428,7 @@ export default ShowroomCRM;
 //   useDeleteCustomer,
 //   useCheckCustomerMobile,
 // } from "./services/customerApi.js";
+// // import order react query hooks
 // import {
 //   useOrders,
 //   useCreateOrder,
@@ -409,22 +437,29 @@ export default ShowroomCRM;
 //   useUpdateOrderProduct,
 //   useDeleteOrderProduct,
 // } from "./services/orderApi.js";
+// // component for adding and editing order
 // import AddOrder from "./OrderForm.jsx";
-
+// // Main Component
 // const ShowroomCRM = () => {
 //   // =========================
 //   // 🔹 STATE MANAGEMENT
 //   // =========================
+//   // controls which tab is open
 //   const [activeTab, setActiveTab] = useState("customerList");
-
+//   // stores current selected customer
 //   const [selectedCustomer, setSelectedCustomer] = useState(null);
+//   // stores current selected order
 //   const [selectedOrder, setSelectedOrder] = useState(null);
 //   if (selectedOrder) {
-//     console.log(selectedOrder);
+//     //console.log(selectedOrder);
 //   }
+//   // controls screen navigation
 //   const [activePage, setActivePage] = useState("list");
+//   // set order for editing
 //   const [editingOrder, setEditingOrder] = useState(null);
+//   // set product for editing
 //   const [editingProduct, setEditingProduct] = useState(null);
+//   // delete confirmation state
 //   const [confirmOpen, setConfirmOpen] = useState(false);
 //   const [orderToDelete, setOrderToDelete] = useState(null);
 
@@ -590,7 +625,12 @@ export default ShowroomCRM;
 //         productId,
 //       });
 //     } catch (error) {
-//       console.log("DELETE PRODUCT ERROR:", error);
+//       console.error("DELETE PRODUCT ERROR:", error);
+
+//       toast.error(
+//         error?.response?.data?.message ||
+//           "Failed to delete product. Please try again.",
+//       );
 //     }
 //   };
 
@@ -628,6 +668,7 @@ export default ShowroomCRM;
 //   // 🔹 TABS CONFIGURATION
 //   // =========================
 //   const tabs = [
+//     { id: "dashboard", label: "Dashboard", icon: "FiGrid" },
 //     { id: "customerList", label: "Customer List", icon: "FiUsers" },
 //     { id: "orderList", label: "Order List", icon: "FiShoppingCart" },
 //   ];

@@ -1,11 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { FiUsers, FiPlus, FiShoppingCart } from "react-icons/fi";
-
-const iconMap = {
-  FiUsers: <FiUsers size={18} />,
-  FiPlus: <FiPlus size={18} />,
-  FiShoppingCart: <FiShoppingCart size={18} />,
-};
+import { FiUsers, FiGrid, FiPlus, FiShoppingCart } from "react-icons/fi";
 
 const Tabs = ({ tabs, activeTab, onTabChange }) => {
   const tabRefs = useRef({});
@@ -51,7 +45,8 @@ const Tabs = ({ tabs, activeTab, onTabChange }) => {
             onClick={() => handleClick(tab.id)}
             className={tabClass(tab.id)}
           >
-            {iconMap[tab.icon]}
+            {tab.icon}
+
             <span>{tab.label}</span>
           </button>
         ))}

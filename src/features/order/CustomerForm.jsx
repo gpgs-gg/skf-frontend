@@ -6,7 +6,7 @@
 // - Save & Continue Flow
 // =========================
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 import { generateWorklog, generateCreateWorklog } from "../../utils/worklog";
@@ -185,7 +185,7 @@ const AddCustomer = ({
       toast.dismiss();
       toast.success(customer ? "Customer Updated" : "Customer Saved");
 
-     const loggedInUser = {
+      const loggedInUser = {
         name: currentUser?.user?.name || "Unknown User",
         empId: currentUser?.user?.id || "",
       };

@@ -8,7 +8,7 @@ import CustomerCard from "./common/CustomerCard";
 import { FiEye } from "react-icons/fi";
 import CellWithTooltip from "./common/CellWithTooltip";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 20;
 
 const CustomerList = ({
   customers,
@@ -244,9 +244,9 @@ const CustomerList = ({
             </div>
           </div>
           {/* 🔥 SCROLLABLE CONTENT */}
-         <div className="flex-1 overflow-visible">
+          <div className="flex-1 overflow-visible">
             {/* DESKTOP TABLE */}
-        <div className="hidden h-auto md:block overflow-visible">
+            <div className="hidden h-auto md:block overflow-visible">
               <table className="w-full table-fixed text-lg">
                 <thead className="bg-black text-white sticky top-0 z-[40]">
                   <tr>
@@ -297,60 +297,58 @@ const CustomerList = ({
                           </span>
                         </td>
                         {/* worklog */}
-    <td
-  className="px-4 py-2 align-middle"
-  style={{
-    width: "280px",
-    minWidth: "280px",
-    maxWidth: "280px",
-  }}
->
-  <CellWithTooltip value={customer.WorkLog} />
-</td>
+                        <td
+                          className="px-4 py-2 align-middle"
+                          style={{
+                            width: "280px",
+                            minWidth: "280px",
+                            maxWidth: "280px",
+                          }}
+                        >
+                          <CellWithTooltip value={customer.WorkLog} />
+                        </td>
                         {/* actions */}
-                       <td className="text-center align-middle">
-  <div className="flex items-center justify-center gap-4 py-3">
-    <button
-      onClick={() => onViewOrders(customer)}
-      className="cursor-pointer"
-    >
-      <FiEye size={22} />
-    </button>
+                        <td className="text-center align-middle">
+                          <div className="flex items-center justify-center gap-4 py-3">
+                            <button
+                              onClick={() => onViewOrders(customer)}
+                              className="cursor-pointer"
+                            >
+                              <FiEye size={22} />
+                            </button>
 
-    <button
-      className="text-lg"
-      onClick={() => onViewOrders(customer)}
-    >
-      <i className="fas fa-edit cursor-pointer"></i>
-    </button>
+                            <button
+                              className="text-lg"
+                              onClick={() => onViewOrders(customer)}
+                            >
+                              <i className="fas fa-edit cursor-pointer"></i>
+                            </button>
 
-    <button
-      className="rounded-md text-xl cursor-pointer hover:bg-gray-50 transition"
-      onClick={() => {
-        setCustomerToDelete(customer);
-        setShowDeleteModal(true);
-      }}
-    >
-      <FiTrash2 size={20} />
-    </button>
-  </div>
-</td>
+                            <button
+                              className="rounded-md text-xl cursor-pointer hover:bg-gray-50 transition"
+                              onClick={() => {
+                                setCustomerToDelete(customer);
+                                setShowDeleteModal(true);
+                              }}
+                            >
+                              <FiTrash2 size={20} />
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     );
                   })}
-
-                
                 </tbody>
               </table>
-                {paginatedCustomers.length === 0 && (
-                      <div className="flex flex-col items-center justify-center">
-                    <img
-                      src="https://itcresorts.com/img/other/NoRecordFound.png"
-                      alt="No Orders Found"
-                      // className="w-52 sm:w-64 md:w-72 object-contain"
-                    />
-                  </div>
-                  )}
+              {paginatedCustomers.length === 0 && (
+                <div className="flex flex-col items-center justify-center">
+                  <img
+                    src="https://itcresorts.com/img/other/NoRecordFound.png"
+                    alt="No Orders Found"
+                    // className="w-52 sm:w-64 md:w-72 object-contain"
+                  />
+                </div>
+              )}
             </div>
             {/* MOBILE CARDS */}
             <div className="md:hidden p-3 space-y-3">
@@ -540,8 +538,8 @@ export default CustomerList;
 //                 {/* LEFT SECTION: SEARCH + FILTERS */}
 //                 <div
 //                   className="
-//       flex flex-col gap-3 
-//       sm:flex-col 
+//       flex flex-col gap-3
+//       sm:flex-col
 //       md:flex-row md:items-center
 //     "
 //                 >
@@ -555,7 +553,7 @@ export default CustomerList;
 //                     <input
 //                       type="text"
 //                       placeholder="Search customers..."
-//                       className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-xl  
+//                       className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-xl
 //           focus:bg-white focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-400
 //           transition-all shadow-sm"
 //                       value={searchTerm}
@@ -570,7 +568,7 @@ export default CustomerList;
 //                   <div className="relative w-full sm:w-full md:w-[160px]">
 //                     <div
 //                       onClick={() => setShowCityDropdown((prev) => !prev)}
-//                       className="pl-10 pr-8 py-2.5 cursor-pointer text-sm border border-gray-300 rounded-xl  
+//                       className="pl-10 pr-8 py-2.5 cursor-pointer text-sm border border-gray-300 rounded-xl
 //           flex items-center justify-between hover:bg-white transition shadow-sm"
 //                     >
 //                       <FiMapPin
@@ -628,7 +626,7 @@ export default CustomerList;
 //                       className="
 //             w-full sm:w-full md:w-auto
 //             flex items-center justify-center gap-2 px-4 py-2.5 text-sm
-//             bg-gray-100 hover:bg-gray-200 text-gray-700 
+//             bg-gray-100 hover:bg-gray-200 text-gray-700
 //             rounded-xl transition shadow-sm
 //           "
 //                     >
@@ -644,10 +642,10 @@ export default CustomerList;
 //                     onClick={() => setShowCreateForm(true)}
 //                     className="
 //           w-full sm:w-full md:w-auto
-//           flex items-center justify-center gap-2 px-5 py-2.5 
-//           bg-gradient-to-r from-gray-900 to-gray-700 
-//           text-white text-sm font-medium 
-//           rounded-xl shadow-md 
+//           flex items-center justify-center gap-2 px-5 py-2.5
+//           bg-gradient-to-r from-gray-900 to-gray-700
+//           text-white text-sm font-medium
+//           rounded-xl shadow-md
 //           hover:shadow-lg active:scale-95 transition
 //         "
 //                   >
@@ -750,7 +748,6 @@ export default CustomerList;
 //                     );
 //                   })}
 
-                
 //                 </tbody>
 //               </table>
 //                 {paginatedCustomers.length === 0 && (
@@ -821,4 +818,3 @@ export default CustomerList;
 // };
 
 // export default CustomerList;
-

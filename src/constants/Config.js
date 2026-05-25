@@ -2,7 +2,7 @@ export const SECRET_KEY = import.meta.env.REACT_APP_SECRET_KEY;
 export const MAP_KEY = import.meta.env.MAP_API_KEY;
 
 export const SelectStyles = {
-  control: (base, state) => ({
+  control: (base) => ({
     ...base,
     width: "100%",
     paddingTop: "0.25rem",
@@ -83,6 +83,21 @@ export const SelectStylesfilter = {
   }),
 };
 
+// Status styles for order status badges
+export const statusStyles = {
+  Cancelled: "font-semibold text-red-800 bg-red-50 border-red-200",
+  Pending: "font-semibold text-yellow-800 bg-yellow-50 border-yellow-200",
+  Completed: "font-semibold text-green-800 bg-green-50 border-green-200",
+  Processing: "font-semibold text-blue-800 bg-blue-50 border-blue-200",
+  Open: "font-semibold text-indigo-800 bg-indigo-50 border-indigo-200",
+};
+
+export const getStatusStyle = (status) => {
+  return (
+    statusStyles[status] ||
+    "font-semibold text-gray-800 bg-gray-50 border-gray-200"
+  );
+};
 // Add these new style objects
 export const InputStyles = {
   base: `
