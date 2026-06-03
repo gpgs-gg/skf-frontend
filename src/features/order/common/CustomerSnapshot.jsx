@@ -1,0 +1,1204 @@
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { FiArrowLeft, FiSearch, FiX } from "react-icons/fi";
+import AddOrder from "../OrderForm";
+import AddCustomer from "../CustomerForm";
+import ProductForm from "../ProductForm";
+import RoomForm from "./RoomForm.jsx";
+import { toast } from "react-toastify";
+import { FiEye } from "react-icons/fi";
+import ConfirmModal from "./ConfirmModal";
+import { getStatusStyle } from "@/constants/Config";
+const CustomerSnapshot = ({
+  filteredOrders,
+  selectedCustomer,
+  customerOrders,
+  handleBackAction,
+  products,
+  searchTerm,
+  setSearchTerm,
+  closeAllPanels,
+  setEditingCustomer,
+  setShowAddOrderForm,
+  setEditingOrder,
+  deleteOrder,
+  startProductEdit,
+  deleteProduct,
+  formatDate,
+  isEditingActive,
+  setSelectedProduct,
+  setShowProductModal,
+  startRoomEdit, // NEW
+  editingCustomer,
+  editingOrder,
+  editingRoomState,
+  setEditingRoomState,
+  editingProductState,
+
+  saveRoomEdit,
+  cancelRoomEdit,
+
+  saveProductEdit,
+  cancelProductEdit,
+
+  handleUpdateProductInline,
+
+  handleUpdateOrder,
+
+  roomName,
+  roomType,
+
+  showAddOrderForm,
+
+  customers,
+  setProducts,
+
+  handleOrderCreated,
+
+  onUpdateCustomer,
+
+  setSelectedCustomer,
+  handleGlobalCancel,
+  editingRoomOrderId,
+  editingProductOrderId,
+  deleteRoom,
+}) => {
+  // ✅ DECLARE HERE
+  const hasActiveEditor =
+    editingCustomer ||
+    editingOrder ||
+    editingRoomState ||
+    editingProductState ||
+    showAddOrderForm;
+  if (!selectedCustomer) {
+    return (
+      <div className="border border-gray-200 rounded-2xl px-6  text-center">
+        <p className="text-gray-500">
+          No customer selected. Add a customer first.
+        </p>
+      </div>
+    );
+  }
+  const [previewAttachment, setPreviewAttachment] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState({
+    open: false,
+    type: null,
+    id: null,
+  });
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
+  return (
+    <div className="sticky lg:top-0 z-30 ">
+      <div className="px-4 sm:px-5  border-b">
+        {/* TOP ROW */}
+        {/* DESKTOP TITLE */}
+
+        <div className="flex flex-col  lg:flex-row lg:items-center py-1 lg:justify-between gap-4">
+          {/* LEFT SIDE */}
+          <div className="flex  items-center justify-between md:gap-3">
+            {/* <button
+              onClick={handleBackAction}
+              className="flex items-center text-sm bg-black px-4 py-2 lg:text-lg text-white  rounded-lg cursor-pointer shrink-0"
+            >
+              <FiArrowLeft />
+              Back
+            </button> */}
+            <button
+              onClick={() => {
+                if (hasActiveEditor) {
+                  setShowBackConfirm(true);
+                } else {
+                  handleBackAction();
+                }
+              }}
+              className="flex items-center  text-sm mdpx-4 md:py-2 lg:text-xl rounded-lg cursor-pointer shrink-0"
+            >
+              <FiArrowLeft className="w-6 h-6" />
+            </button>
+            {/* MOBILE TITLE */}
+            <h2 className="text-sm  sm:text-base lg:text-[24px] font-medium lg:hidden text-right">
+              Customer & Order Details
+            </h2>
+          </div>
+
+          {/* DESKTOP TITLE */}
+          <div className="hidden lg:flex justify-center  flex-1 ">
+            <h2 className={`text-3xl font-medium  `}>
+              Customer and Order Details
+            </h2>
+          </div>
+
+          {/* SEARCH */}
+          <div className="relative hidden md:block w-full lg:w-80 ">
+            <input
+              type="text"
+              placeholder="Search orders, products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl outline-none text-sm sm:text-base"
+            />
+
+            {/* SEARCH ICON */}
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <FiSearch className="w-4 h-4" />
+            </span>
+
+            {/* CLEAR BUTTON */}
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
+              >
+                <FiX size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+      {/* all customers details */}
+      <div className="bg-gradient-to-r  from-gray-900 to-black border-b border-gray-800 py-1">
+        <div className="px-4 lg:px-6 py-0">
+          <div
+            className="
+flex flex-col lg:flex-row
+lg:justify-between
+lg:items-center
+gap-3
+"
+          >
+            {/* Left Side */}
+            <div className="flex items-center flex-wrap gap-3 text-white">
+              <h3 className="text-lg lg:text-2xl font-semibold">
+                {selectedCustomer.name}
+              </h3>
+
+              <span className="px-3 py-1 rounded-full text-md bg-gray-700 border border-gray-600 whitespace-nowrap">
+                <span className="text-lg font-bold">
+                  {customerOrders.length}
+                </span>{" "}
+                Order(s)
+              </span>
+
+              <span className="text-lg  flex flex-wrap gap-2">
+                <a
+                  href={`tel:${selectedCustomer?.mobile}`}
+                  className=" font-semibold cursor-pointer"
+                >
+                  {selectedCustomer?.mobile}
+                </a>
+                {selectedCustomer?.city && (
+                  <>
+                    <span>•</span>
+                    <span>{selectedCustomer.city}</span>
+                  </>
+                )}
+                {selectedCustomer?.address && (
+                  <>
+                    <span>•</span>
+                    <span>{selectedCustomer.address}</span>
+                  </>
+                )}
+              </span>
+            </div>
+
+            {/* Right Side */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <button
+                disabled={hasActiveEditor}
+                className={`
+    px-4 py-2 rounded-xl font-semibold transition
+    ${
+      hasActiveEditor
+        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+        : "bg-white text-black hover:bg-gray-200 hover:scale-105 cursor-pointer"
+    }
+  `}
+                onClick={() => {
+                  closeAllPanels();
+                  setEditingCustomer(selectedCustomer);
+                }}
+              >
+                Edit Customer
+              </button>
+
+              <button
+                disabled={hasActiveEditor}
+                className={`
+    px-4 py-2 rounded-xl font-semibold transition
+    ${
+      hasActiveEditor
+        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+        : "bg-white text-black hover:bg-gray-200 hover:scale-105 cursor-pointer"
+    }
+  `}
+                onClick={() => {
+                  closeAllPanels();
+                  setShowAddOrderForm(true);
+                }}
+              >
+                Create New Order
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* cancel button */}
+      {/* GLOBAL CANCEL */}
+      {/* {hasActiveEditor && (
+        <button
+          onClick={handleGlobalCancel}
+          className="absolute top-28 right-8 z-50
+                 w-10 h-10 flex items-center justify-center
+                 rounded-full bg-red-500 text-white
+                 hover:bg-red-600 shadow-lg transition-all
+    duration-200
+    hover:scale-105 cursor-pointer"
+        >
+          <FiX size={20} />
+        </button>
+      )} */}
+      {/* customer form */}
+      {editingCustomer && (
+        <div className="bg-white border-b px-4 sm:px-5 py-5">
+          <AddCustomer
+            customer={editingCustomer}
+            showNextButton={false}
+            onCancel={() => setEditingCustomer(null)}
+            onSave={async (updatedCustomer) => {
+              try {
+                const finalCustomer = {
+                  ...editingCustomer,
+                  ...updatedCustomer,
+                };
+
+                await onUpdateCustomer(finalCustomer);
+
+                setSelectedCustomer(finalCustomer);
+
+                setEditingCustomer(null);
+              } catch (error) {
+                console.log(error);
+              }
+            }}
+          />
+        </div>
+      )}
+      {/* order form */}
+      {showAddOrderForm && (
+        <div className=" pt-1 px-4 sm:px-5 ">
+          <AddOrder
+            key="create-order"
+            products={products}
+            setProducts={setProducts}
+            selectedCustomerId={selectedCustomer._id}
+            customers={customers}
+            onSave={handleOrderCreated}
+            onCancel={() => setShowAddOrderForm(false)}
+            title="Create New Order"
+          />
+        </div>
+      )}
+      {/* all orders */}
+
+      <div className="lg:flex-1 lg:overflow-y-auto  min-h-0  lg:h-[550px] px-3 sm:px-5 pb-5  space-y-3 pt-2">
+        {filteredOrders.map((order) => {
+          const shouldHideOrder =
+            hasActiveEditor &&
+            editingOrder?._id !== order._id &&
+            editingRoomOrderId !== order._id &&
+            editingProductOrderId !== order._id;
+
+          if (shouldHideOrder) {
+            return null;
+          }
+          // SHOW ONLY EDITING ORDER
+          if (editingOrder && editingOrder._id !== order._id) {
+            return null;
+          }
+
+          return (
+            <div
+              key={order._id}
+              className="border-2 border-gray-300 p-1 rounded-2xl "
+            >
+              <div
+                className="
+  flex flex-col lg:flex-row
+  lg:items-center
+  gap-2 lg:gap-12
+  w-full
+"
+              >
+                {/* Order No */}
+                <div className="bg-gradient-to-r  from-gray-900 to-black border-bs text-white rounded-xl px-4 lg:px-8 py-2 whitespace-nowrap">
+                  <span className="font-semibold">Order No:</span>{" "}
+                  <span className="font-bold ">{order.orderNo}</span>
+                </div>
+
+                {/* Order Date */}
+                <div className="bg-white rounded-xl px-4 lg:px-8 py-2 border border-gray-200 whitespace-nowrap">
+                  <span className="text-gray-500 text-sm">Order Date:</span>{" "}
+                  <span className="font-semibold">
+                    {formatDate(order.orderDate)}
+                  </span>
+                </div>
+
+                {/* Delivery Date */}
+                <div className="bg-white rounded-xl px-4 lg:px-8 py-2 border border-gray-200 whitespace-nowrap">
+                  <span className="text-gray-500 text-sm">Delivery Date:</span>{" "}
+                  <span className="font-semibold">
+                    {formatDate(order.deliveryDate)}
+                  </span>
+                </div>
+
+                {/* Status */}
+                <div className="bg-white rounded-xl px-4 lg:px-8 py-2 border border-gray-200 whitespace-nowrap">
+                  <span className="text-gray-500 text-sm">Order Status:</span>{" "}
+                  <span className="font-semibold">{order.orderStatus}</span>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 ml-auto whitespace-nowrap">
+                  <button
+                    onClick={() => {
+                      closeAllPanels();
+                      setEditingOrder(order);
+                    }}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-green-50"
+                  >
+                    <i
+                      className="fas fa-edit  transition-all
+    duration-200
+    hover:scale-125 text-green-600"
+                    ></i>
+                  </button>
+
+                  <button
+                    onClick={() => deleteOrder(order._id)}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-red-50"
+                  >
+                    <i
+                      className="fas fa-trash-alt  transition-all
+    duration-200
+    hover:scale-125 text-red-600"
+                    ></i>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                {/* order form */}
+                {editingOrder?._id === order._id && (
+                  <div className="mt-1   px-4">
+                    <AddOrder
+                      key={editingOrder._id}
+                      order={{
+                        ...editingOrder,
+                        customer:
+                          editingOrder.customer?._id || editingOrder.customer,
+                      }}
+                      customers={customers}
+                      setProducts={setProducts}
+                      products={products}
+                      selectedCustomerId={
+                        editingOrder?.customer?._id ||
+                        editingOrder?.customer ||
+                        selectedCustomer?._id
+                      }
+                      onSave={handleUpdateOrder}
+                      onCancel={() => setEditingOrder(null)}
+                      title="Update Order"
+                      isEditMode={true}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Products list - now without inline editing */}
+              {order.rooms?.map((room, roomIndex) => (
+                <div
+                  key={`${order._id}-${room._id}-${roomIndex}`}
+                  className="mt-1 p-1  border
+      border-gray-200 rounded-2xl "
+                >
+                  {/* ROOM HEADER */}
+                  <div className="flex justify-between items-center gap-2 ">
+                    <div className="flex items-center gap-2 flex-wrap mb-2">
+                      <div className="flex items-center gap-2 bg-gradient-to-r  from-gray-900 to-black border-b text-white px-4 py-2 rounded-2xl shadow-sm">
+                        <span className="text-lg">🏠</span>
+                        <span className="font-bold text-sm sm:text-base tracking-wide">
+                          {room.roomType || "Room"} -
+                        </span>
+
+                        {room.roomName && (
+                          <span className=" py-1     ">{room.roomName}</span>
+                        )}
+                      </div>
+                    </div>
+                    {/* edit delete room */}
+                    <div className=" hidden sm:flex justify-end  sm:justify-start gap-2 items-center w-full sm:w-auto">
+                      {/* edit room */}
+                      <button
+                        className="px-3 py-1 cursor-pointer rounded-lg text-lg"
+                        onClick={() =>
+                          startRoomEdit(order._id, room, roomIndex)
+                        }
+                      >
+                        <i
+                          className="fas fa-edit  transition-all
+    duration-200
+    hover:scale-125 text-green-600 hover:text-green-800"
+                        ></i>
+                      </button>
+                      <button
+                        className="px-3 py-1 cursor-pointer rounded-lg bg-white text-red-600 text-sm hover:bg-red-50"
+                        onClick={() => deleteRoom(order._id, room._id)}
+                      >
+                        <i
+                          className="fas fa-trash-alt  transition-all
+    duration-200
+    hover:scale-125 text-red-600 hover:text-red-800 cursor-pointer"
+                        ></i>
+                      </button>
+                    </div>
+                  </div>
+                  {/* room form */}
+                  {editingRoomState?._id === room._id && (
+                    <div className="mb-1 border rounded-2xl bg-white p-4">
+                      <RoomForm
+                        room={editingRoomState}
+                        onChange={setEditingRoomState}
+                        onCancel={cancelRoomEdit}
+                        onSave={saveRoomEdit}
+                      />
+                    </div>
+                  )}
+                  {/* PRODUCTS INSIDE ROOM */}
+                  <div className="">
+                    {room.products
+                      ?.filter((p) => p.isActive !== false)
+                      .map((product, idx) => (
+                        <React.Fragment
+                          key={product._id || `${room._id}-${idx}`}
+                        >
+                          {editingProductState?._id === product._id ? (
+                            <div className="mt-1 border rounded-2xl bg px-4">
+                              {/* ROOM INFO */}
+                              {/* <div className="flex items-center gap-2 mb-4 flex-wrap">
+                                <span className="px-3 py-1 rounded-full bg-black text-white text-sm">
+                                  {roomType}
+                                </span>
+
+                                {roomName && (
+                                  <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm">
+                                    {roomName}
+                                  </span>
+                                )}
+                              </div> */}
+
+                              {/* PRODUCT FORM */}
+                              <ProductForm
+                                product={editingProductState}
+                                index={0}
+                                onUpdate={handleUpdateProductInline}
+                                hideRemove={true}
+                              />
+
+                              {/* ACTIONS */}
+                              <div className="flex justify-end gap-3 mt-5">
+                                <button
+                                  onClick={cancelProductEdit}
+                                  className="px-5 py-2 border rounded-xl hover:bg-gray-100"
+                                >
+                                  Cancel
+                                </button>
+
+                                <button
+                                  onClick={saveProductEdit}
+                                  className="px-5 py-2 bg-black text-white rounded-xl hover:bg-gray-800"
+                                >
+                                  Save Changes
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="border  border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md transition  mb-4 ">
+                              <div
+                                className=" mb-4 
+flex flex-col
+lg:grid lg:grid-cols-1
+
+lg:gap-0
+"
+                              >
+                                <div className="flex justify-between items-center gap-2  ">
+                                  <h3 className="text-lg   lg:text-2xl font-bold text-gray-900 ">
+                                    {product.category
+                                      ? product.category
+                                          .charAt(0)
+                                          .toUpperCase() +
+                                        product.category.slice(1)
+                                      : "Product"}
+                                  </h3>
+                                  <div className="flex gap-2 justify-center items-center ">
+                                    <button
+                                      onClick={() =>
+                                        startProductEdit(
+                                          order._id,
+                                          room._id,
+                                          product,
+                                        )
+                                      }
+                                      className="w-10 h-10   bg-white hover:bg-gray-50 flex items-center justify-center"
+                                    >
+                                      <i
+                                        className="fas fa-edit  transition-all
+    duration-200
+    hover:scale-125 text-green-600"
+                                      ></i>
+                                    </button>
+
+                                    <button
+                                      onClick={() =>
+                                        deleteProduct(
+                                          order._id,
+                                          room._id,
+                                          product._id,
+                                        )
+                                      }
+                                      className="w-10 h-10 rounded-xl  bg-white hover:bg-red-50 flex items-center justify-center"
+                                    >
+                                      <i
+                                        className="fas fa-trash-alt  transition-all
+    duration-200
+    hover:scale-125 text-red-600"
+                                      ></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="flex justify-between items-start gap-3">
+                                  {/* LEFT */}
+                                  <div className="flex-1 ">
+                                    {/* ATTRIBUTES */}
+                                    <div
+                                      className="flex lg:flex-row lg:gap-16
+                                     flex-col gap-5 mt-3"
+                                    >
+                                      {/* LEFT - 30% */}
+                                      <div className="w-full lg:w-[30%] space-y-3">
+                                        {/* Company / Collection / Status */}
+                                        <div className="space-y-3">
+                                          <div className="grid md:grid-cols-2 gap-2">
+                                            <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition">
+                                              <p className="text-[11px] text-gray-500 uppercase mb-1">
+                                                Company
+                                              </p>
+                                              <p className="text-xl font-semibold text-gray-800">
+                                                {product.companyName}
+                                              </p>
+                                            </div>
+
+                                            <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition">
+                                              <p className="text-[11px] text-gray-500 uppercase mb-1">
+                                                Collection
+                                              </p>
+                                              <p className="text-xl font-semibold text-gray-800">
+                                                {product.collectionName}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition">
+                                            <p className="text-[11px] text-gray-500 uppercase mb-1">
+                                              Serial No.
+                                            </p>
+                                            <p className="text-xl font-semibold text-gray-800">
+                                              {product.productCode}
+                                            </p>
+                                          </div>
+                                          <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl shadow-sm">
+                                            <p className="text-[11px] text-gray-500 uppercase mb-2">
+                                              Attachments (
+                                              {product.attachments?.length || 0}
+                                              )
+                                            </p>
+
+                                            {product.attachments?.length > 0 ? (
+                                              <div className="flex flex-wrap gap-2">
+                                                {product.attachments.map(
+                                                  (file, index) => (
+                                                    <button
+                                                      key={file._id || index}
+                                                      type="button"
+                                                      onClick={() =>
+                                                        setPreviewAttachment(
+                                                          file,
+                                                        )
+                                                      }
+                                                      className="group"
+                                                    >
+                                                      <img
+                                                        src={file.url}
+                                                        alt={file.originalName}
+                                                        className="
+              w-12 h-12
+              object-cover cursor-pointer
+              rounded-lg
+              border
+              border-gray-200
+              shadow-sm
+              hover:scale-110
+              transition
+            "
+                                                      />
+                                                    </button>
+                                                  ),
+                                                )}
+                                              </div>
+                                            ) : (
+                                              <p className="text-sm text-gray-400">
+                                                No attachments
+                                              </p>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      {/* RIGHT - 70% */}
+                                      <div className="w-full  lg:w-[70%]">
+                                        {Array.isArray(
+                                          product.attributes?.measurements,
+                                        ) &&
+                                          product.category?.toLowerCase() ===
+                                            "curtains" && (
+                                            <div>
+                                              {/* <h4 className="font-bold text-gray-800 text-sm uppercase tracking-wide mb-2">
+                                                Curtain Measurements
+                                              </h4> */}
+
+                                              <div className="grid  lg:grid-cols-3  gap-4">
+                                                {product.attributes.measurements.map(
+                                                  (m, i) => (
+                                                    <div
+                                                      key={i}
+                                                      className="   px-3  "
+                                                    >
+                                                      {m.windowName && (
+                                                        <div className="flex justify-center mb-2">
+                                                          <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                                                            {m.windowName}
+                                                          </span>
+                                                        </div>
+                                                      )}
+
+                                                      <div className="flex justify-center bg-amber-800">
+                                                        <div className="relative w-[360px] h-[150px]">
+                                                          <div className="absolute top-10 left-16 w-46 border-t-2 border-gray-500"></div>
+                                                          <div className="absolute top-10 left-16 h-24 border-l-2 border-gray-500"></div>
+
+                                                          <div className="absolute top-0 left-29 w-24 border font-bold text-[18px] rounded-md px-2 py-1 text-center bg-white text-sm">
+                                                            {m.width}
+                                                          </div>
+
+                                                          <div className="absolute top-18 w-24 -left-10 border rounded-md px-2 py-1 font-bold text-[18px] text-center bg-white text-sm">
+                                                            {m.height}
+                                                          </div>
+
+                                                          <div className="absolute top-12 left-18 w-44 h-21 bg-white border rounded-xl p-2 shadow-sm">
+                                                            {/* <p className="text-[10px] text-gray-500 mb-1">
+                                                            Details
+                                                          </p> */}
+                                                            <p className="w-full  text-xs resize-none">
+                                                              {m.details || "-"}
+                                                            </p>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  ),
+                                                )}
+                                              </div>
+                                            </div>
+                                          )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </React.Fragment>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+      {previewAttachment && (
+        <div
+          className="fixed inset-0 z-[9999] mt-26 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setPreviewAttachment(null)}
+        >
+          <div
+            className="relative max-w-6xl w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setPreviewAttachment(null)}
+              className="
+          absolute
+          -top-12
+          right-0
+          w-10
+          h-10
+          rounded-full
+          bg-white
+          text-black
+          flex
+          items-center
+          justify-center cursor-pointer
+          shadow-lg
+        "
+            >
+              <FiX size={22} />
+            </button>
+
+            {/* Image */}
+            <img
+              src={previewAttachment.url}
+              alt={previewAttachment.originalName}
+              className="
+          w-full
+          max-h-[65vh]
+          object-contain
+          rounded-2xl
+         
+          p-2
+        "
+            />
+
+            {/* File Name */}
+            {/* <div className="mt-3 text-center text-white text-sm">
+              {previewAttachment.originalName}
+            </div> */}
+          </div>
+        </div>
+      )}
+      <ConfirmModal
+        isOpen={showBackConfirm}
+        title="Leave Customer?"
+        message="You have unsaved changes. All changes will be lost."
+        onCancel={() => setShowBackConfirm(false)}
+        onConfirm={() => {
+          setShowBackConfirm(false);
+
+          handleGlobalCancel(); // clear editing states
+
+          handleBackAction(); // go back
+        }}
+      />
+    </div>
+  );
+};
+
+export default CustomerSnapshot;
+
+// import React, { useState, useEffect, useMemo, useRef } from "react";
+// import { FiArrowLeft, FiSearch, FiX } from "react-icons/fi";
+
+// import { toast } from "react-toastify";
+// import { FiEye } from "react-icons/fi";
+
+// import { getStatusStyle } from "@/constants/Config";
+// const CustomerSnapshot = ({
+//   filteredOrders,
+//   selectedCustomer,
+//   customerOrders,
+//   handleBackAction,
+//   products,
+//   searchTerm,
+//   setSearchTerm,
+//   closeAllPanels,
+//   setEditingCustomer,
+//   setShowAddOrderForm,
+//   setEditingOrder,
+//   deleteOrder,
+//   startProductEdit,
+//   deleteProduct,
+//   formatDate,
+//   isEditingActive,
+//   setSelectedProduct,
+//   setShowProductModal,
+//   startRoomEdit,
+// }) => {
+//   if (!selectedCustomer) {
+//     return (
+//       <div className="border border-gray-200 rounded-2xl px-6  text-center">
+//         <p className="text-gray-500">
+//           No customer selected. Add a customer first.
+//         </p>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="sticky lg:top-0 z-30 ">
+//       <div className="px-4 sm:px-5 pt-3 pb-4 border-b">
+//         {/* TOP ROW */}
+//         {/* DESKTOP TITLE */}
+//         <div className="hidden lg:flex pb-2 justify-center flex-1">
+//           <h2
+//             className={`text-xl font-medium  ${
+//               isEditingActive() ? "block" : "hidden"
+//             }`}
+//           >
+//             Customer and Order Details
+//           </h2>
+//         </div>
+//         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+//           {/* LEFT SIDE */}
+//           <div className="flex items-center justify-between gap-3">
+//             <button
+//               onClick={handleBackAction}
+//               className="flex items-center gap-2 text-sm px-3 py-2 bg-gray-900 hover:bg-black text-white rounded-lg cursor-pointer shrink-0"
+//             >
+//               <FiArrowLeft />
+//               Back
+//             </button>
+
+//             {/* MOBILE TITLE */}
+//             <h2 className="text-sm sm:text-base font-medium lg:hidden text-right">
+//               Customer & Order Details
+//             </h2>
+//           </div>
+
+//           {/* DESKTOP TITLE */}
+//           <div className="hidden lg:flex justify-center flex-1">
+//             <h2
+//               className={`text-xl font-medium  ${
+//                 isEditingActive() ? "hidden" : "block"
+//               }`}
+//             >
+//               Customer and Order Details
+//             </h2>
+//           </div>
+
+//           {/* SEARCH */}
+//           <div className="relative w-full lg:w-80">
+//             <input
+//               type="text"
+//               placeholder="Search orders, products..."
+//               value={searchTerm}
+//               onChange={(e) => setSearchTerm(e.target.value)}
+//               className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl outline-none text-sm sm:text-base"
+//             />
+
+//             {/* SEARCH ICON */}
+//             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+//               <FiSearch className="w-4 h-4" />
+//             </span>
+
+//             {/* CLEAR BUTTON */}
+//             {searchTerm && (
+//               <button
+//                 onClick={() => setSearchTerm("")}
+//                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
+//               >
+//                 <FiX size={16} />
+//               </button>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+//       {/* all customers details */}
+//       <div className="flex-1 min-h-0   bg-black p-4  ">
+//         <div className=" lg:px-3   ">
+//           <div className="flex justify-between gap-3 flex-wrap items-start h-full ">
+//             <div>
+//               <h3 className="text-md sm:text-2xl lg:text-3xl  mb-2 pt-1  break-words text-white">
+//                 {selectedCustomer.name}{" "}
+//                 <span className="px-3 mx-2 py-1 rounded-full text-[12px]  bg-gray-600 text-white border ">
+//                   <span className="text bold  text-[14px] lg:text-[16px] pt-1">
+//                     {" "}
+//                     {customerOrders.length}{" "}
+//                   </span>
+//                   Order(s)
+//                 </span>
+//               </h3>
+
+//               <div className="text-white text-xs sm:text-sm break-words">
+//                 {[
+//                   selectedCustomer?.mobile,
+//                   selectedCustomer?.city,
+//                   selectedCustomer?.address,
+//                 ]
+//                   .filter(Boolean)
+//                   .join(" • ")}
+//               </div>
+
+//               {/* <div className="flex gap-2 bg-amber-700 flex-wrap lg:mt-3">
+//                 {hasPartial && (
+//                   <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
+//                     Partial Payment
+//                   </span>
+//                 )}
+//               </div> */}
+//             </div>
+
+//             <div
+//               className={`flex justify-between gap-3 mb-1 md:mb-0  mt-0   ${
+//                 isEditingActive() ? "" : "mt-4"
+//               }`}
+//             >
+//               <div>
+//                 <button
+//                   className="px-4 py-1 md:py-2 rounded-xl cursor-pointer bg-white text-black font-semibold hover:bg-gray-200 transition"
+//                   onClick={() => {
+//                     closeAllPanels();
+//                     setEditingCustomer(selectedCustomer);
+//                   }}
+//                 >
+//                   Edit Customer
+//                 </button>
+//               </div>
+//               <div>
+//                 <button
+//                   className="px-4 py-1 md:py-2 rounded-xl cursor-pointer bg-white text-black font-semibold hover:bg-gray-200 transition"
+//                   onClick={() => {
+//                     closeAllPanels();
+//                     setShowAddOrderForm(true);
+//                   }}
+//                 >
+//                   Create New Order
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//       {/* all orders */}
+//       <div className="lg:flex-1 lg:overflow-y-auto  min-h-0 bg-[#fbfbfb] lg:h-[550px] px-3 sm:px-5 pb-5  space-y-3 pt-2">
+//         {filteredOrders.map((order) => (
+//           <div key={order._id} className="md::border rounded-2xl p-4 ">
+//             <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:items-center">
+//               <div className="flex items-start justify-between gap-3 w-full sm:w-auto">
+//                 <div className="font-extrabold bg-black p-2 rounded-xl text-white text-base sm:text-xl break-all">
+//                   <span>Order Code : </span> {order.orderNo}
+//                 </div>
+
+//                 {/* MOBILE STATUS */}
+//                 <div
+//                   className={`sm:hidden flex px-3 py-1 border rounded-full text-xs  ${getStatusStyle(
+//                     order.orderStatus,
+//                   )}`}
+//                 >
+//                   {order.orderStatus}
+//                 </div>
+
+//                 <div className="sm:hidden">
+//                   <div className="flex justify-end sm:justify-start gap-2 items-center w-full sm:w-auto">
+//                     <button
+//                       className="px-1 py-1 cursor-pointer rounded-lg   text-md "
+//                       onClick={() => {
+//                         closeAllPanels(); // ✅ reset everything first
+//                         setEditingOrder(order);
+//                       }}
+//                       // onClick={() => {
+//                       //   setEditingOrder(order);
+//                       //   setEditingProductState(null);
+//                       // }}
+//                     >
+//                       <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
+//                     </button>
+//                     <button
+//                       className="px-1 py-1 cursor-pointer rounded-lg bg-white  text-red-600 text-sm hover:bg-red-50"
+//                       onClick={() => deleteOrder(order._id)}
+//                     >
+//                       <i className="fas fa-trash-alt text-red-600 hover:text-red-800 cursor-pointer"></i>
+//                     </button>
+//                   </div>
+//                 </div>
+//               </div>
+//               <div
+//                 className={`px-3 hidden md:flex py-2 rounded-full text-xs  border ${getStatusStyle(
+//                   order.orderStatus,
+//                 )}`}
+//               >
+//                 {order.orderStatus}
+//               </div>
+//               <div className=" hidden sm:flex justify-end sm:justify-start gap-2 items-center w-full sm:w-auto">
+//                 <button
+//                   className="px-3 py-1 cursor-pointer rounded-lg   text-lg "
+//                   onClick={() => {
+//                     closeAllPanels(); // ✅ reset everything first
+//                     setEditingOrder(order);
+//                   }}
+//                   // onClick={() => {
+//                   //   setEditingOrder(order);
+//                   //   setEditingProductState(null);
+//                   // }}
+//                 >
+//                   <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
+//                 </button>
+//                 <button
+//                   className="px-3 py-1 cursor-pointer rounded-lg bg-white border border-red-300 text-red-600 text-sm hover:bg-red-50"
+//                   onClick={() => deleteOrder(order._id)}
+//                 >
+//                   <i className="fas fa-trash-alt text-red-600 hover:text-red-800 cursor-pointer"></i>
+//                 </button>
+//               </div>
+//             </div>
+
+//             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+//               <div className="bg-white rounded-xl p-3 border border-gray-200">
+//                 <small className="text-gray-800  lg:text-[15px]   block">
+//                   Total
+//                 </small>
+//                 <strong className="text-base sm:text-md">
+//                   ₹
+//                   {parseInt(
+//                     order.totalAmount || order.total || 0,
+//                   ).toLocaleString()}
+//                 </strong>
+//               </div>
+//               <div className="bg-white rounded-xl p-3 border border-gray-200">
+//                 <small className="text-gray-800  lg:text-[15px]   block">
+//                   Received Amount
+//                 </small>
+//                 <strong className="text-base sm:text-md">
+//                   ₹{parseInt(order.receivedAmount || 0).toLocaleString()}
+//                 </strong>
+//               </div>
+//               <div className="bg-white rounded-xl p-3 border border-gray-200">
+//                 <small className="text-gray-800  lg:text-[15px]  block">
+//                   Delivery
+//                 </small>
+//                 <strong className="text-base sm:text-md">
+//                   {formatDate(order.deliveryDate)}
+//                 </strong>
+//               </div>
+//               <div className="bg-white rounded-xl p-3 border border-gray-200">
+//                 <small className="text-gray-800  lg:text-[15px]  block">
+//                   Due Amount
+//                 </small>
+//                 <strong className="text-base sm:text-md">
+//                   ₹{parseInt(order.dueAmount || 0).toLocaleString()}
+//                 </strong>
+//               </div>
+//             </div>
+
+//             {/* Products list - now without inline editing */}
+//             {order.rooms?.map((room, roomIndex) => (
+//               <div
+//                 key={`${order._id}-${room._id}-${roomIndex}`}
+//                 className="mt-4 "
+//               >
+//                 {/* ROOM HEADER */}
+//                 <div className="flex justify-between items-center gap-2 mb-2">
+//                   <div className="flex items-center gap-2 flex-wrap mb-2">
+//                     <div className="flex items-center gap-2 bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 py-2 rounded-2xl shadow-sm">
+//                       <span className="text-lg">🏠</span>
+
+//                       <span className="font-bold text-sm sm:text-base tracking-wide">
+//                         {room.roomType || "Room"}
+//                       </span>
+//                     </div>
+
+//                     {room.roomName && (
+//                       <div className="px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-sm font-semibold shadow-sm">
+//                         {room.roomName}
+//                       </div>
+//                     )}
+//                   </div>
+//                   {/* edit delete room */}
+//                   <div className=" hidden sm:flex justify-end sm:justify-start gap-2 items-center w-full sm:w-auto">
+//                     {/* edit room */}
+//                     <button
+//                       className="px-3 py-1 cursor-pointer rounded-lg text-lg"
+//                       onClick={() => startRoomEdit(order._id, room, roomIndex)}
+//                     >
+//                       <i className="fas fa-edit text-green-600 hover:text-green-800"></i>
+//                     </button>
+//                     <button
+//                       className="px-3 py-1 cursor-pointer rounded-lg bg-white border border-red-300 text-red-600 text-sm hover:bg-red-50"
+//                       onClick={() => {}}
+//                     >
+//                       <i className="fas fa-trash-alt text-red-600 hover:text-red-800 cursor-pointer"></i>
+//                     </button>
+//                   </div>
+//                 </div>
+
+//                 {/* PRODUCTS INSIDE ROOM */}
+//                 <div className="">
+//                   {room.products
+//                     ?.filter((p) => p.isActive)
+//                     .map((product, idx) => (
+//                       <div
+//                         key={product._id || `${room._id}-${idx}`}
+//                         className="mt-2 border border-gray-200 bg-white rounded-xl p-3 sm:p-4"
+//                       >
+//                         <div className="flex justify-between items-center">
+//                           {/* PRODUCT NAME */}
+//                           <p className="font-semibold">
+//                             <span className="bg-black text-white px-2 py-1 rounded-full mr-2">
+//                               {idx + 1}
+//                             </span>
+
+//                             {product.category}
+//                             {product.productCode && ` - ${product.productCode}`}
+//                           </p>
+
+//                           {/* ACTIONS */}
+//                           <div className="flex gap-4">
+//                             <button
+//                               onClick={() =>
+//                                 startProductEdit(
+//                                   order._id,
+//                                   room._id || room.id,
+//                                   product,
+//                                 )
+//                               }
+//                             >
+//                               <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
+//                             </button>
+
+//                             <button
+//                               onClick={() =>
+//                                 deleteProduct(
+//                                   order._id,
+//                                   room._id || room.id,
+//                                   product._id,
+//                                 )
+//                               }
+//                             >
+//                               <i className="fas fa-trash-alt text-red-600 hover:text-red-800 cursor-pointer"></i>
+//                             </button>
+//                           </div>
+//                         </div>
+
+//                         {/* ATTRIBUTES */}
+// <div className="mt-2 text-sm grid grid-cols-2 gap-2">
+//   {Object.entries(product.attributes || {}).map(
+//     ([key, value]) => (
+//       <div key={key}>
+//         <span className="text-gray-500">{key}: </span>
+//         <span>{JSON.stringify(value)}</span>
+//       </div>
+//     ),
+//   )}
+// </div>
+//                       </div>
+//                     ))}
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default CustomerSnapshot;

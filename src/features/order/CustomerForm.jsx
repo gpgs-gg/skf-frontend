@@ -102,6 +102,7 @@ const AddCustomer = ({
   // =========================
   const onSubmit = async (data) => {
     if (!data.name || !data.mobile) {
+      toast.dismiss();
       toast.error("Name and Mobile No. Required");
       return;
     }
@@ -159,7 +160,7 @@ const AddCustomer = ({
       onSave?.(payload);
     } catch (error) {
       console.log(error);
-
+      toast.dismiss();
       toast.error(error.response?.data?.message || "Something went wrong");
     }
   };
@@ -215,7 +216,7 @@ const AddCustomer = ({
       onSave?.(payload, true);
     } catch (error) {
       console.log(error);
-
+      toast.dismiss();
       toast.error("Failed to save customer");
     }
   };

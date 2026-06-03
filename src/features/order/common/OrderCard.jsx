@@ -27,10 +27,10 @@ const OrderCard = ({ order, customers, onViewDetails, onDeleteOrder }) => {
           <b>Status:</b> {order.orderStatus}
         </p>
 
-        <p>
+        {/* <p>
           <b>Total:</b> ₹
           {parseInt(order.totalAmount || order.total || 0).toLocaleString()}
-        </p>
+        </p> */}
 
         <p>
           <b>Products:</b> {order.products?.length || 0}

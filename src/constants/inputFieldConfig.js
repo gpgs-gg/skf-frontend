@@ -7,6 +7,7 @@ const FIELD_CONFIG = {
 
   // curtain
   roomName: { label: "Room Name" },
+  specialNotes: { label: "Special Notes Name" },
   curtainType: {
     label: "Curtain Style",
     type: "select",
@@ -61,7 +62,7 @@ const FIELD_CONFIG = {
     type: "select",
     options: ["Pending", "Processing", "Completed", "Cancelled", "Open"],
   },
-  specialNotes: { label: "Special Notes", type: "textarea" },
+
   // SOFA
   sofaType: {
     label: "Sofa Type",

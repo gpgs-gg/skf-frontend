@@ -1,4 +1,3 @@
-
 import { ORDER_FIELDS } from "../../constants/orderInputFields";
 
 export const generateOrderNo = (orders = []) => {
@@ -23,7 +22,6 @@ export const generateOrderNo = (orders = []) => {
 
   return `SKF-${year}-${nextNumber}`;
 };
-
 
 export const calculateOrderTotal = (products) => {
   return products
@@ -65,6 +63,9 @@ export const emptyProduct = () => {
   return {
     id: null,
     category: "",
+    collectionName: "",
+    attachments: [],
+    companyName: "",
     name: "",
     price: 0,
     productCode: "",
@@ -73,7 +74,9 @@ export const emptyProduct = () => {
     deliveryDate: "",
     orderStatus: "Open",
     specialNotes: "",
-    attributes: {}, // Store all category-specific fields here
+    attributes: {
+      measurements: [],
+    }, // Store all category-specific fields here
   };
 };
 
@@ -87,36 +90,43 @@ export const cleanProductData = (product) => {
   const categoryFields = getCategoryFields(product.category);
 
   // Create attributes object from category-specific fields
-  const attributes = {};
+  const attributes = {
+    ...(product.attributes || {}),
+  };
 
   // Check both product.attributes (if exists) AND top-level fields
   categoryFields.forEach((field) => {
-    // First check if field exists in attributes
-    if (
-      product.attributes &&
-      product.attributes[field] !== undefined &&
-      product.attributes[field] !== ""
-    ) {
-      attributes[field] = product.attributes[field];
-    }
-    // Then check top-level (for backward compatibility)
-    else if (product[field] !== undefined && product[field] !== "") {
+    if (product[field] !== undefined) {
       attributes[field] = product[field];
     }
   });
-
   // Return cleaned product with attributes
   return {
     id: product._id,
     category: product.category,
     name: product.name || `${product.category}_${Date.now()}`,
+    companyName: product.companyName || "",
+
+    collectionName: product.collectionName || "",
+    attachments: Array.isArray(product.attachments)
+      ? product.attachments
+          .filter(Boolean)
+          .map((file) => {
+            if (file instanceof File) return file;
+            if (typeof file === "string") return file;
+            if (file?.url) return file.url;
+            return null;
+          })
+          .filter(Boolean)
+      : [],
+
     price: Number(product.price) || 0,
     productCode: product.productCode || "",
-    brand: product.brand || "",
+    // brand: product.brand || "",
     quantity: Number(product.quantity) || 1,
-    deliveryDate: product.deliveryDate || "",
-    orderStatus: product.orderStatus || "Pending",
-    specialNotes: product.specialNotes || "",
+    // deliveryDate: product.deliveryDate || "",
+    // orderStatus: product.orderStatus || "Pending",
+    // specialNotes: product.specialNotes || "",
     attributes: attributes,
   };
 };

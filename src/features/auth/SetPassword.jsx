@@ -97,6 +97,7 @@ const SetPassword = ({ isOpen, setIsOpen, userData, clientData }) => {
     const enteredOtp = otp?.trim();
 
     if (!enteredOtp) {
+      toast.dismiss();
       toast.error("Please enter OTP");
       return;
     }
@@ -153,6 +154,7 @@ const SetPassword = ({ isOpen, setIsOpen, userData, clientData }) => {
         localStorage.removeItem("otpData"); // clean up
       },
       onError: () => {
+        toast.dismiss();
         toast.error("Failed to update password.");
       },
     });

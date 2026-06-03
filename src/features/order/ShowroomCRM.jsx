@@ -23,6 +23,9 @@ import {
   useDeleteOrder,
   useUpdateOrderProduct,
   useDeleteOrderProduct,
+  useUpdateOrderRoom,
+  useDeleteOrderRoom,
+  useAddOrderProduct,
 } from "./services/orderApi.js";
 // component for adding and editing order
 import AddOrder from "./OrderForm.jsx";
@@ -91,6 +94,11 @@ const ShowroomCRM = () => {
 
   const deleteProductMutation = useDeleteOrderProduct();
 
+  //! rooms react query hook
+  const updateRoomMutation = useUpdateOrderRoom();
+  const deleteRoomMutation = useDeleteOrderRoom();
+
+  const addProductMutation = useAddOrderProduct();
   // =========================
   // 🔹 CUSTOMER CRUD WITH API
   // =========================
@@ -187,47 +195,75 @@ const ShowroomCRM = () => {
   // =========================
 
   // ❌ Delete product from order
-  const deleteProduct = async (orderId, productId) => {
+  const deleteProduct = async (orderId, roomId, productId) => {
     try {
       const order = orders.find((o) => o._id === orderId);
 
       if (!order) return;
 
-      if (order.products.length === 1) {
-        // const confirmDelete = window.confirm(
-        //   "Order has only one product. Deleting it will remove the entire order. Continue?",
-        // );
+      // FIND ROOM
+      const room = order.rooms?.find((r) => r._id === roomId);
 
-        const confirmDelete = toast.warning(
-          "Order has only one product. Deleting it will remove the entire order. Continue?",
-        );
-        if (confirmDelete) {
-          handleAskDeleteOrder(orderId);
-        }
-
+      if (!room) {
+        toast.dismiss();
+        toast.error("Room not found");
         return;
+      }
+
+      // CHECK ROOM PRODUCTS COUNT
+      if ((room.products?.length || 0) === 1) {
+        toast.dismiss();
+        toast.warning("This is the last product in the room.");
       }
 
       await deleteProductMutation.mutateAsync({
         orderId,
+        roomId,
         productId,
       });
+      toast.dismiss();
+      toast.success("Product deleted successfully");
     } catch (error) {
       console.error("DELETE PRODUCT ERROR:", error);
-
+      toast.dismiss();
       toast.error(
         error?.response?.data?.message ||
           "Failed to delete product. Please try again.",
       );
     }
   };
-
   // ✏️ Update product inside order
-  const updateProductInOrder = async (orderId, updatedProduct) => {
+  // const updateProductInOrder = async (orderId, roomId, updatedProduct) => {
+  //   try {
+  //     console.log("Updating product:", { orderId, roomId, updatedProduct });
+  //     await updateProductMutation.mutateAsync({
+  //       orderId,
+  //       roomId,
+  //       productId: updatedProduct._id,
+  //       data: updatedProduct,
+  //     });
+  //   } catch (error) {
+  //     console.log("UPDATE PRODUCT ERROR:", error);
+  //   }
+  // };
+  const updateProductInOrder = async (
+    orderId,
+    roomId,
+    productId,
+    updatedProduct,
+  ) => {
     try {
+      console.log("Updating product:", {
+        orderId,
+        roomId,
+        productId,
+        updatedProduct,
+      });
+
       await updateProductMutation.mutateAsync({
         orderId,
-        productId: updatedProduct._id,
+        roomId,
+        productId,
         data: updatedProduct,
       });
     } catch (error) {
@@ -235,6 +271,72 @@ const ShowroomCRM = () => {
     }
   };
 
+  // update the room
+  const updateRoomDetails = async (orderId, roomId, roomData) => {
+    try {
+      await updateRoomMutation.mutateAsync({
+        orderId,
+        roomId,
+        data: roomData,
+      });
+    } catch (error) {
+      console.log("UPDATE ROOM ERROR:", error);
+    }
+  };
+
+  // DELTE ROOM
+
+  const deleteRoom = async (orderId, roomId) => {
+    try {
+      const order = orders.find((o) => o._id === orderId);
+
+      if (!order) return;
+
+      const room = order.rooms?.find((r) => r._id === roomId);
+
+      if (!room) {
+        toast.dismiss();
+        toast.error("Room not found");
+        return;
+      }
+
+      // OPTIONAL WARNING
+      if ((room.products?.length || 0) > 0) {
+        toast.dismiss();
+        toast.warning(
+          `Deleting room will also remove ${room.products.length} product(s).`,
+        );
+      }
+
+      await deleteRoomMutation.mutateAsync({
+        orderId,
+        roomId,
+      });
+      toast.dismiss();
+      toast.success("Room deleted successfully");
+    } catch (error) {
+      toast.dismiss();
+      console.log("DELETE ROOM ERROR:", error);
+
+      toast.error(error?.response?.data?.message || "Failed to delete room");
+    }
+  };
+
+  // ADD PRODUCT TO ROOM
+  const addProductToOrder = async (orderId, roomId, productData) => {
+    try {
+      await addProductMutation.mutateAsync({
+        orderId,
+        roomId,
+        data: productData,
+      });
+      toast.dismiss();
+      toast.success("Product added successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to add product");
+    }
+  };
   // check customer is exists with the mobile number
   const handleCheckMobile = async (mobile) => {
     try {
@@ -314,6 +416,9 @@ const ShowroomCRM = () => {
           onUpdateCustomer={updateCustomerDetails}
           onUpdateOrder={updateOrderDetails}
           onUpdateProduct={updateProductInOrder}
+          onUpdateRoom={updateRoomDetails}
+          onDeleteRoom={deleteRoom}
+          onAddProduct={addProductToOrder}
         />
       );
     }

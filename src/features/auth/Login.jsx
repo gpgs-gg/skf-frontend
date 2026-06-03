@@ -41,6 +41,7 @@ const Login = () => {
         const user = response?.user;
 
         if (!user) {
+          toast.dismiss();
           toast.error("Login failed");
           setIsSubmitting(false);
           return;
@@ -86,6 +87,7 @@ const Login = () => {
       //   // }
       // },
       onError: (error) => {
+        toast.dismiss();
         toast.error(
           error?.response?.data?.message || "Invalid Email or Password",
         );

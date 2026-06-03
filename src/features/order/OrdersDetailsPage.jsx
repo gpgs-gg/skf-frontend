@@ -29,426 +29,17 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { FiArrowLeft, FiSearch, FiX } from "react-icons/fi";
-import AddOrder from "./OrderForm";
-import AddCustomer from "./CustomerForm";
-import ProductForm from "./ProductForm";
+
 import ConfirmModal from "./common/ConfirmModal";
 import { toast } from "react-toastify";
 import { FiEye } from "react-icons/fi";
 import FIELD_CONFIG from "../../constants/inputFieldConfig";
 import ProductDetailsModal from "./common/ProductDetailsModal";
-import { getStatusStyle } from "../../constants/Config";
-
-/**
- * =========================================================
- * CustomerSnapshot Component
- * =========================================================
- * Displays:
- * - Customer profile details
- * - Order summary cards
- * - Product listing for each order
- * - Edit/Delete actions
- *
- * This component is purely presentational and receives
- * all state/actions from parent component.
- * =========================================================
- */
-const CustomerSnapshot = ({
-  filteredOrders,
-  selectedCustomer,
-  customerOrders,
-  handleBackAction,
-  products,
-  searchTerm,
-  setSearchTerm,
-  closeAllPanels,
-  setEditingCustomer,
-  setShowAddOrderForm,
-  setEditingOrder,
-  deleteOrder,
-  startProductEdit,
-  deleteProduct,
-  formatDate,
-  isEditingActive,
-  setSelectedProduct,
-  setShowProductModal,
-}) => {
-  if (!selectedCustomer) {
-    return (
-      <div className="border border-gray-200 rounded-2xl px-6  text-center">
-        <p className="text-gray-500">
-          No customer selected. Add a customer first.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="sticky lg:top-0 z-30 ">
-      <div className="px-4 sm:px-5 pt-3 pb-4 border-b">
-        {/* TOP ROW */}
-        {/* DESKTOP TITLE */}
-        <div className="hidden lg:flex pb-2 justify-center flex-1">
-          <h2
-            className={`text-xl font-medium  ${
-              isEditingActive() ? "block" : "hidden"
-            }`}
-          >
-            Customer and Order Details
-          </h2>
-        </div>
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          {/* LEFT SIDE */}
-          <div className="flex items-center justify-between gap-3">
-            <button
-              onClick={handleBackAction}
-              className="flex items-center gap-2 text-sm px-3 py-2 bg-gray-900 hover:bg-black text-white rounded-lg cursor-pointer shrink-0"
-            >
-              <FiArrowLeft />
-              Back
-            </button>
-
-            {/* MOBILE TITLE */}
-            <h2 className="text-sm sm:text-base font-medium lg:hidden text-right">
-              Customer & Order Details
-            </h2>
-          </div>
-
-          {/* DESKTOP TITLE */}
-          <div className="hidden lg:flex justify-center flex-1">
-            <h2
-              className={`text-xl font-medium  ${
-                isEditingActive() ? "hidden" : "block"
-              }`}
-            >
-              Customer and Order Details
-            </h2>
-          </div>
-
-          {/* SEARCH */}
-          <div className="relative w-full lg:w-80">
-            <input
-              type="text"
-              placeholder="Search orders, products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl outline-none text-sm sm:text-base"
-            />
-
-            {/* SEARCH ICON */}
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              <FiSearch className="w-4 h-4" />
-            </span>
-
-            {/* CLEAR BUTTON */}
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
-              >
-                <FiX size={16} />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-      {/* all customers details */}
-      <div className="flex-1 min-h-0   bg-black p-4  ">
-        <div className=" lg:px-3   ">
-          <div className="flex justify-between gap-3 flex-wrap items-start h-full ">
-            <div>
-              <h3 className="text-md sm:text-2xl lg:text-3xl  mb-2 pt-1  break-words text-white">
-                {selectedCustomer.name}{" "}
-                <span className="px-3 mx-2 py-1 rounded-full text-[12px]  bg-gray-600 text-white border ">
-                  <span className="text bold  text-[14px] lg:text-[16px] pt-1">
-                    {" "}
-                    {customerOrders.length}{" "}
-                  </span>
-                  Order(s)
-                </span>
-              </h3>
-
-              <div className="text-white text-xs sm:text-sm break-words">
-                {[
-                  selectedCustomer?.mobile,
-                  selectedCustomer?.city,
-                  selectedCustomer?.address,
-                ]
-                  .filter(Boolean)
-                  .join(" • ")}
-              </div>
-
-              {/* <div className="flex gap-2 bg-amber-700 flex-wrap lg:mt-3">
-                {hasPartial && (
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
-                    Partial Payment
-                  </span>
-                )}
-              </div> */}
-            </div>
-
-            <div
-              className={`flex justify-between gap-3 mb-1 md:mb-0  mt-0   ${
-                isEditingActive() ? "" : "mt-4"
-              }`}
-            >
-              <div>
-                <button
-                  className="px-4 py-1 md:py-2 rounded-xl cursor-pointer bg-white text-black font-semibold hover:bg-gray-200 transition"
-                  onClick={() => {
-                    closeAllPanels();
-                    setEditingCustomer(selectedCustomer);
-                  }}
-                >
-                  Edit Customer
-                </button>
-              </div>
-              <div>
-                <button
-                  className="px-4 py-1 md:py-2 rounded-xl cursor-pointer bg-white text-black font-semibold hover:bg-gray-200 transition"
-                  onClick={() => {
-                    closeAllPanels();
-                    setShowAddOrderForm(true);
-                  }}
-                >
-                  Create New Order
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* all orders */}
-      <div className="lg:flex-1 lg:overflow-y-auto  min-h-0 bg-[#fbfbfb] lg:h-[550px] px-3 sm:px-5 pb-5  space-y-3 pt-2">
-        {filteredOrders.map((order) => (
-          <div key={order._id} className="md::border rounded-2xl p-4 ">
-            <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:items-center">
-              <div className="flex items-start justify-between gap-3 w-full sm:w-auto">
-                <div className="font-extrabold bg-black p-2 rounded-xl text-white text-base sm:text-xl break-all">
-                  <span>Order Code : </span> {order.orderNo}
-                </div>
-
-                {/* MOBILE STATUS */}
-                <div
-                  className={`sm:hidden flex px-3 py-1 border rounded-full text-xs  ${getStatusStyle(
-                    order.orderStatus,
-                  )}`}
-                >
-                  {order.orderStatus}
-                </div>
-
-                <div className="sm:hidden">
-                  <div className="flex justify-end sm:justify-start gap-2 items-center w-full sm:w-auto">
-                    <button
-                      className="px-1 py-1 cursor-pointer rounded-lg   text-md "
-                      onClick={() => {
-                        closeAllPanels(); // ✅ reset everything first
-                        setEditingOrder(order);
-                      }}
-                      // onClick={() => {
-                      //   setEditingOrder(order);
-                      //   setEditingProductState(null);
-                      // }}
-                    >
-                      <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
-                    </button>
-                    <button
-                      className="px-1 py-1 cursor-pointer rounded-lg bg-white  text-red-600 text-sm hover:bg-red-50"
-                      onClick={() => deleteOrder(order._id)}
-                    >
-                      <i className="fas fa-trash-alt text-red-600 hover:text-red-800 cursor-pointer"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div
-                className={`px-3 hidden md:flex py-2 rounded-full text-xs  border ${getStatusStyle(
-                  order.orderStatus,
-                )}`}
-              >
-                {order.orderStatus}
-              </div>
-              <div className=" hidden sm:flex justify-end sm:justify-start gap-2 items-center w-full sm:w-auto">
-                <button
-                  className="px-3 py-1 cursor-pointer rounded-lg   text-lg "
-                  onClick={() => {
-                    closeAllPanels(); // ✅ reset everything first
-                    setEditingOrder(order);
-                  }}
-                  // onClick={() => {
-                  //   setEditingOrder(order);
-                  //   setEditingProductState(null);
-                  // }}
-                >
-                  <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
-                </button>
-                <button
-                  className="px-3 py-1 cursor-pointer rounded-lg bg-white border border-red-300 text-red-600 text-sm hover:bg-red-50"
-                  onClick={() => deleteOrder(order._id)}
-                >
-                  <i className="fas fa-trash-alt text-red-600 hover:text-red-800 cursor-pointer"></i>
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
-              <div className="bg-white rounded-xl p-3 border border-gray-200">
-                <small className="text-gray-800  lg:text-[15px]   block">
-                  Total
-                </small>
-                <strong className="text-base sm:text-md">
-                  ₹
-                  {parseInt(
-                    order.totalAmount || order.total || 0,
-                  ).toLocaleString()}
-                </strong>
-              </div>
-              <div className="bg-white rounded-xl p-3 border border-gray-200">
-                <small className="text-gray-800  lg:text-[15px]   block">
-                  Received Amount
-                </small>
-                <strong className="text-base sm:text-md">
-                  ₹{parseInt(order.receivedAmount || 0).toLocaleString()}
-                </strong>
-              </div>
-              <div className="bg-white rounded-xl p-3 border border-gray-200">
-                <small className="text-gray-800  lg:text-[15px]  block">
-                  Delivery
-                </small>
-                <strong className="text-base sm:text-md">
-                  {formatDate(order.deliveryDate)}
-                </strong>
-              </div>
-              <div className="bg-white rounded-xl p-3 border border-gray-200">
-                <small className="text-gray-800  lg:text-[15px]  block">
-                  Due Amount
-                </small>
-                <strong className="text-base sm:text-md">
-                  ₹{parseInt(order.dueAmount || 0).toLocaleString()}
-                </strong>
-              </div>
-            </div>
-
-            {/* Products list - now without inline editing */}
-            {order.products
-              ?.filter((p) => p.isActive)
-              .map((product, idx) => (
-                <div
-                  key={product._id || idx}
-                  className="mt-3 border border-gray-200 bg-white rounded-xl p-3 sm:p-4"
-                >
-                  <div className="flex flex-col sm:flex-row justify-between gap-3 sm:items-center">
-                    <p className="font-semibold text-base sm:text-[18px] break-words">
-                      <span className="bg-black rounded-full mr-2 text-white py-2 px-3">
-                        {idx + 1}
-                      </span>
-                      {product.category?.charAt(0).toUpperCase() +
-                        product.category?.slice(1)}
-
-                      {product?.productCode && (
-                        <span className="text-[16px]  ">
-                          {" "}
-                          <span className="font-normal">- </span>
-                          {product.productCode}
-                        </span>
-                      )}
-                    </p>
-                    {/* <span className="px-2 py-1 rounded-full text-xs bg-gray-100 border border-gray-200">
-        {product.curtainType}
-      </span> */}
-                    <div>
-                      {/* Order Status */}
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs  border ${getStatusStyle(
-                          product?.orderStatus,
-                        )}`}
-                      >
-                        {product?.orderStatus}
-                      </span>
-                    </div>
-                    <div className="flex items-center flex-wrap gap-3 mt-2 sm:mt-0">
-                      {/* View Product */}
-                      <div className="relative group ">
-                        <button
-                          className="cursor-pointer pt-2"
-                          onClick={() => {
-                            setSelectedProduct(product);
-                            setShowProductModal(true);
-                          }}
-                        >
-                          <FiEye size={20} />
-                        </button>
-                      </div>
-                      {/* Edit Product */}
-                      <button
-                        className="text-md text-green-500 cursor-pointer hover:text-green-700"
-                        onClick={() => startProductEdit(order._id, product)}
-                      >
-                        <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
-                      </button>
-                      {/* Delete Product */}
-                      <button
-                        className="text-md text-red-500 cursor-pointer hover:text-red-700"
-                        onClick={() => deleteProduct(order._id, product._id)}
-                      >
-                        <i className="fas fa-trash-alt text-red-600 hover:text-red-800 cursor-pointer"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    className={`  ${
-                      isEditingActive()
-                        ? "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1  lg:grid-cols-2 gap-x-4 gap-y-2 text-gray-900"
-                        : "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-gray-900"
-                    }`}
-                  >
-                    {Object.keys(product.attributes || {}).length > 0 && (
-                      <div
-                        className={`${
-                          isEditingActive()
-                            ? "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-2 text-gray-900"
-                            : "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-gray-900"
-                        }`}
-                      >
-                        {Object.entries(product.attributes || {}).map(
-                          ([key, value]) => (
-                            <div key={key} className="flex gap-1">
-                              <span className="text-gray-600 whitespace-nowrap">
-                                {FIELD_CONFIG[key]?.label || key}:
-                              </span>
-
-                              <span className="font-medium text-gray-800 break-words">
-                                {value || "-"}
-                              </span>
-                            </div>
-                          ),
-                        )}
-                      </div>
-                    )}
-                    {/* {Object.entries(product.attributes || {}).map(
-                      ([key, value]) => (
-                        <div key={key} className="flex gap-1">
-                          <span className="text-gray-600 whitespace-nowrap">
-                            {FIELD_CONFIG[key]?.label || key}:
-                          </span>
-                          <span className="font-medium text-gray-800 break-words">
-                            {value || "-"}
-                          </span>
-                        </div>
-                      ),
-                    )} */}
-                  </div>
-                </div>
-              ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+import CustomerSnapshot from "./common/CustomerSnapshot";
 
 const OrderDetailsPage = ({
   customer,
+  onDeleteRoom,
   orders,
   onBack,
   onDeleteOrder,
@@ -458,6 +49,8 @@ const OrderDetailsPage = ({
   onUpdateCustomer,
   onUpdateOrder,
   onUpdateProduct,
+  onUpdateRoom,
+  OnAddProduct,
 }) => {
   // Controls different editing panels/forms
   const [showAddOrderForm, setShowAddOrderForm] = useState(false);
@@ -488,16 +81,62 @@ const OrderDetailsPage = ({
   // console.log(11111111, products.length);
   const [showBackConfirmModal, setShowBackConfirmModal] = useState(false);
 
+  // state for rooms
+  const [editingRoomState, setEditingRoomState] = useState(null);
+  const [editingRoomOrderId, setEditingRoomOrderId] = useState(null);
+  const [editingRoomIndex, setEditingRoomIndex] = useState(null);
+
+  // for product room id
+  const [editingProductRoomId, setEditingProductRoomId] = useState(null);
+  const [showRoomDeleteModal, setShowRoomDeleteModal] = useState(false);
+  const [roomToDelete, setRoomToDelete] = useState(null);
+  const [roomOrderId, setRoomOrderId] = useState(null);
+  const [showGlobalCancelModal, setShowGlobalCancelModal] = useState(false);
+  const deleteRoom = (orderId, roomId) => {
+    setRoomOrderId(orderId);
+    setRoomToDelete(roomId);
+    setShowRoomDeleteModal(true);
+  };
+  const hasUnsavedChanges = () => {
+    return (
+      editingCustomer ||
+      editingOrder ||
+      editingRoomState ||
+      editingProductState ||
+      showAddOrderForm ||
+      products?.length > 0
+    );
+  };
+  const confirmDeleteRoom = () => {
+    if (onDeleteRoom && roomOrderId && roomToDelete) {
+      onDeleteRoom(roomOrderId, roomToDelete);
+    }
+
+    setShowRoomDeleteModal(false);
+    setRoomToDelete(null);
+    setRoomOrderId(null);
+
+    if (editingRoomState?._id === roomToDelete) {
+      setEditingRoomState(null);
+      setEditingRoomOrderId(null);
+      setEditingRoomIndex(null);
+    }
+  };
   /**
    * Closes all active editing panels/forms
    * Used before opening another panel to avoid UI conflicts
    */
+  //console.log(222222, editingProductRoomId);
   const closeAllPanels = () => {
     setEditingCustomer(null);
     setEditingOrder(null);
     setEditingProductState(null);
     setEditingProductOrderId(null);
     setShowAddOrderForm(false);
+    setEditingRoomState(null);
+    setEditingRoomOrderId(null);
+    setEditingRoomIndex(null);
+    setEditingProductRoomId(null);
   };
   const hasUnsavedProducts = () => {
     return (products?.length || 0) > 0;
@@ -520,6 +159,42 @@ const OrderDetailsPage = ({
     setShowBackConfirmModal(false);
   };
 
+  // room edit start
+  const startRoomEdit = (orderId, room, index) => {
+    console.log("ROOM EDIT CLICKED", { orderId, room, index });
+
+    closeAllPanels();
+
+    setEditingRoomState(room);
+    setEditingRoomOrderId(orderId);
+    setEditingRoomIndex(index);
+  };
+
+  // update room inside order
+  const saveRoomEdit = async (updatedRoom) => {
+    try {
+      await onUpdateRoom(editingRoomOrderId, updatedRoom._id, {
+        roomType: updatedRoom.roomType,
+        roomName: updatedRoom.roomName,
+        products: updatedRoom.products || [],
+      });
+      toast.dismiss();
+      toast.success("Room updated successfully");
+
+      setEditingRoomState(null);
+      setEditingRoomOrderId(null);
+      setEditingRoomIndex(null);
+    } catch (error) {
+      console.log(error);
+      toast.dismiss();
+      toast.error("Failed to update room");
+    }
+  };
+  const cancelRoomEdit = () => {
+    setEditingRoomState(null);
+    setEditingRoomOrderId(null);
+    setEditingRoomIndex(null);
+  };
   /**
    * Handles newly created order
    * Adds metadata and updates parent state
@@ -538,7 +213,26 @@ const OrderDetailsPage = ({
       onAddNewOrder(completeOrder);
     }
   };
+  const handleGlobalCancel = () => {
+    closeAllPanels();
 
+    setEditingCustomer(null);
+    setEditingOrder(null);
+    setEditingProductState(null);
+    setEditingRoomState(null);
+
+    setShowAddOrderForm(false);
+
+    toast.dismiss();
+  };
+  const handleGlobalCancelClick = () => {
+    if (hasUnsavedChanges()) {
+      setShowGlobalCancelModal(true);
+      return;
+    }
+
+    handleGlobalCancel();
+  };
   const addOrderRef = useRef(null);
   /**
    * Opens delete confirmation modal for selected order
@@ -561,8 +255,12 @@ const OrderDetailsPage = ({
   /**
    * Opens delete confirmation modal for product
    */
-  const deleteProduct = (orderId, productId) => {
+
+  const [productRoomId, setProductRoomId] = useState(null);
+
+  const deleteProduct = (orderId, roomId, productId) => {
     setProductOrderId(orderId);
+    setProductRoomId(roomId);
     setProductToDelete(productId);
     setShowProductDeleteModal(true);
   };
@@ -572,7 +270,7 @@ const OrderDetailsPage = ({
    */
   const confirmDeleteProduct = () => {
     if (onDeleteProduct && productOrderId && productToDelete) {
-      onDeleteProduct(productOrderId, productToDelete);
+      onDeleteProduct(productOrderId, productRoomId, productToDelete);
     }
 
     // Reset states
@@ -625,10 +323,18 @@ const OrderDetailsPage = ({
    * Opens product edit form
    * Closes other panels before opening
    */
-  const startProductEdit = (orderId, product) => {
-    closeAllPanels(); // ✅ important
+  const startProductEdit = (orderId, roomId, product) => {
+    if (!roomId) {
+      console.error("❌ Missing roomId:", roomId);
+      toast.dismiss();
+      toast.error("Room ID missing. Cannot edit product.");
+      return;
+    }
+    closeAllPanels();
+    console.log("11111ROOM ID RECEIVED:", roomId);
     setEditingProductState(product);
     setEditingProductOrderId(orderId);
+    setEditingProductRoomId(roomId);
   };
 
   const handleUpdateProductInline = (updatedProduct) => {
@@ -641,12 +347,23 @@ const OrderDetailsPage = ({
    * Calls parent update handler
    */
   const saveProductEdit = () => {
+    console.log("editingProductRoomId:", editingProductRoomId);
     console.log("editingProductOrderId:", editingProductOrderId);
     console.log("editingProductState:", editingProductState);
     console.log("onUpdateProduct exists:", !!onUpdateProduct);
-    if (onUpdateProduct && editingProductOrderId && editingProductState) {
+    if (
+      onUpdateProduct &&
+      editingProductOrderId &&
+      editingProductRoomId &&
+      editingProductState
+    ) {
       // Call the parent's update function
-      onUpdateProduct(editingProductOrderId, editingProductState);
+      onUpdateProduct(
+        editingProductOrderId,
+        editingProductRoomId,
+        editingProductState._id,
+        editingProductState,
+      );
       toast.dismiss();
       toast.success("Product details updated successfully!");
     } else {
@@ -655,6 +372,7 @@ const OrderDetailsPage = ({
         hasOrderId: !!editingProductOrderId,
         hasProduct: !!editingProductState,
       });
+      toast.dismiss();
       toast.error("Failed to update product");
     }
 
@@ -686,7 +404,11 @@ const OrderDetailsPage = ({
   // Helper to check if any editing is active
   const isEditingActive = () => {
     return (
-      editingCustomer || editingOrder || editingProductState || showAddOrderForm
+      editingCustomer ||
+      editingOrder ||
+      editingProductState ||
+      showAddOrderForm ||
+      editingRoomState
     );
   };
   /**
@@ -718,12 +440,14 @@ const OrderDetailsPage = ({
         order.orderNo?.toLowerCase().includes(term) ||
         order.orderStatus?.toLowerCase().includes(term);
       // Match product-level searchable fields
-      const productMatch = order.products?.some((p) =>
-        [p.category, p.roomName, p.fabricName, p.fabricType, p.curtainRod]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(term),
+      const productMatch = order.rooms?.some((room) =>
+        room.products?.some((p) =>
+          [p.category, room.roomName, p.fabricName, p.fabricType, p.curtainRod]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase()
+            .includes(term),
+        ),
       );
 
       return orderMatch || productMatch;
@@ -739,6 +463,20 @@ const OrderDetailsPage = ({
       year: "numeric",
     });
   };
+
+  // get editing product room name
+  const getEditingRoomInfo = () => {
+    const order = orders.find((o) => o._id === editingProductOrderId);
+    if (!order) return { roomName: "", roomType: "" };
+
+    const room = order.rooms?.find((r) => r._id === editingProductRoomId);
+
+    return {
+      roomName: room?.roomName || "",
+      roomType: room?.roomType || "",
+    };
+  };
+  const { roomName, roomType } = getEditingRoomInfo();
   /**
    * =========================================================
    * MAIN LAYOUT
@@ -749,174 +487,53 @@ const OrderDetailsPage = ({
    */
   return (
     <div className="overflow-hidden">
-      <div className="flex flex-col lg:flex-row w-full h-full p-2 sm:p-3 lg:p-4 gap-3 lg:gap-6 overflow-hidden">
-        {/* LEFT SECTION → Customer snapshot + order listing */}
-
-        <div
-          className={`transition-all duration-500 ease-in-out 
-${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
-  w-full rounded-2xl border bg-white shadow-sm 
-  flex-col min-h-0`}
-        >
-          <div
-            className={`transition-opacity duration-300 flex-1   ${
-              isEditingActive() ? "opacity-100" : "opacity-100"
-            }`}
-          >
-            <CustomerSnapshot
-              filteredOrders={filteredOrders}
-              selectedCustomer={selectedCustomer}
-              customerOrders={customerOrders}
-              handleBackAction={handleBackAction}
-              onBack={onBack}
-              products={products}
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              closeAllPanels={closeAllPanels}
-              setEditingCustomer={setEditingCustomer}
-              setShowAddOrderForm={setShowAddOrderForm}
-              setEditingOrder={setEditingOrder}
-              deleteOrder={deleteOrder}
-              startProductEdit={startProductEdit}
-              deleteProduct={deleteProduct}
-              formatDate={formatDate}
-              isEditingActive={isEditingActive}
-              setSelectedProduct={setSelectedProduct}
-              setShowProductModal={setShowProductModal}
-            />
-          </div>
-        </div>
-        {/* RIGHT SECTION → Dynamic forms/edit panels */}
-        <div
-          className={`transition-all duration-500 ease-in-out  lg:h-[calc(90vh-2rem)]  transform  min-h-0
-  ${
-    isEditingActive()
-      ? "w-full lg:w-[60%] lg:translate-x-0 opacity-100"
-      : "hidden lg:block lg:w-0 lg:translate-x-10 opacity-0"
-  } 
-  w-full  mt-4 lg:mt-0`}
-        >
-          <div className="h-full  rounded-2xl shadow-sm md:border md:border-gray-100 animate-slideInRight  flex flex-col  lg:overflow-y-auto">
-            <div className="min-h-full  animate-slideInRight">
-              {isEditingActive() && (
-                <div className="sticky top-0 bg-white  z-10 flex justify-end px-3 lg:pt-1 pt-3">
-                  <button
-                    onClick={() => {
-                      if (hasUnsavedProducts()) {
-                        setShowBackConfirmModal(true);
-                        return;
-                      }
-
-                      if (addOrderRef.current?.handleClose) {
-                        addOrderRef.current.handleClose();
-                      } else {
-                        closeAllPanels();
-                      }
-                    }}
-                    className=" rounded-full hover:bg-gray-100 transition cursor-pointer"
-                  >
-                    <FiX size={23} />
-                  </button>
-                </div>
-              )}
-
-              {editingCustomer ? (
-                <AddCustomer
-                  customer={editingCustomer}
-                  showNextButton={false}
-                  onCancel={() => setEditingCustomer(null)}
-                  onSave={async (updatedCustomer) => {
-                    try {
-                      const finalCustomer = {
-                        ...editingCustomer,
-                        ...updatedCustomer,
-                      };
-
-                      await onUpdateCustomer(finalCustomer);
-
-                      // ✅ instant UI update
-                      setSelectedCustomer(finalCustomer);
-
-                      setEditingCustomer(null);
-                    } catch (error) {
-                      console.log(error);
-                    }
-                  }}
-                />
-              ) : editingOrder ? (
-                <AddOrder
-                  key={editingOrder?._id}
-                  order={{ ...editingOrder, products: [] }}
-                  customers={customers}
-                  setProducts={setProducts}
-                  products={products}
-                  selectedCustomerId={
-                    selectedCustomer._id || selectedCustomer._id
-                  }
-                  onSave={handleUpdateOrder}
-                  onCancel={() => setEditingOrder(null)}
-                  title="Edit Order"
-                />
-              ) : editingProductState ? (
-                <div className="bg-white rounded-2xl px-3 sm:px-5 py-3">
-                  <h3 className="text-2xl font-bold mb-4">Edit Product</h3>
-                  <ProductForm
-                    product={editingProductState}
-                    index={0}
-                    onUpdate={handleUpdateProductInline}
-                    hideRemove={true}
-                  />
-                  <div className="flex gap-2 mt-6 mb-12 justify-end">
-                    <button
-                      onClick={cancelProductEdit}
-                      className="
-  w-full sm:w-auto
-  px-6 py-3
-  cursor-pointer font-extrabold
-  rounded-xl
-  border border-gray-300
-  text-gray-600
-  hover:bg-gray-100
-  transition
-  text-md sm:text-base
-"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={saveProductEdit}
-                      className="px-5 py-2 bg-gray-800  cursor-pointer text-white rounded-xl"
-                    >
-                      Save Changes
-                    </button>
-                    {/* <button
-                      onClick={() => {
-                        console.log("Manual save test");
-                        saveProductEdit();
-                      }}
-                      className="px-5 py-2 bg-green-600 cursor-pointer text-white rounded-xl"
-                    >
-                      Test Save
-                    </button> */}
-                  </div>
-                </div>
-              ) : showAddOrderForm ? (
-                <AddOrder
-                  key="create-order"
-                  products={products}
-                  setProducts={setProducts}
-                  selectedCustomerId={selectedCustomer._id}
-                  customers={customers}
-                  onSave={handleOrderCreated}
-                  onCancel={() => setShowAddOrderForm(false)}
-                  title="Create New Order"
-                />
-              ) : (
-                <></>
-              )}
-            </div>
-          </div>
-        </div>
+      <div className="w-full min-h-screen bg-gray-50">
+        <CustomerSnapshot
+          filteredOrders={filteredOrders}
+          selectedCustomer={selectedCustomer}
+          customerOrders={customerOrders}
+          handleBackAction={handleBackAction}
+          onBack={onBack}
+          products={products}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          closeAllPanels={closeAllPanels}
+          setEditingCustomer={setEditingCustomer}
+          setShowAddOrderForm={setShowAddOrderForm}
+          setEditingOrder={setEditingOrder}
+          deleteOrder={deleteOrder}
+          startProductEdit={startProductEdit}
+          deleteProduct={deleteProduct}
+          formatDate={formatDate}
+          setSelectedProduct={setSelectedProduct}
+          setShowProductModal={setShowProductModal}
+          startRoomEdit={startRoomEdit}
+          // NEW
+          editingCustomer={editingCustomer}
+          editingOrder={editingOrder}
+          editingRoomState={editingRoomState}
+          editingProductState={editingProductState}
+          saveRoomEdit={saveRoomEdit}
+          cancelRoomEdit={cancelRoomEdit}
+          saveProductEdit={saveProductEdit}
+          cancelProductEdit={cancelProductEdit}
+          handleUpdateProductInline={handleUpdateProductInline}
+          handleUpdateOrder={handleUpdateOrder}
+          roomName={roomName}
+          roomType={roomType}
+          setEditingCustomer={setEditingCustomer}
+          showAddOrderForm={showAddOrderForm}
+          customers={customers}
+          setProducts={setProducts}
+          handleOrderCreated={handleOrderCreated}
+          onUpdateCustomer={onUpdateCustomer}
+          setSelectedCustomer={setSelectedCustomer}
+          setEditingRoomState={setEditingRoomState}
+          handleGlobalCancel={handleGlobalCancelClick}
+          editingRoomOrderId={editingRoomOrderId}
+          editingProductOrderId={editingProductOrderId}
+          deleteRoom={deleteRoom}
+        />
       </div>
       {/* Product full details modal */}
       <ProductDetailsModal
@@ -927,6 +544,29 @@ ${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
           setSelectedProduct(null);
         }}
         formatDate={formatDate}
+      />
+      {/* global cancel confirmation modal */}
+      <ConfirmModal
+        isOpen={showGlobalCancelModal}
+        title="Discard Changes"
+        message="You have unsaved changes. Are you sure you want to cancel and discard them?"
+        onConfirm={() => {
+          setShowGlobalCancelModal(false);
+          handleGlobalCancel();
+        }}
+        onCancel={() => setShowGlobalCancelModal(false)}
+      />
+      {/* Room delete confirmation modal */}
+      <ConfirmModal
+        isOpen={showRoomDeleteModal}
+        title="Delete Room"
+        message="Are you sure you want to delete this room? All products inside this room will also be removed."
+        onConfirm={confirmDeleteRoom}
+        onCancel={() => {
+          setShowRoomDeleteModal(false);
+          setRoomToDelete(null);
+          setRoomOrderId(null);
+        }}
       />
       {/* Order delete confirmation modal */}
       <ConfirmModal
@@ -1004,394 +644,8 @@ export default OrderDetailsPage;
 // import { FiEye } from "react-icons/fi";
 // import FIELD_CONFIG from "../../constants/inputFieldConfig";
 // import ProductDetailsModal from "./common/ProductDetailsModal";
-// import { emptyProduct, migrateProductToNewFormat } from "./orderUtils";
-
-// /**
-//  * =========================================================
-//  * CustomerSnapshot Component
-//  * =========================================================
-//  * Displays:
-//  * - Customer profile details
-//  * - Order summary cards
-//  * - Product listing for each order
-//  * - Edit/Delete actions
-//  *
-//  * This component is purely presentational and receives
-//  * all state/actions from parent component.
-//  * =========================================================
-//  */
-// const CustomerSnapshot = ({
-//   filteredOrders,
-//   selectedCustomer,
-//   customerOrders,
-//   handleBackAction,
-//   products,
-//   searchTerm,
-//   setSearchTerm,
-//   closeAllPanels,
-//   setEditingCustomer,
-//   setShowAddOrderForm,
-//   setEditingOrder,
-//   deleteOrder,
-//   startProductEdit,
-//   deleteProduct,
-//   formatDate,
-//   isEditingActive,
-//   setSelectedProduct,
-//   setShowProductModal,
-// }) => {
-//   if (!selectedCustomer) {
-//     return (
-//       <div className="border border-gray-200 rounded-2xl px-6  text-center">
-//         <p className="text-gray-500">
-//           No customer selected. Add a customer first.
-//         </p>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="sticky lg:top-0 z-30 ">
-//       <div className="px-4 sm:px-5 pt-3 pb-4 border-b">
-//         {/* TOP ROW */}
-//         {/* DESKTOP TITLE */}
-//         <div className="hidden lg:flex pb-2 justify-center flex-1">
-//           <h2
-//             className={`text-xl font-medium  ${
-//               isEditingActive() ? "block" : "hidden"
-//             }`}
-//           >
-//             Customer and Order Details
-//           </h2>
-//         </div>
-//         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-//           {/* LEFT SIDE */}
-//           <div className="flex items-center justify-between gap-3">
-//             <button
-//               onClick={handleBackAction}
-//               className="flex items-center gap-2 text-sm px-3 py-2 bg-gray-900 hover:bg-black text-white rounded-lg cursor-pointer shrink-0"
-//             >
-//               <FiArrowLeft />
-//               Back
-//             </button>
-
-//             {/* MOBILE TITLE */}
-//             <h2 className="text-sm sm:text-base font-medium lg:hidden text-right">
-//               Customer & Order Details
-//             </h2>
-//           </div>
-
-//           {/* DESKTOP TITLE */}
-//           <div className="hidden lg:flex justify-center flex-1">
-//             <h2
-//               className={`text-xl font-medium  ${
-//                 isEditingActive() ? "hidden" : "block"
-//               }`}
-//             >
-//               Customer and Order Details
-//             </h2>
-//           </div>
-
-//           {/* SEARCH */}
-//           <div className="relative w-full lg:w-80">
-//             <input
-//               type="text"
-//               placeholder="Search orders, products..."
-//               value={searchTerm}
-//               onChange={(e) => setSearchTerm(e.target.value)}
-//               className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl outline-none text-sm sm:text-base"
-//             />
-
-//             {/* SEARCH ICON */}
-//             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-//               <FiSearch className="w-4 h-4" />
-//             </span>
-
-//             {/* CLEAR BUTTON */}
-//             {searchTerm && (
-//               <button
-//                 onClick={() => setSearchTerm("")}
-//                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
-//               >
-//                 <FiX size={16} />
-//               </button>
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//       {/* all customers details */}
-//       <div className="flex-1 min-h-0   bg-black p-4 rounded-xl ">
-//         <div className=" lg:px-3   ">
-//           <div className="flex justify-between gap-3 flex-wrap items-start h-full ">
-//             <div>
-//               <h3 className="text-md sm:text-2xl lg:text-3xl  mb-2 pt-1  break-words text-white">
-//                 {selectedCustomer.name}{" "}
-//                 <span className="px-3 mx-2 py-1 rounded-full text-[12px]  bg-gray-600 text-white border ">
-//                   <span className="text bold  text-[14px] lg:text-[16px] pt-1">
-//                     {" "}
-//                     {customerOrders.length}{" "}
-//                   </span>
-//                   Order(s)
-//                 </span>
-//               </h3>
-
-//               <div className="text-white text-xs sm:text-sm break-words">
-//                 {[
-//                   selectedCustomer?.mobile,
-//                   selectedCustomer?.city,
-//                   selectedCustomer?.address,
-//                 ]
-//                   .filter(Boolean)
-//                   .join(" • ")}
-//               </div>
-
-//               {/* <div className="flex gap-2 bg-amber-700 flex-wrap lg:mt-3">
-//                 {hasPartial && (
-//                   <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
-//                     Partial Payment
-//                   </span>
-//                 )}
-//               </div> */}
-//             </div>
-
-//             <div
-//               className={`flex justify-between gap-3 mb-1 md:mb-0  mt-0   ${
-//                 isEditingActive() ? "" : "mt-4"
-//               }`}
-//             >
-//               <div>
-//                 <button
-//                   className="px-4 py-1 md:py-2 rounded-xl cursor-pointer bg-white text-black font-semibold hover:bg-gray-200 transition"
-//                   onClick={() => {
-//                     closeAllPanels();
-//                     setEditingCustomer(selectedCustomer);
-//                   }}
-//                 >
-//                   Edit Customer
-//                 </button>
-//               </div>
-//               <div>
-//                 <button
-//                   className="px-4 py-1 md:py-2 rounded-xl cursor-pointer bg-white text-black font-semibold hover:bg-gray-200 transition"
-//                   onClick={() => {
-//                     closeAllPanels();
-//                     setShowAddOrderForm(true);
-//                   }}
-//                 >
-//                   Create New Order
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//       {/* all orders */}
-//       <div className="lg:flex-1 lg:overflow-y-auto  min-h-0 bg-[#fbfbfb] lg:h-[550px] px-3 sm:px-5 pb-5  space-y-3 pt-2">
-//         {filteredOrders.map((order) => (
-//           <div key={order._id} className="md::border rounded-2xl p-4 ">
-//             <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:items-center">
-//               <div className="flex items-start justify-between gap-3 w-full sm:w-auto">
-//                 <div className="font-extrabold text-base sm:text-xl break-all">
-//                   {order.orderNo}
-//                 </div>
-
-//                 {/* MOBILE STATUS */}
-//                 <div
-//                   className={`sm:hidden  flex px-3 lg:py-1 py-1 border rounded-full text-xs lg:text-[16px] `}
-//                 >
-//                   {order.orderStatus}
-//                 </div>
-
-//                 <div className="sm:hidden">
-//                   <div className="flex justify-end sm:justify-start gap-2 items-center w-full sm:w-auto">
-//                     <button
-//                       className="px-1 py-1 cursor-pointer rounded-lg   text-md "
-//                       onClick={() => {
-//                         closeAllPanels(); // ✅ reset everything first
-//                         setEditingOrder(order);
-//                       }}
-//                       // onClick={() => {
-//                       //   setEditingOrder(order);
-//                       //   setEditingProductState(null);
-//                       // }}
-//                     >
-//                       <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
-//                     </button>
-//                     <button
-//                       className="px-1 py-1 cursor-pointer rounded-lg bg-white  text-red-600 text-sm hover:bg-red-50"
-//                       onClick={() => deleteOrder(order._id)}
-//                     >
-//                       <i className="fas fa-trash-alt text-red-600 hover:text-red-800 cursor-pointer"></i>
-//                     </button>
-//                   </div>
-//                 </div>
-//               </div>
-//               <div
-//                 className={`px-3 hidden md:flex lg:py-1 py-2 rounded-full text-xs lg:text-[16px]   border
-
-//   `}
-//               >
-//                 {order.orderStatus}
-//               </div>
-//               <div className=" hidden sm:flex justify-end sm:justify-start gap-2 items-center w-full sm:w-auto">
-//                 <button
-//                   className="px-3 py-1 cursor-pointer rounded-lg   text-lg "
-//                   onClick={() => {
-//                     closeAllPanels(); // ✅ reset everything first
-//                     setEditingOrder(order);
-//                   }}
-//                   // onClick={() => {
-//                   //   setEditingOrder(order);
-//                   //   setEditingProductState(null);
-//                   // }}
-//                 >
-//                   <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
-//                 </button>
-//                 <button
-//                   className="px-3 py-1 cursor-pointer rounded-lg bg-white border border-red-300 text-red-600 text-sm hover:bg-red-50"
-//                   onClick={() => deleteOrder(order._id)}
-//                 >
-//                   <i className="fas fa-trash-alt text-red-600 hover:text-red-800 cursor-pointer"></i>
-//                 </button>
-//               </div>
-//             </div>
-
-//             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
-//               <div className="bg-white rounded-xl p-3 border border-gray-200">
-//                 <small className="text-gray-800  lg:text-[15px]   block">
-//                   Total
-//                 </small>
-//                 <strong className="text-base sm:text-md">
-//                   ₹
-//                   {parseInt(
-//                     order.totalAmount || order.total || 0,
-//                   ).toLocaleString()}
-//                 </strong>
-//               </div>
-//               <div className="bg-white rounded-xl p-3 border border-gray-200">
-//                 <small className="text-gray-800  lg:text-[15px]   block">
-//                   Received Amount
-//                 </small>
-//                 <strong className="text-base sm:text-md">
-//                   ₹{parseInt(order.receivedAmount || 0).toLocaleString()}
-//                 </strong>
-//               </div>
-//               <div className="bg-white rounded-xl p-3 border border-gray-200">
-//                 <small className="text-gray-800  lg:text-[15px]  block">
-//                   Delivery
-//                 </small>
-//                 <strong className="text-base sm:text-md">
-//                   {formatDate(order.deliveryDate)}
-//                 </strong>
-//               </div>
-//               <div className="bg-white rounded-xl p-3 border border-gray-200">
-//                 <small className="text-gray-800  lg:text-[15px]  block">
-//                   Due Amount
-//                 </small>
-//                 <strong className="text-base sm:text-md">
-//                   ₹{parseInt(order.dueAmount || 0).toLocaleString()}
-//                 </strong>
-//               </div>
-//             </div>
-
-//             {/* Products list - now without inline editing */}
-//             {order.products
-//               ?.filter((p) => p.isActive)
-//               .map((product, idx) => (
-//                 <div
-//                   key={product._id || idx}
-//                   className="mt-3 border border-gray-200 bg-white rounded-xl p-3 sm:p-4"
-//                 >
-//                   <div className="flex flex-col sm:flex-row justify-between gap-3 sm:items-center">
-//                     <p className="font-semibold text-base sm:text-[18px] break-words">
-//                       {product.category?.charAt(0).toUpperCase() +
-//                         product.category?.slice(1)}
-
-//                       {product?.productCode && (
-//                         <span className="text-[16px]  ">
-//                           {" "}
-//                           <span className="font-normal">- </span>
-//                           {product.productCode}
-//                         </span>
-//                       )}
-//                     </p>
-//                     {/* <span className="px-2 py-1 rounded-full text-xs bg-gray-100 border border-gray-200">
-//         {product.curtainType}
-//       </span> */}
-//                     <div>
-//                       {/* Order Status */}
-//                       <span
-//                         className={`px-3 py-1 rounded-full text-xs lg:text-[16px]   border
-
-//     `}
-//                         //                     className={`px-2 py-1 rounded-full text-xs font-semibold border
-//                         //   ${product?.orderStatus === "Cancelled" ? " text-red-700 " : ""}
-//                         //   ${product?.orderStatus === "Pending" ? "text-yellow-700 " : ""}
-//                         //   ${product?.orderStatus === "Completed" ? " text-green-700 " : ""}
-//                         //   ${product?.orderStatus === "Processing" ? " text-blue-700 " : ""}
-//                         // `}
-//                       >
-//                         {product?.orderStatus}
-//                       </span>
-//                     </div>
-//                     <div className="flex items-center flex-wrap gap-3 mt-2 sm:mt-0">
-//                       {/* View Product */}
-//                       <div className="relative group ">
-//                         <button
-//                           className="cursor-pointer pt-2"
-//                           onClick={() => {
-//                             setSelectedProduct(product);
-//                             setShowProductModal(true);
-//                           }}
-//                         >
-//                           <FiEye size={20} />
-//                         </button>
-//                       </div>
-//                       {/* Edit Product */}
-//                       <button
-//                         className="text-md text-green-500 cursor-pointer hover:text-green-700"
-//                         onClick={() => startProductEdit(order._id, product)}
-//                       >
-//                         <i className="fas fa-edit text-green-600 hover:text-green-800 cursor-pointer"></i>
-//                       </button>
-//                       {/* Delete Product */}
-//                       <button
-//                         className="text-md text-red-500 cursor-pointer hover:text-red-700"
-//                         onClick={() => deleteProduct(order._id, product._id)}
-//                       >
-//                         <i className="fas fa-trash-alt text-red-600 hover:text-red-800 cursor-pointer"></i>
-//                       </button>
-//                     </div>
-//                   </div>
-//                   <div
-//                     className={`  ${
-//                       isEditingActive()
-//                         ? "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1  lg:grid-cols-2 gap-x-4 gap-y-2 text-gray-900"
-//                         : "mt-2 text-[13px] sm:text-[14px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-gray-900"
-//                     }`}
-//                   >
-//                     {Object.entries(product.attributes || {}).map(
-//                       ([key, value]) => (
-//                         <div key={key} className="flex gap-1">
-//                           <span className="text-gray-600 whitespace-nowrap">
-//                             {FIELD_CONFIG[key]?.label || key}:
-//                           </span>
-//                           <span className="font-medium text-gray-800 break-words">
-//                             {value || "-"}
-//                           </span>
-//                         </div>
-//                       ),
-//                     )}
-//                   </div>
-//                 </div>
-//               ))}
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
+// import CustomerSnapshot from "./common/CustomerSnapshot";
+// import RoomForm from "./common/RoomForm.jsx";
 // const OrderDetailsPage = ({
 //   customer,
 //   orders,
@@ -1403,6 +657,7 @@ export default OrderDetailsPage;
 //   onUpdateCustomer,
 //   onUpdateOrder,
 //   onUpdateProduct,
+//   onUpdateRoom,
 // }) => {
 //   // Controls different editing panels/forms
 //   const [showAddOrderForm, setShowAddOrderForm] = useState(false);
@@ -1430,30 +685,38 @@ export default OrderDetailsPage;
 //   const [selectedProduct, setSelectedProduct] = useState(null);
 
 //   const [products, setProducts] = useState([]);
-//   console.log(11111111, products.length);
+//   // console.log(11111111, products.length);
 //   const [showBackConfirmModal, setShowBackConfirmModal] = useState(false);
 
+//   // state for rooms
+//   const [editingRoomState, setEditingRoomState] = useState(null);
+//   const [editingRoomOrderId, setEditingRoomOrderId] = useState(null);
+//   const [editingRoomIndex, setEditingRoomIndex] = useState(null);
+
+//   // for product room id
+//   const [editingProductRoomId, setEditingProductRoomId] = useState(null);
 //   /**
 //    * Closes all active editing panels/forms
 //    * Used before opening another panel to avoid UI conflicts
 //    */
+//   console.log(222222, editingProductRoomId);
 //   const closeAllPanels = () => {
 //     setEditingCustomer(null);
 //     setEditingOrder(null);
 //     setEditingProductState(null);
 //     setEditingProductOrderId(null);
 //     setShowAddOrderForm(false);
+//     setEditingRoomState(null);
+//     setEditingRoomOrderId(null);
+//     setEditingRoomIndex(null);
+//     setEditingProductRoomId(null);
 //   };
-
+//   const hasUnsavedProducts = () => {
+//     return (products?.length || 0) > 0;
+//   };
 //   const handleBackAction = () => {
-//     // if (isEditingActive()) {
-//     //   closeAllPanels();
-//     //   return;
-//     // }
-
-//     if (products?.length > 0) {
+//     if (hasUnsavedProducts()) {
 //       setShowBackConfirmModal(true);
-//       console.log("skjdshkdjfhskjdhf");
 //       return;
 //     }
 
@@ -1469,6 +732,41 @@ export default OrderDetailsPage;
 //     setShowBackConfirmModal(false);
 //   };
 
+//   // room edit start
+//   const startRoomEdit = (orderId, room, index) => {
+//     console.log("ROOM EDIT CLICKED", { orderId, room, index });
+
+//     closeAllPanels();
+
+//     setEditingRoomState(room);
+//     setEditingRoomOrderId(orderId);
+//     setEditingRoomIndex(index);
+//   };
+
+//   // update room inside order
+//   const saveRoomEdit = async (updatedRoom) => {
+//     try {
+//       await onUpdateRoom(editingRoomOrderId, updatedRoom._id, {
+//         roomType: updatedRoom.roomType,
+//         roomName: updatedRoom.roomName,
+//         products: updatedRoom.products || [],
+//       });
+
+//       toast.success("Room updated successfully");
+
+//       setEditingRoomState(null);
+//       setEditingRoomOrderId(null);
+//       setEditingRoomIndex(null);
+//     } catch (error) {
+//       console.log(error);
+//       toast.error("Failed to update room");
+//     }
+//   };
+//   const cancelRoomEdit = () => {
+//     setEditingRoomState(null);
+//     setEditingRoomOrderId(null);
+//     setEditingRoomIndex(null);
+//   };
 //   /**
 //    * Handles newly created order
 //    * Adds metadata and updates parent state
@@ -1510,8 +808,12 @@ export default OrderDetailsPage;
 //   /**
 //    * Opens delete confirmation modal for product
 //    */
-//   const deleteProduct = (orderId, productId) => {
+
+//   const [productRoomId, setProductRoomId] = useState(null);
+
+//   const deleteProduct = (orderId, roomId, productId) => {
 //     setProductOrderId(orderId);
+//     setProductRoomId(roomId);
 //     setProductToDelete(productId);
 //     setShowProductDeleteModal(true);
 //   };
@@ -1521,7 +823,7 @@ export default OrderDetailsPage;
 //    */
 //   const confirmDeleteProduct = () => {
 //     if (onDeleteProduct && productOrderId && productToDelete) {
-//       onDeleteProduct(productOrderId, productToDelete);
+//       onDeleteProduct(productOrderId, productRoomId, productToDelete);
 //     }
 
 //     // Reset states
@@ -1574,10 +876,17 @@ export default OrderDetailsPage;
 //    * Opens product edit form
 //    * Closes other panels before opening
 //    */
-//   const startProductEdit = (orderId, product) => {
-//     closeAllPanels(); // ✅ important
+//   const startProductEdit = (orderId, roomId, product) => {
+//     if (!roomId) {
+//       console.error("❌ Missing roomId:", roomId);
+//       toast.error("Room ID missing. Cannot edit product.");
+//       return;
+//     }
+//     closeAllPanels();
+//     console.log("11111ROOM ID RECEIVED:", roomId);
 //     setEditingProductState(product);
 //     setEditingProductOrderId(orderId);
+//     setEditingProductRoomId(roomId);
 //   };
 
 //   const handleUpdateProductInline = (updatedProduct) => {
@@ -1590,12 +899,23 @@ export default OrderDetailsPage;
 //    * Calls parent update handler
 //    */
 //   const saveProductEdit = () => {
+//     console.log("editingProductRoomId:", editingProductRoomId);
 //     console.log("editingProductOrderId:", editingProductOrderId);
 //     console.log("editingProductState:", editingProductState);
 //     console.log("onUpdateProduct exists:", !!onUpdateProduct);
-//     if (onUpdateProduct && editingProductOrderId && editingProductState) {
+//     if (
+//       onUpdateProduct &&
+//       editingProductOrderId &&
+//       editingProductRoomId &&
+//       editingProductState
+//     ) {
 //       // Call the parent's update function
-//       onUpdateProduct(editingProductOrderId, editingProductState);
+//       onUpdateProduct(
+//         editingProductOrderId,
+//         editingProductRoomId,
+//         editingProductState._id,
+//         editingProductState,
+//       );
 //       toast.dismiss();
 //       toast.success("Product details updated successfully!");
 //     } else {
@@ -1613,6 +933,11 @@ export default OrderDetailsPage;
 //   };
 
 //   const cancelProductEdit = () => {
+//     if (hasUnsavedProducts()) {
+//       setShowBackConfirmModal(true);
+//       return;
+//     }
+
 //     setEditingProductState(null);
 //     setEditingProductOrderId(null);
 //   };
@@ -1630,7 +955,11 @@ export default OrderDetailsPage;
 //   // Helper to check if any editing is active
 //   const isEditingActive = () => {
 //     return (
-//       editingCustomer || editingOrder || editingProductState || showAddOrderForm
+//       editingCustomer ||
+//       editingOrder ||
+//       editingProductState ||
+//       showAddOrderForm ||
+//       editingRoomState
 //     );
 //   };
 //   /**
@@ -1662,12 +991,14 @@ export default OrderDetailsPage;
 //         order.orderNo?.toLowerCase().includes(term) ||
 //         order.orderStatus?.toLowerCase().includes(term);
 //       // Match product-level searchable fields
-//       const productMatch = order.products?.some((p) =>
-//         [p.category, p.roomName, p.fabricName, p.fabricType, p.curtainRod]
-//           .filter(Boolean)
-//           .join(" ")
-//           .toLowerCase()
-//           .includes(term),
+//       const productMatch = order.rooms?.some((room) =>
+//         room.products?.some((p) =>
+//           [p.category, room.roomName, p.fabricName, p.fabricType, p.curtainRod]
+//             .filter(Boolean)
+//             .join(" ")
+//             .toLowerCase()
+//             .includes(term),
+//         ),
 //       );
 
 //       return orderMatch || productMatch;
@@ -1683,6 +1014,20 @@ export default OrderDetailsPage;
 //       year: "numeric",
 //     });
 //   };
+
+//   // get editing product room name
+//   const getEditingRoomInfo = () => {
+//     const order = orders.find((o) => o._id === editingProductOrderId);
+//     if (!order) return { roomName: "", roomType: "" };
+
+//     const room = order.rooms?.find((r) => r._id === editingProductRoomId);
+
+//     return {
+//       roomName: room?.roomName || "",
+//       roomType: room?.roomType || "",
+//     };
+//   };
+//   const { roomName, roomType } = getEditingRoomInfo();
 //   /**
 //    * =========================================================
 //    * MAIN LAYOUT
@@ -1727,12 +1072,13 @@ export default OrderDetailsPage;
 //               isEditingActive={isEditingActive}
 //               setSelectedProduct={setSelectedProduct}
 //               setShowProductModal={setShowProductModal}
+//               startRoomEdit={startRoomEdit}
 //             />
 //           </div>
 //         </div>
 //         {/* RIGHT SECTION → Dynamic forms/edit panels */}
 //         <div
-//           className={`transition-all duration-500 ease-in-out  lg:h-[calc(90vh-2rem)]  transform  min-h-0
+//           className={`transition-all duration-500 ease-in-out  lg:h-[calc(110vh-2rem)]  transform  min-h-0
 //   ${
 //     isEditingActive()
 //       ? "w-full lg:w-[60%] lg:translate-x-0 opacity-100"
@@ -1746,6 +1092,11 @@ export default OrderDetailsPage;
 //                 <div className="sticky top-0 bg-white  z-10 flex justify-end px-3 lg:pt-1 pt-3">
 //                   <button
 //                     onClick={() => {
+//                       if (hasUnsavedProducts()) {
+//                         setShowBackConfirmModal(true);
+//                         return;
+//                       }
+
 //                       if (addOrderRef.current?.handleClose) {
 //                         addOrderRef.current.handleClose();
 //                       } else {
@@ -1758,6 +1109,14 @@ export default OrderDetailsPage;
 //                   </button>
 //                 </div>
 //               )}
+//               {editingRoomState ? (
+//                 <RoomForm
+//                   room={editingRoomState}
+//                   onChange={setEditingRoomState}
+//                   onCancel={cancelRoomEdit}
+//                   onSave={saveRoomEdit}
+//                 />
+//               ) : null}
 
 //               {editingCustomer ? (
 //                 <AddCustomer
@@ -1785,12 +1144,19 @@ export default OrderDetailsPage;
 //               ) : editingOrder ? (
 //                 <AddOrder
 //                   key={editingOrder?._id}
-//                   order={{ ...editingOrder, products: [] }}
+//                   order={{
+//                     ...editingOrder,
+//                     customer:
+//                       editingOrder.customer?._id || editingOrder.customer,
+//                     products: [],
+//                   }}
 //                   customers={customers}
 //                   setProducts={setProducts}
 //                   products={products}
 //                   selectedCustomerId={
-//                     selectedCustomer._id || selectedCustomer._id
+//                     editingOrder?.customer?._id ||
+//                     editingOrder?.customer ||
+//                     selectedCustomer?._id
 //                   }
 //                   onSave={handleUpdateOrder}
 //                   onCancel={() => setEditingOrder(null)}
@@ -1798,7 +1164,21 @@ export default OrderDetailsPage;
 //                 />
 //               ) : editingProductState ? (
 //                 <div className="bg-white rounded-2xl px-3 sm:px-5 py-3">
-//                   <h3 className="text-2xl font-bold mb-4">Edit Product</h3>
+//                   <h3 className="text-2xl font-bold mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
+//                     <span>Edit Product</span>
+
+//                     <span className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-600">
+//                       <span className="px-3 py-1 rounded-full bg-gray-100 border border-gray-200">
+//                         {roomType}
+//                       </span>
+
+//                       <span className="text-gray-400">•</span>
+
+//                       <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+//                         {roomName}
+//                       </span>
+//                     </span>
+//                   </h3>
 //                   <ProductForm
 //                     product={editingProductState}
 //                     index={0}
@@ -1857,6 +1237,7 @@ export default OrderDetailsPage;
 //           </div>
 //         </div>
 //       </div>
+
 //       {/* Product full details modal */}
 //       <ProductDetailsModal
 //         product={selectedProduct}

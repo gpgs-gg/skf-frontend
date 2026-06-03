@@ -42,10 +42,12 @@ export const useUpdateUser = () => {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.dismiss();
       toast.success("User updated successfully");
     },
 
     onError: (error) => {
+      toast.dismiss();
       toast.error(error?.response?.data?.message || "Failed to update user");
     },
   });
@@ -62,10 +64,12 @@ export const useDeleteUser = () => {
       queryClient.invalidateQueries({
         queryKey: ["users"],
       });
+      toast.dismiss();
       toast.success("User deleted successfully");
     },
 
     onError: (error) => {
+      toast.dismiss();
       toast.error(error?.response?.data?.message || "Failed to delete user");
     },
   });

@@ -24,10 +24,17 @@ export const SelectStyles = {
     },
   }),
 
+  singleValue: (provided) => ({
+    ...provided,
+    fontWeight: 600,
+    color: "black",
+  }),
+
   option: (provided, state) => ({
     ...provided,
     color: state.isSelected ? "white" : "black",
     backgroundColor: state.isSelected ? "black" : "white",
+    fontWeight: state.isSelected ? 600 : 500,
 
     "&:hover": {
       backgroundColor: "#f3f4f6",
@@ -68,6 +75,7 @@ export const SelectStylesfilter = {
     color: state.isSelected ? "white" : "black",
     backgroundColor: state.isSelected ? "black" : "white",
     "&:hover": { backgroundColor: "#fed7aa" },
+    fontWeight: state.isSelected ? 800 : 500,
   }),
 
   menu: (provided) => ({
@@ -83,21 +91,6 @@ export const SelectStylesfilter = {
   }),
 };
 
-// Status styles for order status badges
-export const statusStyles = {
-  Cancelled: "font-semibold text-red-800 bg-red-50 border-red-200",
-  Pending: "font-semibold text-yellow-800 bg-yellow-50 border-yellow-200",
-  Completed: "font-semibold text-green-800 bg-green-50 border-green-200",
-  Processing: "font-semibold text-blue-800 bg-blue-50 border-blue-200",
-  Open: "font-semibold text-indigo-800 bg-indigo-50 border-indigo-200",
-};
-
-export const getStatusStyle = (status) => {
-  return (
-    statusStyles[status] ||
-    "font-semibold text-gray-800 bg-gray-50 border-gray-200"
-  );
-};
 // Add these new style objects
 export const InputStyles = {
   base: `
@@ -119,6 +112,22 @@ export const TextareaStyles = {
     transition-all duration-200 resize-y
   `,
   error: "border-red-500",
+};
+
+// Status styles for order status badges
+export const statusStyles = {
+  Cancelled: "font-semibold text-red-800 bg-red-50 border-red-200",
+  Pending: "font-semibold text-yellow-800 bg-yellow-50 border-yellow-200",
+  Completed: "font-semibold text-green-800 bg-green-50 border-green-200",
+  Processing: "font-semibold text-blue-800 bg-blue-50 border-blue-200",
+  Open: "font-semibold text-indigo-800 bg-indigo-50 border-indigo-200",
+};
+
+export const getStatusStyle = (status) => {
+  return (
+    statusStyles[status] ||
+    "font-semibold text-gray-800 bg-gray-50 border-gray-200"
+  );
 };
 export const formatDateTime = (date) => {
   if (!date) return "-";

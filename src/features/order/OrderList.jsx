@@ -170,9 +170,7 @@ const OrderList = ({
               <th className="px-4 border py-3  text-center font-semibold text-white  whitespace-nowrap  bg-black">
                 Status
               </th>
-              <th className="px-4 border py-3  text-center font-semibold text-white  whitespace-nowrap  bg-black">
-                Total
-              </th>
+
               <th className="px-4 border py-3  text-center font-semibold text-white  whitespace-nowrap  bg-black">
                 Products
               </th>
@@ -243,12 +241,12 @@ const OrderList = ({
                     {order.orderStatus}
                   </span>
                 </td> */}
-                <td className="p-3 text-center">
+                {/* <td className="p-3 text-center">
                   ₹
                   {parseInt(
                     order.totalAmount || order.total || 0,
                   ).toLocaleString()}
-                </td>
+                </td> */}
                 <td className="p-3 text-center relative group">
                   <div className="">
                     {/* Show total count */}
