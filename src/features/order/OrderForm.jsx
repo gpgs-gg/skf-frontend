@@ -6,7 +6,7 @@ import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
 import ProductForm from "./ProductForm";
 import FormField from "./common/FormField";
 import ConfirmModal from "./common/ConfirmModal";
-
+import ImagePreviewModal from "./common/ImagePreviewModal";
 import { emptyProduct, cleanProductData } from "./orderUtils";
 
 import { generateWorklog, generateCreateWorklog } from "../../utils/worklog";
@@ -179,6 +179,7 @@ const AddOrder = ({
   const { data: currentUser } = useCurrentUser();
   const [isSaving, setIsSaving] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [previewAttachment, setPreviewAttachment] = useState(null);
   // ======================================================
   // INITIAL SNAPSHOT
   // ======================================================
@@ -571,7 +572,7 @@ const AddOrder = ({
           ORDER DETAILS
       ====================================================== */}
 
-      <div className="  border rounded-xl px-2">
+      <div className="  lg:border rounded-xl px-2">
         {/* <h2 className="text-xl font-semibold mb-1">Order Details</h2> */}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -630,7 +631,7 @@ orderNo"
       {/* ======================================================
           ROOMS
       ====================================================== */}
-      <div className=" border rounded-xl p-2 my-1">
+      <div className=" md:border rounded-xl p-2 my-1">
         <div className="my-1 ">
           <button
             type="button"
@@ -728,14 +729,17 @@ orderNo"
               className="border rounded-xl p-1 bg-white shadow-sm"
             >
               {/* Room Header */}
-              <div className="mb-1 border-b pb-1">
-                <h3 className="font-bold text-lg text-gray-900">
-                  {room.roomType}
-                  {room.roomName && ` - ${room.roomName}`}
-                  {/* <span className="font-semibold text-sm px-4 text-gray-900">
-                    (Total Products: {room.products.length})
-                  </span> */}
-                </h3>
+              <div className="mb-1 border-b pb-1 w-1/4">
+                <div className="flex items-center gap-2 bg-gradient-to-r  from-gray-900 to-black border-b text-white px-4 py-2 rounded-2xl shadow-sm">
+                  <span className="text-lg">🏠</span>
+                  <span className="font-bold text-sm sm:text-base tracking-wide">
+                    {room.roomType || "Room"} -
+                  </span>
+
+                  {room.roomName && (
+                    <span className=" py-1     ">{room.roomName}</span>
+                  )}
+                </div>
               </div>
 
               {/* Products List */}
@@ -743,142 +747,155 @@ orderNo"
                 {room.products.map((product) => (
                   <div
                     key={product.id}
-                    className="border rounded-lg p-1 bg-gray-50"
+                    className="border border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md transition mb-4 bg-white"
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-5">
-                      {/* Product */}
-                      <div>
-                        <div className="text-xs uppercase tracking-wide text-gray-500">
-                          Product
-                        </div>
+                    {/* HEADER */}
+                    <div className="flex justify-between items-center gap-2 mb-3">
+                      <h3 className="text-lg lg:text-2xl font-bold text-gray-900">
+                        {product.category
+                          ? product.category.charAt(0).toUpperCase() +
+                            product.category.slice(1)
+                          : "Product"}
+                      </h3>
 
-                        <div className="font-bold text-gray-900">
-                          {product.category || "-"}
-                        </div>
-                      </div>
+                      <div className="flex gap-2 items-center">
+                        <button
+                          type="button"
+                          onClick={() => handleEditProduct(room, product)}
+                          className="w-10 h-10 flex items-center justify-center"
+                        >
+                          <i className="fas fa-edit text-green-600 hover:scale-125 transition-all duration-200" />
+                        </button>
 
-                      {/* Company */}
-                      <div>
-                        <div className="text-xs uppercase tracking-wide text-gray-500">
-                          Company Name
-                        </div>
-
-                        <div className="font-bold text-gray-900">
-                          {product.companyName || "-"}
-                        </div>
-                      </div>
-
-                      {/* Collection */}
-                      <div>
-                        <div className="text-xs uppercase tracking-wide text-gray-500">
-                          Collection Name
-                        </div>
-
-                        <div className="font-bold text-gray-900">
-                          {product.collectionName || "-"}
-                        </div>
-                      </div>
-
-                      {/* Product Code */}
-                      <div>
-                        <div className="text-xs uppercase tracking-wide text-gray-500">
-                          Product Code
-                        </div>
-
-                        <div className="font-bold text-gray-900">
-                          {product.productCode || "-"}
-                        </div>
-                      </div>
-
-                      {/* Quantity */}
-                      {/* {product.quantity && (
-                        <div>
-                          <div className="text-xs uppercase tracking-wide text-gray-500">
-                            Quantity
-                          </div>
-
-                          <div className="font-bold text-gray-900">
-                            {product.quantity}
-                          </div>
-                        </div>
-                      )} */}
-
-                      {/* delete */}
-                      <div>
                         <button
                           type="button"
                           onClick={() =>
                             removeProductFromRoom(room.id, product.id)
                           }
+                          className="w-10 h-10 flex items-center justify-center"
                         >
-                          <FiTrash2 className="text-red-500" />
+                          <FiTrash2 className="text-red-600 hover:scale-125 transition-all duration-200" />
                         </button>
                       </div>
-                      <div>
-                        <button
-                          type="button"
-                          onClick={() => handleEditProduct(room, product)}
-                        >
-                          <i
-                            className="fas fa-edit  transition-all
-    duration-200
-    hover:scale-125 text-green-600 hover:text-green-800"
-                          ></i>
-                        </button>
-                      </div>
-                      {/* measurment */}
-                      {/* {product?.attributes?.measurements?.length > 0 && (
-                        <div className="lg:col-span-7 mt-2">
-                          <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-                            Measurements
+                    </div>
+
+                    {/* CONTENT */}
+                    <div className="flex flex-col lg:flex-row gap-5 lg:gap-16">
+                      {/* LEFT */}
+                      <div className="w-full lg:w-[30%] space-y-3">
+                        <div className="grid md:grid-cols-2 gap-2">
+                          <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+                            <p className="text-[11px] text-gray-500 uppercase mb-1">
+                              Company
+                            </p>
+
+                            <p className="text-xl font-semibold text-gray-800">
+                              {product.companyName || "-"}
+                            </p>
                           </div>
 
-                          <div className="space-y-2">
-                            {product.attributes.measurements.map((m, index) => (
-                              <div
-                                key={index}
-                                className="border rounded-lg bg-white p-2 grid grid-cols-2 md:grid-cols-5 gap-3"
-                              >
-                                <div>
-                                  <div className="text-xs text-gray-500">
-                                    Window
-                                  </div>
-                                  <div className="font-medium">
-                                    {m.windowName || "-"}
-                                  </div>
-                                </div>
+                          <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+                            <p className="text-[11px] text-gray-500 uppercase mb-1">
+                              Collection
+                            </p>
 
-                                <div>
-                                  <div className="text-xs text-gray-500">
-                                    Width
-                                  </div>
-                                  <div className="font-medium">
-                                    {m.width || "-"} {m.unit}
-                                  </div>
-                                </div>
-
-                                <div>
-                                  <div className="text-xs text-gray-500">
-                                    Height
-                                  </div>
-                                  <div className="font-medium">
-                                    {m.height || "-"} {m.unit}
-                                  </div>
-                                </div>
-
-                                <div className="md:col-span-2">
-                                  <div className="text-xs text-gray-500">
-                                    Details
-                                  </div>
-                                  <div className="font-medium">
-                                    {m.details || "-"}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                            <p className="text-xl font-semibold text-gray-800">
+                              {product.collectionName || "-"}
+                            </p>
                           </div>
                         </div>
-                      )} */}
+
+                        <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+                          <p className="text-[11px] text-gray-500 uppercase mb-1">
+                            Serial No.
+                          </p>
+
+                          <p className="text-xl font-semibold text-gray-800">
+                            {product.productCode || "-"}
+                          </p>
+                        </div>
+
+                        {/* Attachments */}
+                        <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+                          <p className="text-[11px] text-gray-500 uppercase mb-2">
+                            Attachments ({product.attachments?.length || 0})
+                          </p>
+
+                          {product.attachments?.length > 0 ? (
+                            <div className="flex flex-wrap gap-2">
+                              {product.attachments.map((file, index) => (
+                                <img
+                                  key={index}
+                                  src={
+                                    file.url ||
+                                    file.preview ||
+                                    (file instanceof File
+                                      ? URL.createObjectURL(file)
+                                      : "")
+                                  }
+                                  alt=""
+                                  onClick={() => setPreviewAttachment(file)}
+                                  className="
+      w-12 h-12
+      object-cover
+      rounded-lg
+      border
+      cursor-pointer
+      hover:scale-110
+      transition
+    "
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-400">
+                              No attachments
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* RIGHT */}
+                      <div className="w-full lg:w-[70%]">
+                        {Array.isArray(product?.attributes?.measurements) &&
+                          product.category?.toLowerCase() === "curtains" && (
+                            <div className="grid lg:grid-cols-3 gap-4">
+                              {product.attributes.measurements.map((m, i) => (
+                                <div key={i}>
+                                  {m.windowName && (
+                                    <div className="flex justify-center mb-2">
+                                      <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                                        {m.windowName}
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  <div className="flex justify-center">
+                                    <div className="relative w-[360px] h-[150px]">
+                                      <div className="absolute top-10 left-16 w-46 border-t-2 border-gray-500"></div>
+
+                                      <div className="absolute top-10 left-16 h-24 border-l-2 border-gray-500"></div>
+
+                                      <div className="absolute top-0 left-29 w-24 border rounded-md px-2 py-1 text-center bg-white font-bold">
+                                        {m.width}
+                                      </div>
+
+                                      <div className="absolute top-18 -left-10 w-24 border rounded-md px-2 py-1 text-center bg-white font-bold">
+                                        {m.height}
+                                      </div>
+
+                                      <div className="absolute top-12 left-18 w-44 h-21 bg-white border rounded-xl p-2 shadow-sm">
+                                        <p className="text-xs">
+                                          {m.details || "-"}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -953,7 +970,17 @@ orderNo"
       {/* ======================================================
           CANCEL MODAL
       ====================================================== */}
-
+      <ImagePreviewModal
+        isOpen={!!previewAttachment}
+        image={
+          previewAttachment?.url ||
+          previewAttachment?.preview ||
+          (previewAttachment instanceof File
+            ? URL.createObjectURL(previewAttachment)
+            : "")
+        }
+        onClose={() => setPreviewAttachment(null)}
+      />
       <ConfirmModal
         isOpen={showCancelModal}
         title="Cancel Order"
@@ -990,7 +1017,7 @@ orderNo"
   // ======================================================
 
   return isModal ? (
-    <div className="mt-20 rounded-2xl border p-6 max-w-6xl mx-auto">
+    <div className="mt-20 rounded-2xl md:border p-6 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-1">
         <h3 className="text-2xl font-bold">{title}</h3>
 
@@ -1010,7 +1037,7 @@ orderNo"
       {content}
     </div>
   ) : (
-    <div className="  px-6  py-0 rounded-2xl border">
+    <div className="  px-6  py-0 rounded-2xl md:border">
       <div className="flex justify-center items-center  rounded-xl ">
         <h3 className="text-2xl font-bold mb-1">{title}</h3>
       </div>

@@ -329,7 +329,7 @@ gap-3
               >
                 {/* Order No */}
                 <div className="bg-gradient-to-r  from-gray-900 to-black border-bs text-white rounded-xl px-4 lg:px-8 py-2 whitespace-nowrap">
-                  <span className="font-semibold">Order No:</span>{" "}
+                  <span className="font-semibold ">Order No:</span>{" "}
                   <span className="font-bold ">{order.orderNo}</span>
                 </div>
 
@@ -416,11 +416,11 @@ gap-3
               {order.rooms?.map((room, roomIndex) => (
                 <div
                   key={`${order._id}-${room._id}-${roomIndex}`}
-                  className="mt-1 p-1  border
+                  className="mt-1 p-1  border 
       border-gray-200 rounded-2xl "
                 >
                   {/* ROOM HEADER */}
-                  <div className="flex justify-between items-center gap-2 ">
+                  <div className="flex  justify-between items-center gap-2 ">
                     <div className="flex items-center gap-2 flex-wrap mb-2">
                       <div className="flex items-center gap-2 bg-gradient-to-r  from-gray-900 to-black border-b text-white px-4 py-2 rounded-2xl shadow-sm">
                         <span className="text-lg">🏠</span>
@@ -576,20 +576,20 @@ lg:gap-0
                                 </div>
                               </div>
                               <div>
-                                <div className="flex justify-between items-start gap-3">
+                                <div className="flex   justify-between items-start gap-3">
                                   {/* LEFT */}
                                   <div className="flex-1 ">
                                     {/* ATTRIBUTES */}
                                     <div
-                                      className="flex lg:flex-row lg:gap-16
+                                      className="flex  lg:flex-row lg:gap-16
                                      flex-col gap-5 mt-3"
                                     >
                                       {/* LEFT - 30% */}
-                                      <div className="w-full lg:w-[30%] space-y-3">
+                                      <div className=" lg:w-[30%] space-y-3">
                                         {/* Company / Collection / Status */}
                                         <div className="space-y-3">
-                                          <div className="grid md:grid-cols-2 gap-2">
-                                            <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition">
+                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                            <div className="bg-gray-50 px-3 py-2 border border-gray-200  rounded-xl shadow-sm hover:shadow-md transition">
                                               <p className="text-[11px] text-gray-500 uppercase mb-1">
                                                 Company
                                               </p>
@@ -607,7 +607,11 @@ lg:gap-0
                                               </p>
                                             </div>
                                           </div>
-                                          <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition">
+                                          <div
+                                            className="px-3 py-2 border border-gray-200 rounded-xl shadow-sm hover:shadow-md w-full
+    min-w-0
+    overflow-hidden transition"
+                                          >
                                             <p className="text-[11px] text-gray-500 uppercase mb-1">
                                               Serial No.
                                             </p>
@@ -690,16 +694,16 @@ lg:gap-0
                                                         </div>
                                                       )}
 
-                                                      <div className="flex justify-center bg-amber-800">
-                                                        <div className="relative w-[360px] h-[150px]">
+                                                      <div className="flex justify-center ">
+                                                        <div className="relative w-[280px] md:w-[360px] h-[150px]">
                                                           <div className="absolute top-10 left-16 w-46 border-t-2 border-gray-500"></div>
                                                           <div className="absolute top-10 left-16 h-24 border-l-2 border-gray-500"></div>
 
-                                                          <div className="absolute top-0 left-29 w-24 border font-bold text-[18px] rounded-md px-2 py-1 text-center bg-white text-sm">
+                                                          <div className="absolute top-0 left-29 w-15 md:w-24 border font-bold text-[18px] rounded-md px-2 py-1 text-center bg-white text-sm">
                                                             {m.width}
                                                           </div>
 
-                                                          <div className="absolute top-18 w-24 -left-10 border rounded-md px-2 py-1 font-bold text-[18px] text-center bg-white text-sm">
+                                                          <div className="absolute top-18 w-15 md:w-24 md:-left-10 border rounded-md px-2 py-1 font-bold text-[18px] text-center bg-white text-sm">
                                                             {m.height}
                                                           </div>
 
