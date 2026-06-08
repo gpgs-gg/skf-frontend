@@ -48,11 +48,11 @@ const SkfAction = () => {
         {/* PRODUCTS */}
         <Link to="/skf-action/products">
           <div className={cardClasses}>
-            <div className={`${iconClasses} bg-purple-100 text-purple-600`}>
+            <div className={`${iconClasses} bg-yellow-100 text-yellow-600`}>
               <Package size={28} />
             </div>
             <h3 className={titleClasses}>Products</h3>
-            <button className={`${btnClasses} bg-purple-600`}>
+            <button className={`${btnClasses} bg-yellow-600`}>
               View Products
             </button>
           </div>

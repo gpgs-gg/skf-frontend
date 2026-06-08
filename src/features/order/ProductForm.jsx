@@ -261,7 +261,7 @@ const ProductForm = ({
           </button>
         )}
       </div>
-      <div className=" grid lg:grid-cols-[30%_70%] gap-3 py-1 w-full">
+      <div className=" grid lg:grid-cols-[30%_70%] gap-3 pt-1 w-full">
         {/* left  */}
         <div className="grid grid-cols-1 gap-2  lg:border-r max-h-[420px]  lg:pr-6 border-gray-800 ">
           {/* category */}
@@ -319,7 +319,7 @@ const ProductForm = ({
           /> */}
         </div>
         {/* right */}
-        <div className="w-full">
+        <div className="w-full ">
           {/* Curtain Measurements */}
           {selectedCategory === "curtains" && (
             <>

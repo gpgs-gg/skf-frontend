@@ -180,6 +180,7 @@ const AddOrder = ({
   const [isSaving, setIsSaving] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [previewAttachment, setPreviewAttachment] = useState(null);
+  const isEditMode = !!order?._id;
   // ======================================================
   // INITIAL SNAPSHOT
   // ======================================================
@@ -451,6 +452,61 @@ const AddOrder = ({
   const normalizeAttachments = (attachments = []) => {
     return attachments.filter(Boolean);
   };
+  const mergeCurrentChangesIntoRooms = () => {
+    let updatedRooms = [...rooms];
+
+    // no pending product
+    if (!currentRoom?.currentProduct?.category) {
+      return updatedRooms;
+    }
+
+    const productToSave = {
+      ...cleanProductData(currentRoom.currentProduct),
+      id: editingProduct?.productId || Date.now(),
+    };
+
+    if (editingProduct) {
+      updatedRooms = updatedRooms.map((room) => {
+        if (room.id !== editingProduct.roomId) return room;
+
+        return {
+          ...room,
+          products: room.products.map((p) =>
+            p.id === editingProduct.productId ? productToSave : p,
+          ),
+        };
+      });
+    } else {
+      const roomIndex = updatedRooms.findIndex(
+        (r) =>
+          r.roomType === currentRoom.roomType &&
+          r.roomName === currentRoom.roomName,
+      );
+
+      if (roomIndex >= 0) {
+        updatedRooms[roomIndex].products.push(productToSave);
+      } else {
+        updatedRooms.push({
+          id: Date.now(),
+          roomType: currentRoom.roomType,
+          roomName: currentRoom.roomName,
+          products: [productToSave],
+        });
+      }
+    }
+
+    return updatedRooms;
+  };
+  const handleGlobalSave = async (data) => {
+    const finalRooms = mergeCurrentChangesIntoRooms();
+
+    const finalOrder = {
+      ...data,
+      rooms: finalRooms,
+    };
+
+    await onSave(finalOrder);
+  };
   // ======================================================
   // SUBMIT
   // ======================================================
@@ -567,135 +623,179 @@ const AddOrder = ({
   // ======================================================
 
   const content = (
+    // <form onSubmit={handleSubmit(handleGlobalSave)}>
     <form onSubmit={handleSubmit(onSubmit)} className="">
       {/* ======================================================
           ORDER DETAILS
       ====================================================== */}
 
-      <div className="  lg:border rounded-xl px-2">
+      <div className="   rounded-xl px-2">
         {/* <h2 className="text-xl font-semibold mb-1">Order Details</h2> */}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {order?._id && (
+        <div className="flex flex-col lg:flex-row lg:items-end gap-1 md:gap-4">
+          {/* Order Fields */}
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 lg:gap-4">
+            {order?._id && (
+              <FormField
+                name="orderNo"
+                control={control}
+                label="Order No"
+                readOnly
+              />
+            )}
+
             <FormField
-              name="orderNo"
+              name="orderDate"
               control={control}
-              label="Order No"
-              readOnly={true}
+              label="Order Date"
+              type="date"
             />
-          )}
-          {/* <FormField
-            name="
-orderNo"
-            control={control}
-            label="Order Date"
-            type="date"
-          /> */}
-          <FormField
-            name="orderDate"
-            control={control}
-            label="Order Date"
-            type="date"
-          />
 
-          <FormField
-            name="deliveryDate"
-            control={control}
-            label="Delivery Date"
-            type="date"
-          />
+            <FormField
+              name="deliveryDate"
+              control={control}
+              label="Delivery Date"
+              type="date"
+            />
 
-          {/* <FormField
-            name="receivedAmount"
-            control={control}
-            label="Received Amount"
-            type="number"
-          /> */}
+            <FormField
+              name="orderStatus"
+              control={control}
+              label="Order Status"
+              type="select"
+              options={[
+                "Open",
+                "Pending",
+                "Processing",
+                "Completed",
+                "Cancelled",
+              ]}
+            />
+          </div>
 
-          <FormField
-            name="orderStatus"
-            control={control}
-            label="Order Status"
-            type="select"
-            options={[
-              "Open",
-              "Pending",
-              "Processing",
-              "Completed",
-              "Cancelled",
-            ]}
-          />
+          {/* Actions */}
+          <div className="flex items-center  gap-3 pb-1">
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentRoom(emptyRoom());
+                setEditingProduct(null);
+                productFormResetRefs.current["currentRoom"]?.();
+                resetField("roomType");
+                resetField("roomName");
+                setShowRoomForm(true);
+              }}
+              className="
+        bg-black
+        text-white
+        px-4 py-1
+        md:py-2.5
+        rounded-xl
+        flex lg:text-[18px]
+        items-center
+        gap-2
+        hover:scale-105
+        transition-all
+      "
+            >
+              {/* <FiPlus /> */}
+              Add Room
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (hasUnsavedChanges()) {
+                  setShowCancelModal(true);
+                } else {
+                  onCancel();
+                }
+              }}
+              className=" bg-white
+        border px-2
+        md:px-4 py-1
+        md:py-2.5
+        rounded-xl
+        hover:scale-105
+        transition-all
+      "
+            >
+              Cancel
+            </button>
+
+            {(order?._id || rooms.length > 0) && (
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="
+      bg-black
+      text-white
+      md:px-5 px-2 py-1
+      md:py-2.5
+      rounded-xl
+      flex
+      items-center
+      gap-2
+      disabled:opacity-60
+    "
+              >
+                {isSaving && (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                )}
+
+                {isSaving
+                  ? order
+                    ? "Updating Order..."
+                    : "Creating Order..."
+                  : order
+                    ? "update main Order"
+                    : "Save main Order"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* ======================================================
-          ROOMS
-      ====================================================== */}
-      <div className=" md:border rounded-xl p-2 my-1">
-        <div className="my-1 ">
-          <button
-            type="button"
-            onClick={() => {
-              setCurrentRoom(emptyRoom());
-
-              setEditingProduct(null);
-
-              productFormResetRefs.current["currentRoom"]?.();
-
-              resetField("roomType");
-              resetField("roomName");
-
-              setShowRoomForm(true);
-            }}
-            className="bg-black cursor-pointer text-white px-5 py-2 rounded-xl flex items-center gap-2 transition-all
-    duration-200
-    hover:scale-105"
-          >
-            <FiPlus />
-            Add Room
-          </button>
-        </div>
-        {showRoomForm && (
-          <>
-            <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="">
-                <FormField
-                  name="roomType"
-                  label=""
-                  type="select"
-                  control={control}
-                  options={ROOM_OPTIONS.map((r) => ({
-                    value: r,
-                    label: r,
-                  }))}
-                  onChange={updateRoomType}
-                />
-              </div>
-
-              <div className="">
-                <FormField
-                  name="roomName"
-                  label=""
-                  type="text"
-                  control={control}
-                  placeholder="Enter Room Name"
-                  onChange={(e) => updateRoomName(e.target.value)}
-                />
-              </div>
+      {showRoomForm && (
+        <>
+          <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="">
+              <FormField
+                name="roomType"
+                label=""
+                type="select"
+                control={control}
+                options={ROOM_OPTIONS.map((r) => ({
+                  value: r,
+                  label: r,
+                }))}
+                onChange={updateRoomType}
+              />
             </div>
-            <ProductForm
-              product={currentRoom.currentProduct}
-              onUpdate={updateCurrentProduct}
-              onResetForm={(resetFn) => {
-                productFormResetRefs.current["currentRoom"] = resetFn;
-              }}
-              hideRemove
-            />
-            {canShowSaveProduct && (
-              <button
-                type="button"
-                onClick={handleAddProduct}
-                className="
+
+            <div className="">
+              <FormField
+                name="roomName"
+                label=""
+                type="text"
+                control={control}
+                placeholder="Enter Room Name"
+                onChange={(e) => updateRoomName(e.target.value)}
+              />
+            </div>
+          </div>
+          <ProductForm
+            product={currentRoom.currentProduct}
+            onUpdate={updateCurrentProduct}
+            onResetForm={(resetFn) => {
+              productFormResetRefs.current["currentRoom"] = resetFn;
+            }}
+            hideRemove
+          />
+          {canShowSaveProduct && (
+            <button
+              type="button"
+              onClick={handleAddProduct}
+              className="
       mt-0
       bg-black
       text-white
@@ -710,26 +810,25 @@ orderNo"
       hover:scale-105
       cursor-pointer
     "
-              >
-                {editingProduct ? "Update Product" : "Save Product"}
-              </button>
-            )}
-          </>
-        )}
-
-        {/* ======================================================
-          ADD ROOM
+            >
+              {editingProduct ? "Update Product" : "Save Product"}
+            </button>
+          )}
+        </>
+      )}
+      {/* ======================================================
+          ROOMS
       ====================================================== */}
-      </div>
+
       {rooms.length > 0 && (
-        <div className="space-y-2 mt-1">
+        <div className="space-y-2  mt-1">
           {rooms.map((room) => (
             <div
               key={room.id}
-              className="border rounded-xl p-1 bg-white shadow-sm"
+              className="border  rounded-xl p-1 bg-white shadow-sm"
             >
               {/* Room Header */}
-              <div className="mb-1 border-b pb-1 w-1/4">
+              <div className="mb-1  border-b pb-1 w-1/4">
                 <div className="flex items-center gap-2 bg-gradient-to-r  from-gray-900 to-black border-b text-white px-4 py-2 rounded-2xl shadow-sm">
                   <span className="text-lg">🏠</span>
                   <span className="font-bold text-sm sm:text-base tracking-wide">
@@ -743,14 +842,14 @@ orderNo"
               </div>
 
               {/* Products List */}
-              <div className="space-y-3">
+              <div className="space-y-3  ">
                 {room.products.map((product) => (
                   <div
                     key={product.id}
-                    className="border border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md transition mb-4 bg-white"
+                    className="border  border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md transition mb-4 bg-white"
                   >
                     {/* HEADER */}
-                    <div className="flex justify-between items-center gap-2 mb-3">
+                    <div className="flex justify-between items-center gap-2 mb-3 b">
                       <h3 className="text-lg lg:text-2xl font-bold text-gray-900">
                         {product.category
                           ? product.category.charAt(0).toUpperCase() +
@@ -764,7 +863,11 @@ orderNo"
                           onClick={() => handleEditProduct(room, product)}
                           className="w-10 h-10 flex items-center justify-center"
                         >
-                          <i className="fas fa-edit text-green-600 hover:scale-125 transition-all duration-200" />
+                          <i
+                            className="fas fa-edit  transition-all
+    duration-200
+    hover:scale-125 text-yellow-600"
+                          />
                         </button>
 
                         <button
@@ -780,13 +883,13 @@ orderNo"
                     </div>
 
                     {/* CONTENT */}
-                    <div className="flex flex-col lg:flex-row gap-5 lg:gap-16">
+                    <div className="flex flex-col  lg:flex-row gap-5 lg:gap-16">
                       {/* LEFT */}
                       <div className="w-full lg:w-[30%] space-y-3">
                         <div className="grid md:grid-cols-2 gap-2">
                           <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
-                            <p className="text-[11px] text-gray-500 uppercase mb-1">
-                              Company
+                            <p className="text-[11px] text-gray-500  mb-1">
+                              Company Name
                             </p>
 
                             <p className="text-xl font-semibold text-gray-800">
@@ -795,8 +898,8 @@ orderNo"
                           </div>
 
                           <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
-                            <p className="text-[11px] text-gray-500 uppercase mb-1">
-                              Collection
+                            <p className="text-[11px] text-gray-500  mb-1">
+                              Collection Name
                             </p>
 
                             <p className="text-xl font-semibold text-gray-800">
@@ -806,8 +909,8 @@ orderNo"
                         </div>
 
                         <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
-                          <p className="text-[11px] text-gray-500 uppercase mb-1">
-                            Serial No.
+                          <p className="text-[11px] text-gray-500  mb-1">
+                            Serial Number
                           </p>
 
                           <p className="text-xl font-semibold text-gray-800">
@@ -817,7 +920,7 @@ orderNo"
 
                         {/* Attachments */}
                         <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
-                          <p className="text-[11px] text-gray-500 uppercase mb-2">
+                          <p className="text-[11px] text-gray-500  mb-2">
                             Attachments ({product.attachments?.length || 0})
                           </p>
 
@@ -907,8 +1010,56 @@ orderNo"
       {/* ======================================================
           ACTIONS
       ====================================================== */}
+      {/* Bottom Actions - Edit Mode Only */}
+      {isEditMode && showRoomForm && (
+        <div className="flex justify-center gap-3 mt-6 border-t pt-4">
+          <button
+            type="button"
+            onClick={() => {
+              if (hasUnsavedChanges()) {
+                setShowCancelModal(true);
+              } else {
+                onCancel();
+              }
+            }}
+            className="
+        bg-white
+        border
+        px-4
+        py-2.5
+        rounded-xl
+        hover:scale-105
+        transition-all
+      "
+          >
+            Cancel
+          </button>
 
-      <div className="flex flex-col sm:flex-row gap-4 p-1">
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="
+        bg-black
+        text-white
+        px-5
+        py-2.5
+        rounded-xl
+        flex
+        items-center
+        gap-2
+        disabled:opacity-60
+      "
+          >
+            {isSaving && (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            )}
+
+            {isSaving ? "Updating Order..." : "Save Order"}
+          </button>
+        </div>
+      )}
+
+      {/* <div className="flex flex-col sm:flex-row gap-4 p-1">
         <button
           type="button"
           disabled={isSaving}
@@ -965,7 +1116,7 @@ orderNo"
                 : "Save Order"}
           </button>
         )}
-      </div>
+      </div> */}
 
       {/* ======================================================
           CANCEL MODAL
@@ -1036,8 +1187,40 @@ orderNo"
 
       {content}
     </div>
+  ) : isEditMode ? (
+    // UPDATE UI
+    <div className=" py-0 rounded-2xl relative">
+      <button
+        type="button"
+        onClick={() => {
+          if (hasUnsavedChanges()) {
+            setShowCancelModal(true);
+          } else {
+            onCancel();
+          }
+        }}
+        className="
+      absolute
+      -top-2
+      -right-4
+      z-50
+      w-10
+      h-10
+      flex
+      items-center
+      justify-center
+     
+     
+      transition
+    "
+      >
+        <FiX size={22} />
+      </button>
+
+      {content}
+    </div>
   ) : (
-    <div className="  px-6  py-0 rounded-2xl md:border">
+    <div className="  px-6  py-0 rounded-2xl md:border ">
       <div className="flex justify-center items-center  rounded-xl ">
         <h3 className="text-2xl font-bold mb-1">{title}</h3>
       </div>
@@ -1049,7 +1232,7 @@ orderNo"
 
 export default AddOrder;
 
-// import React, { useEffect, useRef, useState } from "react";
+// import React, { useEffect, useRef, useState, useCallback } from "react";
 // import { useForm } from "react-hook-form";
 // import { FiTrash2, FiPlus, FiUpload, FiX } from "react-icons/fi";
 // import { toast } from "react-toastify";
@@ -1057,7 +1240,7 @@ export default AddOrder;
 // import ProductForm from "./ProductForm";
 // import FormField from "./common/FormField";
 // import ConfirmModal from "./common/ConfirmModal";
-
+// import ImagePreviewModal from "./common/ImagePreviewModal";
 // import { emptyProduct, cleanProductData } from "./orderUtils";
 
 // import { generateWorklog, generateCreateWorklog } from "../../utils/worklog";
@@ -1230,6 +1413,7 @@ export default AddOrder;
 //   const { data: currentUser } = useCurrentUser();
 //   const [isSaving, setIsSaving] = useState(false);
 //   const [editingProduct, setEditingProduct] = useState(null);
+//   const [previewAttachment, setPreviewAttachment] = useState(null);
 //   // ======================================================
 //   // INITIAL SNAPSHOT
 //   // ======================================================
@@ -1270,7 +1454,7 @@ export default AddOrder;
 //           }))
 //           .filter((room) => room.products.length > 0), // optional: remove room if empty
 //     );
-
+//     toast.dismiss();
 //     toast.success("Product removed");
 //   };
 //   const hasUnsavedChanges = () => {
@@ -1298,6 +1482,7 @@ export default AddOrder;
 //     // }
 
 //     if (!currentRoom.products.length) {
+//       toast.dismiss();
 //       toast.warning("Please add at least one product");
 //       return;
 //     }
@@ -1317,7 +1502,7 @@ export default AddOrder;
 //     // Clear React Hook Form fields
 //     resetField("roomType");
 //     resetField("roomName");
-
+//     toast.dismiss();
 //     toast.success("Room Added");
 //   };
 
@@ -1342,12 +1527,21 @@ export default AddOrder;
 //   // PRODUCT UPDATE
 //   // ======================================================
 
-//   const updateCurrentProduct = (updatedProduct) => {
-//     setCurrentRoom((prev) => ({
-//       ...prev,
-//       currentProduct: updatedProduct,
-//     }));
-//   };
+//   const updateCurrentProduct = useCallback((updatedProduct) => {
+//     setCurrentRoom((prev) => {
+//       const oldValue = JSON.stringify(prev.currentProduct);
+//       const newValue = JSON.stringify(updatedProduct);
+
+//       if (oldValue === newValue) {
+//         return prev;
+//       }
+
+//       return {
+//         ...prev,
+//         currentProduct: updatedProduct,
+//       };
+//     });
+//   }, []);
 //   // ======================================================
 //   // ADD PRODUCT TO ROOM
 //   // ======================================================
@@ -1391,50 +1585,86 @@ export default AddOrder;
 
 //     const cleanedProduct = cleanProductData(currentRoom.currentProduct);
 
-//     const productToAdd = {
-//       ...cleanedProduct,
-//       id: Date.now(),
-//     };
+//     if (editingProduct) {
+//       // UPDATE EXISTING PRODUCT
 
-//     setRooms((prevRooms) => {
-//       const existingRoomIndex = prevRooms.findIndex(
-//         (r) =>
-//           r.roomType === currentRoom.roomType &&
-//           r.roomName === currentRoom.roomName,
+//       setRooms((prevRooms) =>
+//         prevRooms.map((room) => {
+//           if (room.id !== editingProduct.roomId) return room;
+
+//           return {
+//             ...room,
+//             products: room.products.map((p) =>
+//               p.id === editingProduct.productId
+//                 ? {
+//                     ...cleanedProduct,
+//                     id: editingProduct.productId,
+//                   }
+//                 : p,
+//             ),
+//           };
+//         }),
 //       );
 
-//       if (existingRoomIndex !== -1) {
-//         const updatedRooms = [...prevRooms];
+//       setEditingProduct(null);
+//       toast.dismiss();
+//       toast.success("Product Added");
 
-//         updatedRooms[existingRoomIndex] = {
-//           ...updatedRooms[existingRoomIndex],
-//           products: [...updatedRooms[existingRoomIndex].products, productToAdd],
-//         };
+//       productFormResetRefs.current["currentRoom"]?.();
 
-//         return updatedRooms;
-//       }
+//       setCurrentRoom((prev) => ({
+//         ...prev,
+//         currentProduct: {},
+//       }));
+//     } else {
+//       // ADD NEW PRODUCT
 
-//       return [
-//         ...prevRooms,
-//         {
-//           id: Date.now(),
-//           roomType: currentRoom.roomType,
-//           roomName: currentRoom.roomName,
-//           products: [productToAdd],
-//         },
-//       ];
-//     });
+//       const productToAdd = {
+//         ...cleanedProduct,
+//         id: Date.now(),
+//       };
 
-//     setCurrentRoom((prev) => ({
-//       ...prev,
-//       currentProduct: emptyProduct(),
-//     }));
+//       setRooms((prevRooms) => {
+//         const existingRoomIndex = prevRooms.findIndex(
+//           (r) =>
+//             r.roomType === currentRoom.roomType &&
+//             r.roomName === currentRoom.roomName,
+//         );
 
-//     if (productFormResetRefs.current["currentRoom"]) {
-//       productFormResetRefs.current["currentRoom"]();
+//         if (existingRoomIndex !== -1) {
+//           const updatedRooms = [...prevRooms];
+
+//           updatedRooms[existingRoomIndex] = {
+//             ...updatedRooms[existingRoomIndex],
+//             products: [
+//               ...updatedRooms[existingRoomIndex].products,
+//               productToAdd,
+//             ],
+//           };
+
+//           return updatedRooms;
+//         }
+
+//         return [
+//           ...prevRooms,
+//           {
+//             id: Date.now(),
+//             roomType: currentRoom.roomType,
+//             roomName: currentRoom.roomName,
+//             products: [productToAdd],
+//           },
+//         ];
+//       });
+//       toast.dismiss();
+//       toast.success("Product Added");
+
+//       productFormResetRefs.current["currentRoom"]?.();
+
+//       setCurrentRoom((prev) => ({
+//         ...prev,
+//         currentProduct: {},
+//       }));
 //     }
-
-//     toast.success("Product Added");
 //   };
 //   // ======================================================
 //   // REMOVE PRODUCT
@@ -1462,6 +1692,7 @@ export default AddOrder;
 //   const onSubmit = async (data) => {
 //     try {
 //       if (!data?.customerId) {
+//         toast.dismiss();
 //         toast.error("Please select customer");
 //         // console.log(12222222, selectedCustomerId);
 //         // console.log(1111111111111, data);
@@ -1469,6 +1700,7 @@ export default AddOrder;
 //         return;
 //       }
 //       if (!order?._id && rooms.length === 0) {
+//         toast.dismiss();
 //         toast.error("Please add at least one room");
 //         return;
 //       }
@@ -1549,6 +1781,7 @@ export default AddOrder;
 //         //   order ? "Order updated successfully" : "Order created successfully",
 //         // );
 //       } catch (error) {
+//         toast.dismiss();
 //         toast.error(error.response?.data?.message || "Failed to save order");
 //       } finally {
 //         setIsSaving(false);
@@ -1558,6 +1791,7 @@ export default AddOrder;
 //         order ? "Order updated successfully" : "Order created successfully",
 //       );
 //     } catch (error) {
+//       toast.dismiss();
 //       toast.error(error.response?.data?.message || "Failed to save order");
 //     }
 //   };
@@ -1572,7 +1806,7 @@ export default AddOrder;
 //           ORDER DETAILS
 //       ====================================================== */}
 
-//       <div className="  border rounded-xl px-2">
+//       <div className="  lg:border rounded-xl px-2">
 //         {/* <h2 className="text-xl font-semibold mb-1">Order Details</h2> */}
 
 //         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -1631,11 +1865,22 @@ export default AddOrder;
 //       {/* ======================================================
 //           ROOMS
 //       ====================================================== */}
-//       <div className=" border rounded-xl p-2 my-1">
+//       <div className=" md:border rounded-xl p-2 my-1">
 //         <div className="my-1 ">
 //           <button
 //             type="button"
-//             onClick={() => setShowRoomForm(true)}
+//             onClick={() => {
+//               setCurrentRoom(emptyRoom());
+
+//               setEditingProduct(null);
+
+//               productFormResetRefs.current["currentRoom"]?.();
+
+//               resetField("roomType");
+//               resetField("roomName");
+
+//               setShowRoomForm(true);
+//             }}
 //             className="bg-black cursor-pointer text-white px-5 py-2 rounded-xl flex items-center gap-2 transition-all
 //     duration-200
 //     hover:scale-105"
@@ -1644,67 +1889,67 @@ export default AddOrder;
 //             Add Room
 //           </button>
 //         </div>
-//         {showRoomForm && (
-//           <>
-//             <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-//               <div className="">
-//                 <FormField
-//                   name="roomType"
-//                   label=""
-//                   type="select"
-//                   control={control}
-//                   options={ROOM_OPTIONS.map((r) => ({
-//                     value: r,
-//                     label: r,
-//                   }))}
-//                   onChange={updateRoomType}
-//                 />
-//               </div>
-
-//               <div className="">
-//                 <FormField
-//                   name="roomName"
-//                   label=""
-//                   type="text"
-//                   control={control}
-//                   placeholder="Enter Room Name"
-//                   onChange={(e) => updateRoomName(e.target.value)}
-//                 />
-//               </div>
-//             </div>
-//             <ProductForm
-//               product={currentRoom.currentProduct}
-//               onUpdate={updateCurrentProduct}
-//               onResetForm={(resetFn) => {
-//                 productFormResetRefs.current["currentRoom"] = resetFn;
-//               }}
-//               hideRemove
+//     {showRoomForm && (
+//       <>
+//         <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+//           <div className="">
+//             <FormField
+//               name="roomType"
+//               label=""
+//               type="select"
+//               control={control}
+//               options={ROOM_OPTIONS.map((r) => ({
+//                 value: r,
+//                 label: r,
+//               }))}
+//               onChange={updateRoomType}
 //             />
-//             {canShowSaveProduct && (
-//               <button
-//                 type="button"
-//                 onClick={handleAddProduct}
-//                 className="
-//       mt-0
-//       bg-black
-//       text-white
-//       px-5
-//       py-3
-//       rounded-xl
-//       flex
-//       items-center
-//       gap-2
-//       transition-all
-//       duration-200
-//       hover:scale-105
-//       cursor-pointer
-//     "
-//               >
-//                 Save Product
-//               </button>
-//             )}
-//           </>
+//           </div>
+
+//           <div className="">
+//             <FormField
+//               name="roomName"
+//               label=""
+//               type="text"
+//               control={control}
+//               placeholder="Enter Room Name"
+//               onChange={(e) => updateRoomName(e.target.value)}
+//             />
+//           </div>
+//         </div>
+//         <ProductForm
+//           product={currentRoom.currentProduct}
+//           onUpdate={updateCurrentProduct}
+//           onResetForm={(resetFn) => {
+//             productFormResetRefs.current["currentRoom"] = resetFn;
+//           }}
+//           hideRemove
+//         />
+//         {canShowSaveProduct && (
+//           <button
+//             type="button"
+//             onClick={handleAddProduct}
+//             className="
+//   mt-0
+//   bg-black
+//   text-white
+//   px-5
+//   py-3
+//   rounded-xl
+//   flex
+//   items-center
+//   gap-2
+//   transition-all
+//   duration-200
+//   hover:scale-105
+//   cursor-pointer
+// "
+//           >
+//             {editingProduct ? "Update Product" : "Save Product"}
+//           </button>
 //         )}
+//       </>
+//     )}
 
 //         {/* ======================================================
 //           ADD ROOM
@@ -1718,14 +1963,17 @@ export default AddOrder;
 //               className="border rounded-xl p-1 bg-white shadow-sm"
 //             >
 //               {/* Room Header */}
-//               <div className="mb-1 border-b pb-1">
-//                 <h3 className="font-bold text-lg text-gray-900">
-//                   {room.roomType}
-//                   {room.roomName && ` - ${room.roomName}`}
-//                   {/* <span className="font-semibold text-sm px-4 text-gray-900">
-//                     (Total Products: {room.products.length})
-//                   </span> */}
-//                 </h3>
+//               <div className="mb-1 border-b pb-1 w-1/4">
+//                 <div className="flex items-center gap-2 bg-gradient-to-r  from-gray-900 to-black border-b text-white px-4 py-2 rounded-2xl shadow-sm">
+//                   <span className="text-lg">🏠</span>
+//                   <span className="font-bold text-sm sm:text-base tracking-wide">
+//                     {room.roomType || "Room"} -
+//                   </span>
+
+//                   {room.roomName && (
+//                     <span className=" py-1     ">{room.roomName}</span>
+//                   )}
+//                 </div>
 //               </div>
 
 //               {/* Products List */}
@@ -1733,142 +1981,155 @@ export default AddOrder;
 //                 {room.products.map((product) => (
 //                   <div
 //                     key={product.id}
-//                     className="border rounded-lg p-1 bg-gray-50"
+//                     className="border border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md transition mb-4 bg-white"
 //                   >
-//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-5">
-//                       {/* Product */}
-//                       <div>
-//                         <div className="text-xs uppercase tracking-wide text-gray-500">
-//                           Product
-//                         </div>
+//                     {/* HEADER */}
+//                     <div className="flex justify-between items-center gap-2 mb-3">
+//                       <h3 className="text-lg lg:text-2xl font-bold text-gray-900">
+//                         {product.category
+//                           ? product.category.charAt(0).toUpperCase() +
+//                             product.category.slice(1)
+//                           : "Product"}
+//                       </h3>
 
-//                         <div className="font-bold text-gray-900">
-//                           {product.category || "-"}
-//                         </div>
-//                       </div>
+//                       <div className="flex gap-2 items-center">
+//                         <button
+//                           type="button"
+//                           onClick={() => handleEditProduct(room, product)}
+//                           className="w-10 h-10 flex items-center justify-center"
+//                         >
+//                           <i className="fas fa-edit text-green-600 hover:scale-125 transition-all duration-200" />
+//                         </button>
 
-//                       {/* Company */}
-//                       <div>
-//                         <div className="text-xs uppercase tracking-wide text-gray-500">
-//                           Company Name
-//                         </div>
-
-//                         <div className="font-bold text-gray-900">
-//                           {product.companyName || "-"}
-//                         </div>
-//                       </div>
-
-//                       {/* Collection */}
-//                       <div>
-//                         <div className="text-xs uppercase tracking-wide text-gray-500">
-//                           Collection Name
-//                         </div>
-
-//                         <div className="font-bold text-gray-900">
-//                           {product.collectionName || "-"}
-//                         </div>
-//                       </div>
-
-//                       {/* Product Code */}
-//                       <div>
-//                         <div className="text-xs uppercase tracking-wide text-gray-500">
-//                           Product Code
-//                         </div>
-
-//                         <div className="font-bold text-gray-900">
-//                           {product.productCode || "-"}
-//                         </div>
-//                       </div>
-
-//                       {/* Quantity */}
-//                       {/* {product.quantity && (
-//                         <div>
-//                           <div className="text-xs uppercase tracking-wide text-gray-500">
-//                             Quantity
-//                           </div>
-
-//                           <div className="font-bold text-gray-900">
-//                             {product.quantity}
-//                           </div>
-//                         </div>
-//                       )} */}
-
-//                       {/* delete */}
-//                       <div>
 //                         <button
 //                           type="button"
 //                           onClick={() =>
 //                             removeProductFromRoom(room.id, product.id)
 //                           }
+//                           className="w-10 h-10 flex items-center justify-center"
 //                         >
-//                           <FiTrash2 className="text-red-500" />
+//                           <FiTrash2 className="text-red-600 hover:scale-125 transition-all duration-200" />
 //                         </button>
 //                       </div>
-//                       <div>
-//                         <button
-//                           type="button"
-//                           onClick={() => handleEditProduct(room, product)}
-//                         >
-//                           <i
-//                             className="fas fa-edit  transition-all
-//     duration-200
-//     hover:scale-125 text-green-600 hover:text-green-800"
-//                           ></i>
-//                         </button>
-//                       </div>
-//                       {/* measurment */}
-//                       {/* {product?.attributes?.measurements?.length > 0 && (
-//                         <div className="lg:col-span-7 mt-2">
-//                           <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-//                             Measurements
+//                     </div>
+
+//                     {/* CONTENT */}
+//                     <div className="flex flex-col lg:flex-row gap-5 lg:gap-16">
+//                       {/* LEFT */}
+//                       <div className="w-full lg:w-[30%] space-y-3">
+//                         <div className="grid md:grid-cols-2 gap-2">
+//                           <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+//                             <p className="text-[11px] text-gray-500 uppercase mb-1">
+//                               Company
+//                             </p>
+
+//                             <p className="text-xl font-semibold text-gray-800">
+//                               {product.companyName || "-"}
+//                             </p>
 //                           </div>
 
-//                           <div className="space-y-2">
-//                             {product.attributes.measurements.map((m, index) => (
-//                               <div
-//                                 key={index}
-//                                 className="border rounded-lg bg-white p-2 grid grid-cols-2 md:grid-cols-5 gap-3"
-//                               >
-//                                 <div>
-//                                   <div className="text-xs text-gray-500">
-//                                     Window
-//                                   </div>
-//                                   <div className="font-medium">
-//                                     {m.windowName || "-"}
-//                                   </div>
-//                                 </div>
+//                           <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+//                             <p className="text-[11px] text-gray-500 uppercase mb-1">
+//                               Collection
+//                             </p>
 
-//                                 <div>
-//                                   <div className="text-xs text-gray-500">
-//                                     Width
-//                                   </div>
-//                                   <div className="font-medium">
-//                                     {m.width || "-"} {m.unit}
-//                                   </div>
-//                                 </div>
-
-//                                 <div>
-//                                   <div className="text-xs text-gray-500">
-//                                     Height
-//                                   </div>
-//                                   <div className="font-medium">
-//                                     {m.height || "-"} {m.unit}
-//                                   </div>
-//                                 </div>
-
-//                                 <div className="md:col-span-2">
-//                                   <div className="text-xs text-gray-500">
-//                                     Details
-//                                   </div>
-//                                   <div className="font-medium">
-//                                     {m.details || "-"}
-//                                   </div>
-//                                 </div>
-//                               </div>
-//                             ))}
+//                             <p className="text-xl font-semibold text-gray-800">
+//                               {product.collectionName || "-"}
+//                             </p>
 //                           </div>
 //                         </div>
-//                       )} */}
+
+//                         <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+//                           <p className="text-[11px] text-gray-500 uppercase mb-1">
+//                             Serial No.
+//                           </p>
+
+//                           <p className="text-xl font-semibold text-gray-800">
+//                             {product.productCode || "-"}
+//                           </p>
+//                         </div>
+
+//                         {/* Attachments */}
+//                         <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+//                           <p className="text-[11px] text-gray-500 uppercase mb-2">
+//                             Attachments ({product.attachments?.length || 0})
+//                           </p>
+
+//                           {product.attachments?.length > 0 ? (
+//                             <div className="flex flex-wrap gap-2">
+//                               {product.attachments.map((file, index) => (
+//                                 <img
+//                                   key={index}
+//                                   src={
+//                                     file.url ||
+//                                     file.preview ||
+//                                     (file instanceof File
+//                                       ? URL.createObjectURL(file)
+//                                       : "")
+//                                   }
+//                                   alt=""
+//                                   onClick={() => setPreviewAttachment(file)}
+//                                   className="
+//       w-12 h-12
+//       object-cover
+//       rounded-lg
+//       border
+//       cursor-pointer
+//       hover:scale-110
+//       transition
+//     "
+//                                 />
+//                               ))}
+//                             </div>
+//                           ) : (
+//                             <p className="text-sm text-gray-400">
+//                               No attachments
+//                             </p>
+//                           )}
+//                         </div>
+//                       </div>
+
+//                       {/* RIGHT */}
+//                       <div className="w-full lg:w-[70%]">
+//                         {Array.isArray(product?.attributes?.measurements) &&
+//                           product.category?.toLowerCase() === "curtains" && (
+//                             <div className="grid lg:grid-cols-3 gap-4">
+//                               {product.attributes.measurements.map((m, i) => (
+//                                 <div key={i}>
+//                                   {m.windowName && (
+//                                     <div className="flex justify-center mb-2">
+//                                       <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+//                                         {m.windowName}
+//                                       </span>
+//                                     </div>
+//                                   )}
+
+//                                   <div className="flex justify-center">
+//                                     <div className="relative w-[360px] h-[150px]">
+//                                       <div className="absolute top-10 left-16 w-46 border-t-2 border-gray-500"></div>
+
+//                                       <div className="absolute top-10 left-16 h-24 border-l-2 border-gray-500"></div>
+
+//                                       <div className="absolute top-0 left-29 w-24 border rounded-md px-2 py-1 text-center bg-white font-bold">
+//                                         {m.width}
+//                                       </div>
+
+//                                       <div className="absolute top-18 -left-10 w-24 border rounded-md px-2 py-1 text-center bg-white font-bold">
+//                                         {m.height}
+//                                       </div>
+
+//                                       <div className="absolute top-12 left-18 w-44 h-21 bg-white border rounded-xl p-2 shadow-sm">
+//                                         <p className="text-xs">
+//                                           {m.details || "-"}
+//                                         </p>
+//                                       </div>
+//                                     </div>
+//                                   </div>
+//                                 </div>
+//                               ))}
+//                             </div>
+//                           )}
+//                       </div>
 //                     </div>
 //                   </div>
 //                 ))}
@@ -1943,7 +2204,17 @@ export default AddOrder;
 //       {/* ======================================================
 //           CANCEL MODAL
 //       ====================================================== */}
-
+//       <ImagePreviewModal
+//         isOpen={!!previewAttachment}
+//         image={
+//           previewAttachment?.url ||
+//           previewAttachment?.preview ||
+//           (previewAttachment instanceof File
+//             ? URL.createObjectURL(previewAttachment)
+//             : "")
+//         }
+//         onClose={() => setPreviewAttachment(null)}
+//       />
 //       <ConfirmModal
 //         isOpen={showCancelModal}
 //         title="Cancel Order"
@@ -1980,7 +2251,7 @@ export default AddOrder;
 //   // ======================================================
 
 //   return isModal ? (
-//     <div className="mt-20 rounded-2xl border p-6 max-w-6xl mx-auto">
+//     <div className="mt-20 rounded-2xl md:border p-6 max-w-6xl mx-auto">
 //       <div className="flex justify-between items-center mb-1">
 //         <h3 className="text-2xl font-bold">{title}</h3>
 
@@ -2000,7 +2271,7 @@ export default AddOrder;
 //       {content}
 //     </div>
 //   ) : (
-//     <div className="  px-6  py-0 rounded-2xl border">
+//     <div className="  px-6  py-0 rounded-2xl md:border">
 //       <div className="flex justify-center items-center  rounded-xl ">
 //         <h3 className="text-2xl font-bold mb-1">{title}</h3>
 //       </div>

@@ -4,7 +4,7 @@ import ProductForm from "../ProductForm";
 import { FiPlus, FiTrash2, FiHome, FiSave } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { SelectStyles, InputStyles } from "@/constants/Config";
-
+import { IoClose } from "react-icons/io5";
 const ROOM_TYPES = [
   // Living Areas
   "Hall",
@@ -177,67 +177,35 @@ const RoomForm = ({ room, onChange, onCancel, onSave }) => {
   };
 
   return (
-    <div className="bg-[#f8f9fc] min-h-full rounded-3xl overflow-hidden">
+    <div className=" min-h-full rounded-3xl overflow-hidden">
       {/* HEADER */}
-      <div className="sticky top-0 z-20 bg-white border-b px-4 sm:px-6 py-4 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="sticky top-0 z-20   px-4 sm:px-6 py-2 ">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between md:gap-4 gap-2">
           {/* LEFT */}
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg">
-              <FiHome size={24} />
-            </div>
-
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">Edit Room</h2>
-
-              <p className="text-sm text-gray-500 mt-1">
-                Update room details and manage products
-              </p>
-            </div>
-          </div>
-
-          {/* RIGHT */}
-          <div className="flex gap-3">
-            <button
-              onClick={onCancel}
-              className="
-                px-5 py-2.5 rounded-xl border border-black
-                hover:bg-gray-100 transition font-medium
-              "
-            >
-              Cancel
-            </button>
-
+          <div className="flex md:hidden justify-end  gap-x-3">
             <button
               onClick={handleSave}
               className="
-                px-5 py-2.5 rounded-xl bg-black text-white
+                px-3 md:py-2.5 py-1 rounded-xl bg-black text-white
                 hover:bg-gray-800 transition
                 flex items-center gap-2 font-medium
               "
             >
               <FiSave />
-              Save Room
+            </button>
+            <button
+              onClick={onCancel}
+              className="
+                px-3 md:py-2.5 py-1 rounded-xl border border-black
+                hover:bg-gray-100 transition font-medium
+              "
+            >
+              <IoClose size={18} />
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* BODY */}
-      <div className="p-4 sm:p-6 space-y-6">
-        {/* ROOM DETAILS CARD */}
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
-          {/* CARD HEADER */}
-          <div className="px-5 py-4 border-b bg-black">
-            <h3 className="text-lg font-semibold text-white">
-              Room Information
-            </h3>
-          </div>
-
-          {/* CARD BODY */}
-          <div className="p-5 grid  grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="md:flex items-center md:gap-4 ">
             {/* ROOM TYPE */}
-            <div>
+            <div className="">
               <label className="text-sm font-semibold text-gray-700 block">
                 Room Type
               </label>
@@ -259,7 +227,7 @@ const RoomForm = ({ room, onChange, onCancel, onSave }) => {
             </div>
 
             {/* ROOM NAME */}
-            <div className="">
+            <div className="mt-1 md:mt-0">
               <label className="text-sm font-semibold text-gray-700 block mb-1">
                 Room Name
               </label>
@@ -271,19 +239,91 @@ const RoomForm = ({ room, onChange, onCancel, onSave }) => {
                 placeholder="Enter room name"
               />
             </div>
+            {!showProductForm && (
+              <div className="pt-2 md:pt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowProductForm(true)}
+                  className="
+        inline-flex items-center gap-2 cursor-pointer
+        px-4 md:py-3 py-2
+        rounded-xl
+        bg-black text-white
+      "
+                >
+                  <span className="text-sm font-medium">Add Product</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT */}
+          <div className="hidden md:flex   gap-3">
+            <button
+              onClick={onCancel}
+              className="
+                px-5 md:py-2.5 py-1 rounded-xl border border-black
+                hover:bg-gray-100 transition font-medium
+              "
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleSave}
+              className="
+                px-5 md:py-2.5 py-1 rounded-xl bg-black text-white
+                hover:bg-gray-800 transition
+                flex items-center gap-2 font-medium
+              "
+            >
+              <FiSave />
+              Save Order
+            </button>
           </div>
         </div>
+      </div>
 
+      {/* BODY */}
+      <div className=" px-2">
         {/* PRODUCTS */}
         <div className="space-y-5">
           {showProductForm && (
-            <ProductForm
-              product={currentProduct}
-              onUpdate={setCurrentProduct}
-            />
+            <div className="space-y-4">
+              <ProductForm
+                product={currentProduct}
+                onUpdate={setCurrentProduct}
+              />
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProductForm(false);
+                    setCurrentProduct(emptyProduct());
+                  }}
+                  className="px-4 py-2 border rounded-lg"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={addProduct}
+                  className="
+          px-4 py-2
+          bg-black text-white
+          rounded-lg
+          
+        "
+                >
+                  Save Product
+                </button>
+              </div>
+            </div>
           )}
           {newProducts.length > 0 && (
-            <div className="space-y-2 mt-4">
+            <div className="space-y-2 my-1">
               {newProducts.map((product, index) => (
                 <div
                   key={product.id || index}
@@ -312,33 +352,6 @@ const RoomForm = ({ room, onChange, onCancel, onSave }) => {
             </div>
           )}
         </div>
-
-        {/* ADD PRODUCT BUTTON */}
-        <button
-          type="button"
-          onClick={() => {
-            if (!showProductForm) {
-              setShowProductForm(true);
-              return;
-            }
-
-            addProduct();
-          }}
-          className="
-    inline-flex items-center gap-2 cursor-pointer
-    px-4 py-2
-    rounded-xl
-    bg-black text-white
-    hover:bg-gray-800
-    transition
-  "
-        >
-          <FiPlus size={16} />
-
-          <span className="text-sm font-medium">
-            {showProductForm ? "Save Product" : "Add Product"}
-          </span>
-        </button>
       </div>
     </div>
   );

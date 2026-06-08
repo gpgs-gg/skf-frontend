@@ -175,6 +175,7 @@ const ShowroomCRM = () => {
   };
   // order delete
   const handleAskDeleteOrder = (orderId) => {
+    console.log("OPEN DELETE MODAL", orderId);
     setOrderToDelete(orderId);
     setConfirmOpen(true);
   };

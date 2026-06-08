@@ -64,8 +64,7 @@ const OrderDetailsPage = ({
   const [editingProductOrderId, setEditingProductOrderId] = useState(null); // Track which order contains the product
 
   // Delete confirmation states
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [orderToDelete, setOrderToDelete] = useState(null);
+
   const [productToDelete, setProductToDelete] = useState(null);
   const [productOrderId, setProductOrderId] = useState(null);
   const [showProductDeleteModal, setShowProductDeleteModal] = useState(false);
@@ -161,9 +160,9 @@ const OrderDetailsPage = ({
 
   // room edit start
   const startRoomEdit = (orderId, room, index) => {
-    console.log("ROOM EDIT CLICKED", { orderId, room, index });
+    // console.log("ROOM EDIT CLICKED", { orderId, room, index });
 
-    closeAllPanels();
+    // closeAllPanels();
 
     setEditingRoomState(room);
     setEditingRoomOrderId(orderId);
@@ -234,27 +233,11 @@ const OrderDetailsPage = ({
     handleGlobalCancel();
   };
   const addOrderRef = useRef(null);
-  /**
-   * Opens delete confirmation modal for selected order
-   */
   const deleteOrder = (orderId) => {
-    setOrderToDelete(orderId);
-    setShowDeleteModal(true);
-  };
-  /**
-   * Confirms order deletion and resets modal state
-   */
-  const confirmDeleteOrder = () => {
-    if (onDeleteOrder && orderToDelete) {
-      onDeleteOrder(orderToDelete);
+    if (onDeleteOrder) {
+      onDeleteOrder(orderId);
     }
-    setShowDeleteModal(false);
-    setOrderToDelete(null);
-    setEditingOrder(null);
   };
-  /**
-   * Opens delete confirmation modal for product
-   */
 
   const [productRoomId, setProductRoomId] = useState(null);
 
@@ -330,8 +313,8 @@ const OrderDetailsPage = ({
       toast.error("Room ID missing. Cannot edit product.");
       return;
     }
-    closeAllPanels();
-    console.log("11111ROOM ID RECEIVED:", roomId);
+    // closeAllPanels();
+
     setEditingProductState(product);
     setEditingProductOrderId(orderId);
     setEditingProductRoomId(roomId);
@@ -347,10 +330,6 @@ const OrderDetailsPage = ({
    * Calls parent update handler
    */
   const saveProductEdit = () => {
-    console.log("editingProductRoomId:", editingProductRoomId);
-    console.log("editingProductOrderId:", editingProductOrderId);
-    console.log("editingProductState:", editingProductState);
-    console.log("onUpdateProduct exists:", !!onUpdateProduct);
     if (
       onUpdateProduct &&
       editingProductOrderId &&
@@ -568,17 +547,7 @@ const OrderDetailsPage = ({
           setRoomOrderId(null);
         }}
       />
-      {/* Order delete confirmation modal */}
-      <ConfirmModal
-        isOpen={showDeleteModal}
-        title="Delete Order"
-        message="Are you sure you want to delete this order? This action cannot be undone."
-        onConfirm={confirmDeleteOrder}
-        onCancel={() => {
-          setShowDeleteModal(false);
-          setOrderToDelete(null);
-        }}
-      />
+
       {/* Product delete confirmation modal */}
       <ConfirmModal
         isOpen={showProductDeleteModal}
@@ -636,18 +605,17 @@ export default OrderDetailsPage;
 
 // import React, { useState, useEffect, useMemo, useRef } from "react";
 // import { FiArrowLeft, FiSearch, FiX } from "react-icons/fi";
-// import AddOrder from "./OrderForm";
-// import AddCustomer from "./CustomerForm";
-// import ProductForm from "./ProductForm";
+
 // import ConfirmModal from "./common/ConfirmModal";
 // import { toast } from "react-toastify";
 // import { FiEye } from "react-icons/fi";
 // import FIELD_CONFIG from "../../constants/inputFieldConfig";
 // import ProductDetailsModal from "./common/ProductDetailsModal";
 // import CustomerSnapshot from "./common/CustomerSnapshot";
-// import RoomForm from "./common/RoomForm.jsx";
+
 // const OrderDetailsPage = ({
 //   customer,
+//   onDeleteRoom,
 //   orders,
 //   onBack,
 //   onDeleteOrder,
@@ -658,6 +626,7 @@ export default OrderDetailsPage;
 //   onUpdateOrder,
 //   onUpdateProduct,
 //   onUpdateRoom,
+//   OnAddProduct,
 // }) => {
 //   // Controls different editing panels/forms
 //   const [showAddOrderForm, setShowAddOrderForm] = useState(false);
@@ -695,11 +664,45 @@ export default OrderDetailsPage;
 
 //   // for product room id
 //   const [editingProductRoomId, setEditingProductRoomId] = useState(null);
+//   const [showRoomDeleteModal, setShowRoomDeleteModal] = useState(false);
+//   const [roomToDelete, setRoomToDelete] = useState(null);
+//   const [roomOrderId, setRoomOrderId] = useState(null);
+//   const [showGlobalCancelModal, setShowGlobalCancelModal] = useState(false);
+//   const deleteRoom = (orderId, roomId) => {
+//     setRoomOrderId(orderId);
+//     setRoomToDelete(roomId);
+//     setShowRoomDeleteModal(true);
+//   };
+//   const hasUnsavedChanges = () => {
+//     return (
+//       editingCustomer ||
+//       editingOrder ||
+//       editingRoomState ||
+//       editingProductState ||
+//       showAddOrderForm ||
+//       products?.length > 0
+//     );
+//   };
+//   const confirmDeleteRoom = () => {
+//     if (onDeleteRoom && roomOrderId && roomToDelete) {
+//       onDeleteRoom(roomOrderId, roomToDelete);
+//     }
+
+//     setShowRoomDeleteModal(false);
+//     setRoomToDelete(null);
+//     setRoomOrderId(null);
+
+//     if (editingRoomState?._id === roomToDelete) {
+//       setEditingRoomState(null);
+//       setEditingRoomOrderId(null);
+//       setEditingRoomIndex(null);
+//     }
+//   };
 //   /**
 //    * Closes all active editing panels/forms
 //    * Used before opening another panel to avoid UI conflicts
 //    */
-//   console.log(222222, editingProductRoomId);
+//   //console.log(222222, editingProductRoomId);
 //   const closeAllPanels = () => {
 //     setEditingCustomer(null);
 //     setEditingOrder(null);
@@ -751,7 +754,7 @@ export default OrderDetailsPage;
 //         roomName: updatedRoom.roomName,
 //         products: updatedRoom.products || [],
 //       });
-
+//       toast.dismiss();
 //       toast.success("Room updated successfully");
 
 //       setEditingRoomState(null);
@@ -759,6 +762,7 @@ export default OrderDetailsPage;
 //       setEditingRoomIndex(null);
 //     } catch (error) {
 //       console.log(error);
+//       toast.dismiss();
 //       toast.error("Failed to update room");
 //     }
 //   };
@@ -785,7 +789,26 @@ export default OrderDetailsPage;
 //       onAddNewOrder(completeOrder);
 //     }
 //   };
+//   const handleGlobalCancel = () => {
+//     closeAllPanels();
 
+//     setEditingCustomer(null);
+//     setEditingOrder(null);
+//     setEditingProductState(null);
+//     setEditingRoomState(null);
+
+//     setShowAddOrderForm(false);
+
+//     toast.dismiss();
+//   };
+//   const handleGlobalCancelClick = () => {
+//     if (hasUnsavedChanges()) {
+//       setShowGlobalCancelModal(true);
+//       return;
+//     }
+
+//     handleGlobalCancel();
+//   };
 //   const addOrderRef = useRef(null);
 //   /**
 //    * Opens delete confirmation modal for selected order
@@ -879,6 +902,7 @@ export default OrderDetailsPage;
 //   const startProductEdit = (orderId, roomId, product) => {
 //     if (!roomId) {
 //       console.error("❌ Missing roomId:", roomId);
+//       toast.dismiss();
 //       toast.error("Room ID missing. Cannot edit product.");
 //       return;
 //     }
@@ -924,6 +948,7 @@ export default OrderDetailsPage;
 //         hasOrderId: !!editingProductOrderId,
 //         hasProduct: !!editingProductState,
 //       });
+//       toast.dismiss();
 //       toast.error("Failed to update product");
 //     }
 
@@ -1038,206 +1063,54 @@ export default OrderDetailsPage;
 //    */
 //   return (
 //     <div className="overflow-hidden">
-//       <div className="flex flex-col lg:flex-row w-full h-full p-2 sm:p-3 lg:p-4 gap-3 lg:gap-6 overflow-hidden">
-//         {/* LEFT SECTION → Customer snapshot + order listing */}
-
-//         <div
-//           className={`transition-all duration-500 ease-in-out
-// ${isEditingActive() ? "hidden lg:flex lg:w-[40%]" : "w-full"}
-//   w-full rounded-2xl border bg-white shadow-sm
-//   flex-col min-h-0`}
-//         >
-//           <div
-//             className={`transition-opacity duration-300 flex-1   ${
-//               isEditingActive() ? "opacity-100" : "opacity-100"
-//             }`}
-//           >
-//             <CustomerSnapshot
-//               filteredOrders={filteredOrders}
-//               selectedCustomer={selectedCustomer}
-//               customerOrders={customerOrders}
-//               handleBackAction={handleBackAction}
-//               onBack={onBack}
-//               products={products}
-//               searchTerm={searchTerm}
-//               setSearchTerm={setSearchTerm}
-//               closeAllPanels={closeAllPanels}
-//               setEditingCustomer={setEditingCustomer}
-//               setShowAddOrderForm={setShowAddOrderForm}
-//               setEditingOrder={setEditingOrder}
-//               deleteOrder={deleteOrder}
-//               startProductEdit={startProductEdit}
-//               deleteProduct={deleteProduct}
-//               formatDate={formatDate}
-//               isEditingActive={isEditingActive}
-//               setSelectedProduct={setSelectedProduct}
-//               setShowProductModal={setShowProductModal}
-//               startRoomEdit={startRoomEdit}
-//             />
-//           </div>
-//         </div>
-//         {/* RIGHT SECTION → Dynamic forms/edit panels */}
-//         <div
-//           className={`transition-all duration-500 ease-in-out  lg:h-[calc(110vh-2rem)]  transform  min-h-0
-//   ${
-//     isEditingActive()
-//       ? "w-full lg:w-[60%] lg:translate-x-0 opacity-100"
-//       : "hidden lg:block lg:w-0 lg:translate-x-10 opacity-0"
-//   }
-//   w-full  mt-4 lg:mt-0`}
-//         >
-//           <div className="h-full  rounded-2xl shadow-sm md:border md:border-gray-100 animate-slideInRight  flex flex-col  lg:overflow-y-auto">
-//             <div className="min-h-full  animate-slideInRight">
-//               {isEditingActive() && (
-//                 <div className="sticky top-0 bg-white  z-10 flex justify-end px-3 lg:pt-1 pt-3">
-//                   <button
-//                     onClick={() => {
-//                       if (hasUnsavedProducts()) {
-//                         setShowBackConfirmModal(true);
-//                         return;
-//                       }
-
-//                       if (addOrderRef.current?.handleClose) {
-//                         addOrderRef.current.handleClose();
-//                       } else {
-//                         closeAllPanels();
-//                       }
-//                     }}
-//                     className=" rounded-full hover:bg-gray-100 transition cursor-pointer"
-//                   >
-//                     <FiX size={23} />
-//                   </button>
-//                 </div>
-//               )}
-//               {editingRoomState ? (
-//                 <RoomForm
-//                   room={editingRoomState}
-//                   onChange={setEditingRoomState}
-//                   onCancel={cancelRoomEdit}
-//                   onSave={saveRoomEdit}
-//                 />
-//               ) : null}
-
-//               {editingCustomer ? (
-//                 <AddCustomer
-//                   customer={editingCustomer}
-//                   showNextButton={false}
-//                   onCancel={() => setEditingCustomer(null)}
-//                   onSave={async (updatedCustomer) => {
-//                     try {
-//                       const finalCustomer = {
-//                         ...editingCustomer,
-//                         ...updatedCustomer,
-//                       };
-
-//                       await onUpdateCustomer(finalCustomer);
-
-//                       // ✅ instant UI update
-//                       setSelectedCustomer(finalCustomer);
-
-//                       setEditingCustomer(null);
-//                     } catch (error) {
-//                       console.log(error);
-//                     }
-//                   }}
-//                 />
-//               ) : editingOrder ? (
-//                 <AddOrder
-//                   key={editingOrder?._id}
-//                   order={{
-//                     ...editingOrder,
-//                     customer:
-//                       editingOrder.customer?._id || editingOrder.customer,
-//                     products: [],
-//                   }}
-//                   customers={customers}
-//                   setProducts={setProducts}
-//                   products={products}
-//                   selectedCustomerId={
-//                     editingOrder?.customer?._id ||
-//                     editingOrder?.customer ||
-//                     selectedCustomer?._id
-//                   }
-//                   onSave={handleUpdateOrder}
-//                   onCancel={() => setEditingOrder(null)}
-//                   title="Edit Order"
-//                 />
-//               ) : editingProductState ? (
-//                 <div className="bg-white rounded-2xl px-3 sm:px-5 py-3">
-//                   <h3 className="text-2xl font-bold mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
-//                     <span>Edit Product</span>
-
-//                     <span className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-600">
-//                       <span className="px-3 py-1 rounded-full bg-gray-100 border border-gray-200">
-//                         {roomType}
-//                       </span>
-
-//                       <span className="text-gray-400">•</span>
-
-//                       <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-//                         {roomName}
-//                       </span>
-//                     </span>
-//                   </h3>
-//                   <ProductForm
-//                     product={editingProductState}
-//                     index={0}
-//                     onUpdate={handleUpdateProductInline}
-//                     hideRemove={true}
-//                   />
-//                   <div className="flex gap-2 mt-6 mb-12 justify-end">
-//                     <button
-//                       onClick={cancelProductEdit}
-//                       className="
-//   w-full sm:w-auto
-//   px-6 py-3
-//   cursor-pointer font-extrabold
-//   rounded-xl
-//   border border-gray-300
-//   text-gray-600
-//   hover:bg-gray-100
-//   transition
-//   text-md sm:text-base
-// "
-//                     >
-//                       Cancel
-//                     </button>
-//                     <button
-//                       onClick={saveProductEdit}
-//                       className="px-5 py-2 bg-gray-800  cursor-pointer text-white rounded-xl"
-//                     >
-//                       Save Changes
-//                     </button>
-//                     {/* <button
-//                       onClick={() => {
-//                         console.log("Manual save test");
-//                         saveProductEdit();
-//                       }}
-//                       className="px-5 py-2 bg-green-600 cursor-pointer text-white rounded-xl"
-//                     >
-//                       Test Save
-//                     </button> */}
-//                   </div>
-//                 </div>
-//               ) : showAddOrderForm ? (
-//                 <AddOrder
-//                   key="create-order"
-//                   products={products}
-//                   setProducts={setProducts}
-//                   selectedCustomerId={selectedCustomer._id}
-//                   customers={customers}
-//                   onSave={handleOrderCreated}
-//                   onCancel={() => setShowAddOrderForm(false)}
-//                   title="Create New Order"
-//                 />
-//               ) : (
-//                 <></>
-//               )}
-//             </div>
-//           </div>
-//         </div>
+//       <div className="w-full min-h-screen bg-gray-50">
+//         <CustomerSnapshot
+//           filteredOrders={filteredOrders}
+//           selectedCustomer={selectedCustomer}
+//           customerOrders={customerOrders}
+//           handleBackAction={handleBackAction}
+//           onBack={onBack}
+//           products={products}
+//           searchTerm={searchTerm}
+//           setSearchTerm={setSearchTerm}
+//           closeAllPanels={closeAllPanels}
+//           setEditingCustomer={setEditingCustomer}
+//           setShowAddOrderForm={setShowAddOrderForm}
+//           setEditingOrder={setEditingOrder}
+//           deleteOrder={deleteOrder}
+//           startProductEdit={startProductEdit}
+//           deleteProduct={deleteProduct}
+//           formatDate={formatDate}
+//           setSelectedProduct={setSelectedProduct}
+//           setShowProductModal={setShowProductModal}
+//           startRoomEdit={startRoomEdit}
+//           // NEW
+//           editingCustomer={editingCustomer}
+//           editingOrder={editingOrder}
+//           editingRoomState={editingRoomState}
+//           editingProductState={editingProductState}
+//           saveRoomEdit={saveRoomEdit}
+//           cancelRoomEdit={cancelRoomEdit}
+//           saveProductEdit={saveProductEdit}
+//           cancelProductEdit={cancelProductEdit}
+//           handleUpdateProductInline={handleUpdateProductInline}
+//           handleUpdateOrder={handleUpdateOrder}
+//           roomName={roomName}
+//           roomType={roomType}
+//           setEditingCustomer={setEditingCustomer}
+//           showAddOrderForm={showAddOrderForm}
+//           customers={customers}
+//           setProducts={setProducts}
+//           handleOrderCreated={handleOrderCreated}
+//           onUpdateCustomer={onUpdateCustomer}
+//           setSelectedCustomer={setSelectedCustomer}
+//           setEditingRoomState={setEditingRoomState}
+//           handleGlobalCancel={handleGlobalCancelClick}
+//           editingRoomOrderId={editingRoomOrderId}
+//           editingProductOrderId={editingProductOrderId}
+//           deleteRoom={deleteRoom}
+//         />
 //       </div>
-
 //       {/* Product full details modal */}
 //       <ProductDetailsModal
 //         product={selectedProduct}
@@ -1247,6 +1120,29 @@ export default OrderDetailsPage;
 //           setSelectedProduct(null);
 //         }}
 //         formatDate={formatDate}
+//       />
+//       {/* global cancel confirmation modal */}
+//       <ConfirmModal
+//         isOpen={showGlobalCancelModal}
+//         title="Discard Changes"
+//         message="You have unsaved changes. Are you sure you want to cancel and discard them?"
+//         onConfirm={() => {
+//           setShowGlobalCancelModal(false);
+//           handleGlobalCancel();
+//         }}
+//         onCancel={() => setShowGlobalCancelModal(false)}
+//       />
+//       {/* Room delete confirmation modal */}
+//       <ConfirmModal
+//         isOpen={showRoomDeleteModal}
+//         title="Delete Room"
+//         message="Are you sure you want to delete this room? All products inside this room will also be removed."
+//         onConfirm={confirmDeleteRoom}
+//         onCancel={() => {
+//           setShowRoomDeleteModal(false);
+//           setRoomToDelete(null);
+//           setRoomOrderId(null);
+//         }}
 //       />
 //       {/* Order delete confirmation modal */}
 //       <ConfirmModal

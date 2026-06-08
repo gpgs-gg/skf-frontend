@@ -28,6 +28,7 @@ const FormField = ({
   name,
   control,
   label,
+  customInput,
   type = "input",
   options = [],
   placeholder = "",
@@ -41,6 +42,7 @@ const FormField = ({
     console.error("FormField missing control:", name);
     return null;
   }
+
   return (
     <div className="flex flex-col gap-0 pb-2  w-full">
       <label className="text-sm text-gray-700 font-medium ">{label}</label>
@@ -51,13 +53,13 @@ const FormField = ({
         rules={rules}
         render={({ field, fieldState }) => {
           const hasError = error || fieldState?.error;
-          const inputClass = `${InputStyles.base} ${hasError ? InputStyles.error : ""} ${readOnly ? "bg-gray-50 cursor-not-allowed" : ""} font-semibold`;
+          const inputClass = `${InputStyles.base} ${hasError ? InputStyles.error : ""} ${readOnly ? "bg-gray-50 cursor-not-allowed" : ""} font-semibold placeholder:font-normal`;
           const textareaClass = `${TextareaStyles.base} ${hasError ? TextareaStyles.error : ""}`;
 
           // file
           if (type === "file") {
             return (
-              <div className="space-y-3">
+              <div className="space-y-3 ">
                 {/* Upload Button */}
                 <label
                   htmlFor={name}

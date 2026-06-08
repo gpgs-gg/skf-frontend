@@ -16,7 +16,7 @@ import UsersPage from "./features/users/UsersPage";
 import CategoryManager from "./features/product/CategoryManager";
 const App = () => {
   return (
-    <>
+    <div className="">
       <Header />
 
       <Routes>
@@ -49,7 +49,7 @@ const App = () => {
         {/* PRODUCTS */}
         <Route path="/skf-action/products" element={<CategoryManager />} />
       </Routes>
-    </>
+    </div>
   );
 };
 

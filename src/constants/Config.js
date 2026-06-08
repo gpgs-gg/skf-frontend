@@ -55,8 +55,8 @@ export const SelectStylesfilter = {
   control: (base, state) => ({
     ...base,
     width: "200px",
-    paddingTop: "0.25rem",
-    paddingBottom: "0.10rem",
+    paddingTop: "md:0.25rem",
+    paddingBottom: "md:0.10rem",
     paddingLeft: "0.75rem",
     paddingRight: "0.50rem",
     marginTop: "0.30rem",
