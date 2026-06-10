@@ -104,6 +104,29 @@ const CustomerSnapshot = ({
 
     return yearsDiff <= Number(orderYearFilter);
   });
+  const [showProductCancelConfirm, setShowProductCancelConfirm] =
+    useState(false);
+
+  const [originalProduct, setOriginalProduct] = useState(null);
+  const handleStartProductEdit = (orderId, roomId, product) => {
+    const copy = JSON.parse(JSON.stringify(product));
+
+    setOriginalProduct(copy);
+
+    startProductEdit(orderId, roomId, copy);
+  };
+
+  const hasProductChanged = () => {
+    if (!originalProduct || !editingProductState) return false;
+
+    console.log("ORIGINAL", originalProduct);
+    console.log("EDITING", editingProductState);
+
+    const { _id: _, ...original } = originalProduct;
+    const { _id: __, ...editing } = editingProductState;
+
+    return JSON.stringify(original) !== JSON.stringify(editing);
+  };
   return (
     <div className="sticky lg:top-0 z-30 ">
       <div className="px-4 sm:px-5  border-b">
@@ -338,7 +361,7 @@ md:gap-3
       )}
       {/* all orders */}
 
-      <div className="lg:flex-1 lg:overflow-y-auto  min-h-0  lg:h-[550px] px-3 sm:px-5 pb-5  space-y-3 pt-2">
+      <div className="lg:flex-1 lg:overflow-y-auto  min-h-0  lg:h-[550px] px-3 sm:px-5 pb-5   space-y-3 pt-2">
         {filteredOrdersByYear.map((order) => {
           const shouldHideOrder =
             hasActiveEditor &&
@@ -362,7 +385,9 @@ md:gap-3
           return (
             <div
               key={order._id}
-              className="border-2 border-gray-300 p-1 rounded-2xl "
+              className={`p-1 rounded-2xl  ${
+                editingProductState ? "" : "border-2 border-gray-300"
+              }`}
             >
               {" "}
               {!hideOrderHeader && (
@@ -376,7 +401,7 @@ md:gap-3
 "
                 >
                   {/* Order No */}
-                  <div className="bg-gradient-to-r tracking-[2px]  from-gray-900 to-black border-bs text-white lg:text-xl rounded-xl px-4 lg:px-8 py-2 whitespace-nowrap ">
+                  <div className="bg-gradient-to-r tracking-[2px] bg-[#EB0100] text-white lg:text-xl rounded-xl px-4 lg:px-8 py-2 whitespace-nowrap ">
                     <span className=" ">Order No:</span>{" "}
                     <span className=" ">{order.orderNo}</span>
                   </div>
@@ -533,83 +558,109 @@ md:gap-3
                       onCancel={() => setEditingOrder(null)}
                       title="Update Order"
                       isEditMode={true}
+                      editingRoomState={editingRoomState}
+                      editingProductState={editingProductState}
                     />
                   </div>
                 )}
               </div>
               {/* Products list - now without inline editing */}
-              {order.rooms?.map((room, roomIndex) => (
-                <div
-                  key={`${order._id}-${room._id}-${roomIndex}`}
-                  className="mt-1 p-1  border 
-      border-gray-200 rounded-2xl  "
-                >
-                  {/* ROOM HEADER */}
-                  <div className="flex  justify-between items-center gap-2 ">
-                    <div className="flex items-center gap-2 flex-wrap mb-2">
-                      <div className="flex items-center gap-2 bg-gradient-to-r lg:text-xl  from-gray-900 to-black border-b text-white px-4 rounded-xl whitespace-nowrap shadow-sm tracking-[2px] ">
-                        {/* <span className="text-lg">🏠</span> */}
-                        <span className=" tracking-wide ">
-                          {room.roomType || "Room"} -
-                        </span>
+              {order.rooms?.map((room, roomIndex) => {
+                // Show only the room being edited
+                if (editingRoomState && editingRoomState._id !== room._id) {
+                  return null;
+                }
 
-                        {room.roomName && (
-                          <span className=" py-1   ">{room.roomName}</span>
-                        )}
-                      </div>
-                    </div>
-                    {/* edit delete room */}
-                    {editingOrder?._id === order._id && (
-                      <div className=" flex justify-end  sm:justify-start gap-2 items-center w-full sm:w-auto">
-                        {/* edit room */}
-                        <button
-                          className="px-3 py-1 cursor-pointer rounded-lg text-lg"
-                          onClick={() =>
-                            startRoomEdit(order._id, room, roomIndex)
-                          }
-                        >
-                          <i
-                            className="fas fa-edit  transition-all
+                return (
+                  <div className="">
+                    <div
+                      key={`${order._id}-${room._id}-${roomIndex}`}
+                      className={`   ${
+                        editingProductState
+                          ? ""
+                          : "border rounded-2xl mt-1 p-1 border-gray-200"
+                      }`}
+                    >
+                      {/* ROOM HEADER */}
+                      {editingProductState?._id == null && (
+                        <div className="flex  justify-between items-center gap-2 ">
+                          <div className="flex items-center gap-2 flex-wrap mb-2">
+                            <div className="flex items-center gap-2  bg-gradient-to-r lg:text-xl bg-[#467B89] text-white px-4 rounded-xl whitespace-nowrap shadow-sm tracking-[2px] ">
+                              {/* <span className="text-lg">🏠</span> */}
+                              <span className=" tracking-wide ">
+                                {room.roomType || "Room"} -
+                              </span>
+
+                              {room.roomName && (
+                                <span className=" py-1  ">{room.roomName}</span>
+                              )}
+                            </div>
+                          </div>
+                          {/* edit delete room */}
+                          {editingOrder?._id === order._id &&
+                            editingRoomState?._id !== room._id && (
+                              <div className=" flex justify-end   sm:justify-start gap-2 items-center w-full sm:w-auto">
+                                {/* edit room */}
+                                <button
+                                  className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-green-50"
+                                  onClick={() =>
+                                    startRoomEdit(order._id, room, roomIndex)
+                                  }
+                                >
+                                  <i
+                                    className="fas fa-edit  transition-all
     duration-200
     hover:scale-125 text-green-600"
-                          ></i>
-                        </button>
-                        <button
-                          className="px-3 py-1 cursor-pointer rounded-lg  text-red-600 text-sm hover:bg-red-50"
-                          onClick={() => deleteRoom(order._id, room._id)}
-                        >
-                          <i
-                            className="fas fa-trash-alt  transition-all
+                                  ></i>
+                                </button>
+                                <button
+                                  className="px-3 py-1 cursor-pointer rounded-lg  text-red-600 text-sm hover:bg-red-50"
+                                  onClick={() =>
+                                    deleteRoom(order._id, room._id)
+                                  }
+                                >
+                                  <i
+                                    className="fas fa-trash-alt  transition-all
     duration-200
     hover:scale-125 text-red-600 hover:text-red-800 cursor-pointer"
-                          ></i>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  {/* room form */}
-                  {editingRoomState?._id === room._id && (
-                    <div className="mb-1 border rounded-2xl ">
-                      <RoomForm
-                        room={editingRoomState}
-                        onChange={setEditingRoomState}
-                        onCancel={cancelRoomEdit}
-                        onSave={saveRoomEdit}
-                      />
-                    </div>
-                  )}
-                  {/* PRODUCTS INSIDE ROOM */}
-                  <div className="">
-                    {room.products
-                      ?.filter((p) => p.isActive !== false)
-                      .map((product, idx) => (
-                        <React.Fragment
-                          key={product._id || `${room._id}-${idx}`}
-                        >
-                          {editingProductState?._id === product._id ? (
-                            <div className="mt-1  border rounded-2xl  px-4">
-                              {/* ROOM INFO */}
-                              {/* <div className="flex items-center gap-2 mb-4 flex-wrap">
+                                  ></i>
+                                </button>
+                              </div>
+                            )}
+                        </div>
+                      )}
+                      {/* room form */}
+                      {editingRoomState?._id === room._id && (
+                        <div className="mb-1 border  rounded-2xl ">
+                          <RoomForm
+                            room={editingRoomState}
+                            onChange={setEditingRoomState}
+                            onCancel={cancelRoomEdit}
+                            onSave={saveRoomEdit}
+                            editingProductState={editingProductState}
+                          />
+                        </div>
+                      )}
+                      {/* PRODUCTS INSIDE ROOM */}
+                      <div className="">
+                        {room.products
+                          ?.filter((p) => {
+                            if (!editingProductState)
+                              return p.isActive !== false;
+
+                            return (
+                              p.isActive !== false &&
+                              p._id === editingProductState._id
+                            );
+                          })
+                          .map((product, idx) => (
+                            <React.Fragment
+                              key={product._id || `${room._id}-${idx}`}
+                            >
+                              {editingProductState?._id === product._id ? (
+                                <div className="  border rounded-2xl  px-4">
+                                  {/* ROOM INFO */}
+                                  {/* <div className="flex items-center gap-2 my-2 flex-wrap">
                                 <span className="px-3 py-1 rounded-full bg-black text-white text-sm">
                                   {roomType}
                                 </span>
@@ -621,161 +672,173 @@ md:gap-3
                                 )}
                               </div> */}
 
-                              {/* PRODUCT FORM */}
-                              <ProductForm
-                                product={editingProductState}
-                                index={0}
-                                onUpdate={handleUpdateProductInline}
-                                hideRemove={true}
-                              />
+                                  {/* PRODUCT FORM */}
+                                  <ProductForm
+                                    product={editingProductState}
+                                    index={0}
+                                    onUpdate={handleUpdateProductInline}
+                                    hideRemove={true}
+                                  />
 
-                              {/* ACTIONS */}
-                              <div className="flex justify-end gap-3 mt-5">
-                                <button
-                                  onClick={cancelProductEdit}
-                                  className="px-5 py-2 border rounded-xl hover:bg-gray-100"
-                                >
-                                  Cancel
-                                </button>
+                                  {/* ACTIONS */}
+                                  <div className="flex  justify-center gap-3 my-2">
+                                    <button
+                                      onClick={() => {
+                                        if (hasProductChanged()) {
+                                          setShowProductCancelConfirm(true);
+                                        } else {
+                                          cancelProductEdit();
+                                        }
+                                      }}
+                                      className="px-5 py-2 border rounded-xl hover:bg-gray-100"
+                                    >
+                                      Cancel
+                                    </button>
 
-                                <button
-                                  onClick={saveProductEdit}
-                                  className="px-5 py-2 bg-black text-white rounded-xl hover:bg-gray-800"
-                                >
-                                  Save Changes
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="border bg-white  border-gray-200 rounded-2xl px-3  shadow-sm hover:shadow-md transition  mb-1 ">
-                              <div
-                                className=" mb-1 
+                                    <button
+                                      onClick={saveProductEdit}
+                                      className="px-5 py-2 bg-black text-white rounded-xl hover:bg-gray-800"
+                                    >
+                                      Save Changes
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="border bg-white  border-gray-200 rounded-2xl px-3  shadow-sm hover:shadow-md transition  mb-1 ">
+                                  <div
+                                    className=" mb-1 
 flex flex-col
 lg:grid lg:grid-cols-1
 
 lg:gap-0
 "
-                              >
-                                <div className="flex justify-between items-center gap-2  ">
-                                  <div className="flex items-center gap-2 my-2 bg-gradient-to-r  from-gray-900 to-black border-b text-white px-4 py-1 rounded-xl whitespace-nowrap shadow-sm tracking-[2px]">
-                                    <h3 className="   lg:text-xl  tracking-[2px]">
-                                      {product.category
-                                        ? product.category
-                                            .charAt(0)
-                                            .toUpperCase() +
-                                          product.category.slice(1)
-                                        : "Product"}
-                                    </h3>
-                                  </div>
-                                  {/* for product edit and delete */}
-                                  {(editingOrder?._id === order._id ||
-                                    editingRoomOrderId === order._id) && (
-                                    <div className="flex  gap-2 justify-center items-center ">
-                                      <button
-                                        onClick={() =>
-                                          startProductEdit(
-                                            order._id,
-                                            room._id,
-                                            product,
-                                          )
-                                        }
-                                        className="w-10 h-10   hover:bg-gray-50 flex items-center justify-center"
-                                      >
-                                        <i
-                                          className="fas fa-edit  transition-all
+                                  >
+                                    <div className="flex justify-between items-center gap-2  ">
+                                      <div className="flex items-center gap-2 my-2 bg-gradient-to-r  from-gray-900 to-black  text-white px-4 py-1 rounded-xl whitespace-nowrap shadow-sm tracking-[2px]">
+                                        <h3 className="   lg:text-xl  tracking-[2px]">
+                                          {product.category
+                                            ? product.category
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                              product.category.slice(1)
+                                            : "Product"}
+                                        </h3>
+                                      </div>
+                                      {/* for product edit and delete */}
+                                      {(editingOrder?._id === order._id ||
+                                        editingRoomOrderId === order._id) && (
+                                        <div className="flex  gap-2 justify-center items-center ">
+                                          <button
+                                            onClick={() =>
+                                              handleStartProductEdit(
+                                                order._id,
+                                                room._id,
+                                                product,
+                                              )
+                                            }
+                                            className="w-10 h-10 hover:bg-gray-50 flex items-center justify-center"
+                                          >
+                                            <i
+                                              className="fas fa-edit transition-all
     duration-200
     hover:scale-125 text-green-600"
-                                        ></i>
-                                      </button>
+                                            ></i>
+                                          </button>
 
-                                      <button
-                                        onClick={() =>
-                                          deleteProduct(
-                                            order._id,
-                                            room._id,
-                                            product._id,
-                                          )
-                                        }
-                                        className="w-10 h-10 rounded-xl  hover:bg-red-50 flex items-center justify-center"
-                                      >
-                                        <i
-                                          className="fas fa-trash-alt  transition-all
+                                          <button
+                                            onClick={() =>
+                                              deleteProduct(
+                                                order._id,
+                                                room._id,
+                                                product._id,
+                                              )
+                                            }
+                                            className="w-10 h-10 rounded-xl  hover:bg-red-50 flex items-center justify-center"
+                                          >
+                                            <i
+                                              className="fas fa-trash-alt  transition-all
     duration-200
     hover:scale-125 text-red-600"
-                                        ></i>
-                                      </button>
+                                            ></i>
+                                          </button>
+                                        </div>
+                                      )}
                                     </div>
-                                  )}
-                                </div>
-                              </div>
-                              <div>
-                                <div className="flex  justify-between items-start gap-3 mb-2 bg-white">
-                                  <div className="flex-1   ">
-                                    {/* ATTRIBUTES */}
-                                    <div
-                                      className="flex   lg:flex-row lg:gap-16
+                                  </div>
+                                  <div>
+                                    <div className="flex  justify-between items-start gap-3 mb-2 ">
+                                      <div className="flex-1   ">
+                                        {/* ATTRIBUTES */}
+                                        <div
+                                          className="flex    lg:flex-row lg:gap-16
                                      flex-col gap-5 "
-                                    >
-                                      {/* LEFT - 30% */}
-                                      <div className=" lg:w-[30%] space-y-3">
-                                        {/* Company / Collection / Status */}
-                                        <div className="space-y-3">
-                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                            <div className="bg-white px-3 py-2 border border-gray-200  rounded-xl shadow-sm hover:shadow-md transition">
-                                              <p className="text-[14px] text-gray-500 mb-1">
-                                                Company Name
-                                              </p>
-                                              <p className="text-xl font-semibold text-gray-800">
-                                                {product.companyName}
-                                              </p>
-                                            </div>
+                                        >
+                                          {/* LEFT - 30% */}
+                                          <div className=" lg:w-[30%] lg:border-r lg:pr-6 lg:border-gray-800 space-y-3">
+                                            {/* Company / Collection / Status */}
+                                            <div className="space-y-3">
+                                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                <div className="bg-white px-3 py-2 border border-gray-200  rounded-xl shadow-sm hover:shadow-md transition">
+                                                  <p className="text-[14px] text-gray-500 mb-1">
+                                                    Company Name
+                                                  </p>
+                                                  <p className="text-xl font-semibold text-gray-800">
+                                                    {product.companyName}
+                                                  </p>
+                                                </div>
 
-                                            <div className="bg-white px-3 py-2 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition">
-                                              <p className="text-[14px] text-gray-500  mb-1">
-                                                Collection Name
-                                              </p>
-                                              <p className="text-xl font-semibold text-gray-800">
-                                                {product.collectionName}
-                                              </p>
-                                            </div>
-                                          </div>
-                                          <div
-                                            className="px-3 bg-white py-2 border border-gray-200 rounded-xl shadow-sm hover:shadow-md w-full
+                                                <div className="bg-white px-3 py-2 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition">
+                                                  <p className="text-[14px] text-gray-500  mb-1">
+                                                    Collection Name
+                                                  </p>
+                                                  <p className="text-xl font-semibold text-gray-800">
+                                                    {product.collectionName}
+                                                  </p>
+                                                </div>
+                                              </div>
+                                              <div
+                                                className="px-3 bg-white py-2 border border-gray-200 rounded-xl shadow-sm hover:shadow-md w-full
     min-w-0
     overflow-hidden transition"
-                                          >
-                                            <p className="text-[14px] text-gray-500  mb-1">
-                                              Serial No.
-                                            </p>
-                                            <p className="text-xl font-semibold text-gray-800">
-                                              {product.productCode}
-                                            </p>
-                                          </div>
-                                          <div className="bg-white px-3 py-2 border border-gray-200 rounded-xl shadow-sm">
-                                            <p className="text-[14px] text-gray-500 mb-2">
-                                              Attachments (
-                                              {product.attachments?.length || 0}
-                                              )
-                                            </p>
+                                              >
+                                                <p className="text-[14px] text-gray-500  mb-1">
+                                                  Serial No.
+                                                </p>
+                                                <p className="text-xl font-semibold text-gray-800">
+                                                  {product.productCode}
+                                                </p>
+                                              </div>
+                                              <div className="bg-white px-3 py-2 border border-gray-200 rounded-xl shadow-sm">
+                                                <p className="text-[14px] text-gray-500 mb-2">
+                                                  Attachments (
+                                                  {product.attachments
+                                                    ?.length || 0}
+                                                  )
+                                                </p>
 
-                                            {product.attachments?.length > 0 ? (
-                                              <div className="flex flex-wrap gap-2">
-                                                {product.attachments.map(
-                                                  (file, index) => (
-                                                    <button
-                                                      key={file._id || index}
-                                                      type="button"
-                                                      onClick={() =>
-                                                        setPreviewAttachment(
-                                                          file,
-                                                        )
-                                                      }
-                                                      className="group"
-                                                    >
-                                                      <img
-                                                        src={file.url}
-                                                        alt={file.originalName}
-                                                        className="
+                                                {product.attachments?.length >
+                                                0 ? (
+                                                  <div className="flex flex-wrap gap-2">
+                                                    {product.attachments.map(
+                                                      (file, index) => (
+                                                        <button
+                                                          key={
+                                                            file._id || index
+                                                          }
+                                                          type="button"
+                                                          onClick={() =>
+                                                            setPreviewAttachment(
+                                                              file,
+                                                            )
+                                                          }
+                                                          className="group"
+                                                        >
+                                                          <img
+                                                            src={file.url}
+                                                            alt={
+                                                              file.originalName
+                                                            }
+                                                            className="
               w-12 h-12
               object-cover cursor-pointer
               rounded-lg
@@ -785,88 +848,91 @@ lg:gap-0
               hover:scale-110
               transition
             "
-                                                      />
-                                                    </button>
-                                                  ),
-                                                )}
-                                              </div>
-                                            ) : (
-                                              <p className="text-sm text-gray-400">
-                                                No attachments
-                                              </p>
-                                            )}
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      {/* RIGHT - 70% */}
-                                      <div className="w-full  lg:w-[70%]">
-                                        {Array.isArray(
-                                          product.attributes?.measurements,
-                                        ) &&
-                                          product.category?.toLowerCase() ===
-                                            "curtains" && (
-                                            <div>
-                                              {/* <h4 className="font-bold text-gray-800 text-sm uppercase tracking-wide mb-2">
-                                                Curtain Measurements
-                                              </h4> */}
-
-                                              <div className="grid  lg:grid-cols-3  gap-4">
-                                                {product.attributes.measurements.map(
-                                                  (m, i) => (
-                                                    <div
-                                                      key={i}
-                                                      className="   px-3  "
-                                                    >
-                                                      {m.windowName && (
-                                                        <div className="flex justify-center mb-2">
-                                                          <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
-                                                            {m.windowName}
-                                                          </span>
-                                                        </div>
-                                                      )}
-
-                                                      <div className="flex justify-center ">
-                                                        <div className="relative w-[280px] md:w-[360px] h-[150px]">
-                                                          <div className="absolute top-10 left-16 w-46 border-t-2 border-gray-500"></div>
-                                                          <div className="absolute top-10 left-16 h-24 border-l-2 border-gray-500"></div>
-
-                                                          <div className="absolute top-0 left-29 w-15 md:w-24 border font-bold text-[18px] rounded-md px-2 py-1 text-center bg-white text-sm">
-                                                            {m.width}
-                                                          </div>
-
-                                                          <div className="absolute top-18 w-15 md:w-24 md:-left-10 border rounded-md px-2 py-1 font-bold text-[18px] text-center bg-white text-sm">
-                                                            {m.height}
-                                                          </div>
-
-                                                          <div className="absolute top-12 left-18 w-44 h-21 bg-white border rounded-xl p-2 shadow-sm">
-                                                            {/* <p className="text-[10px] text-gray-500 mb-1">
-                                                            Details
-                                                          </p> */}
-                                                            <p className="w-full  text-xs resize-none">
-                                                              {m.details || "-"}
-                                                            </p>
-                                                          </div>
-                                                        </div>
-                                                      </div>
-                                                    </div>
-                                                  ),
+                                                          />
+                                                        </button>
+                                                      ),
+                                                    )}
+                                                  </div>
+                                                ) : (
+                                                  <p className="text-sm text-gray-400">
+                                                    No attachments
+                                                  </p>
                                                 )}
                                               </div>
                                             </div>
-                                          )}
+                                          </div>
+
+                                          {/* RIGHT - 70% */}
+                                          <div className="w-full  lg:w-[70%]">
+                                            {Array.isArray(
+                                              product.attributes?.measurements,
+                                            ) &&
+                                              product.category?.toLowerCase() ===
+                                                "curtains" && (
+                                                <div>
+                                                  {/* <h4 className="font-bold text-gray-800 text-sm uppercase tracking-wide mb-2">
+                                                Curtain Measurements
+                                              </h4> */}
+
+                                                  <div className="grid  lg:grid-cols-3  gap-4">
+                                                    {product.attributes.measurements.map(
+                                                      (m, i) => (
+                                                        <div
+                                                          key={i}
+                                                          className="   px-3  "
+                                                        >
+                                                          {m.windowName && (
+                                                            <div className="flex justify-center mb-2">
+                                                              <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                                                                {m.windowName}
+                                                              </span>
+                                                            </div>
+                                                          )}
+
+                                                          <div className="flex justify-center ">
+                                                            <div className="relative w-[280px] md:w-[360px] h-[150px]">
+                                                              <div className="absolute top-10 left-16 w-46 border-t-2 border-gray-500"></div>
+                                                              <div className="absolute top-10 left-16 h-24 border-l-2 border-gray-500"></div>
+
+                                                              <div className="absolute top-0 left-29 w-15 md:w-24 border font-bold text-[18px] rounded-md px-2 py-1 text-center bg-white text-sm">
+                                                                {m.width}
+                                                              </div>
+
+                                                              <div className="absolute top-18 w-15 md:w-24 md:-left-10 border rounded-md px-2 py-1 font-bold text-[18px] text-center bg-white text-sm">
+                                                                {m.height}
+                                                              </div>
+
+                                                              <div className="absolute top-12 left-18 w-44 h-21 bg-white border rounded-xl p-2 shadow-sm">
+                                                                {/* <p className="text-[10px] text-gray-500 mb-1">
+                                                            Details
+                                                          </p> */}
+                                                                <p className="w-full  text-xs resize-none">
+                                                                  {m.details ||
+                                                                    "-"}
+                                                                </p>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      ),
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              )}
+                                          </div>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            </div>
-                          )}
-                        </React.Fragment>
-                      ))}
+                              )}
+                            </React.Fragment>
+                          ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           );
         })}
@@ -933,6 +999,16 @@ lg:gap-0
           handleGlobalCancel(); // clear editing states
 
           handleBackAction(); // go back
+        }}
+      />
+      <ConfirmModal
+        isOpen={showProductCancelConfirm}
+        title="Discard Changes?"
+        message="You have unsaved product changes. Do you want to discard them?"
+        onCancel={() => setShowProductCancelConfirm(false)}
+        onConfirm={() => {
+          setShowProductCancelConfirm(false);
+          cancelProductEdit();
         }}
       />
     </div>

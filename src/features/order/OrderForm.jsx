@@ -127,6 +127,8 @@ const AddOrder = ({
   onCancel,
   isModal = false,
   title = "Add Order",
+  editingRoomState,
+  editingProductState,
 }) => {
   // ======================================================
   // FORM
@@ -437,76 +439,6 @@ const AddOrder = ({
   // REMOVE PRODUCT
   // ======================================================
 
-  const removeCurrentRoomProduct = (productId) => {
-    setCurrentRoom((prev) => ({
-      ...prev,
-      products: prev.products.filter((p) => p.id !== productId),
-    }));
-
-    toast.info("Product Removed");
-  };
-  // ======================================================
-  // PRODUCT ATTACHMENTS
-  // ======================================================
-
-  const normalizeAttachments = (attachments = []) => {
-    return attachments.filter(Boolean);
-  };
-  const mergeCurrentChangesIntoRooms = () => {
-    let updatedRooms = [...rooms];
-
-    // no pending product
-    if (!currentRoom?.currentProduct?.category) {
-      return updatedRooms;
-    }
-
-    const productToSave = {
-      ...cleanProductData(currentRoom.currentProduct),
-      id: editingProduct?.productId || Date.now(),
-    };
-
-    if (editingProduct) {
-      updatedRooms = updatedRooms.map((room) => {
-        if (room.id !== editingProduct.roomId) return room;
-
-        return {
-          ...room,
-          products: room.products.map((p) =>
-            p.id === editingProduct.productId ? productToSave : p,
-          ),
-        };
-      });
-    } else {
-      const roomIndex = updatedRooms.findIndex(
-        (r) =>
-          r.roomType === currentRoom.roomType &&
-          r.roomName === currentRoom.roomName,
-      );
-
-      if (roomIndex >= 0) {
-        updatedRooms[roomIndex].products.push(productToSave);
-      } else {
-        updatedRooms.push({
-          id: Date.now(),
-          roomType: currentRoom.roomType,
-          roomName: currentRoom.roomName,
-          products: [productToSave],
-        });
-      }
-    }
-
-    return updatedRooms;
-  };
-  const handleGlobalSave = async (data) => {
-    const finalRooms = mergeCurrentChangesIntoRooms();
-
-    const finalOrder = {
-      ...data,
-      rooms: finalRooms,
-    };
-
-    await onSave(finalOrder);
-  };
   // ======================================================
   // SUBMIT
   // ======================================================
@@ -628,64 +560,64 @@ const AddOrder = ({
       {/* ======================================================
           ORDER DETAILS
       ====================================================== */}
+      {!editingRoomState && !editingProductState && (
+        <div className="  rounded-xl px-2">
+          {/* <h2 className="text-xl font-semibold mb-1">Order Details</h2> */}
 
-      <div className="   rounded-xl px-2">
-        {/* <h2 className="text-xl font-semibold mb-1">Order Details</h2> */}
+          <div className="flex flex-col lg:flex-row lg:items-end gap-1 md:gap-4">
+            {/* Order Fields */}
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 lg:gap-4">
+              {order?._id && (
+                <FormField
+                  name="orderNo"
+                  control={control}
+                  label="Order No"
+                  readOnly
+                />
+              )}
 
-        <div className="flex flex-col lg:flex-row lg:items-end gap-1 md:gap-4">
-          {/* Order Fields */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 lg:gap-4">
-            {order?._id && (
               <FormField
-                name="orderNo"
+                name="orderDate"
                 control={control}
-                label="Order No"
-                readOnly
+                label="Order Date"
+                type="date"
               />
-            )}
 
-            <FormField
-              name="orderDate"
-              control={control}
-              label="Order Date"
-              type="date"
-            />
+              <FormField
+                name="deliveryDate"
+                control={control}
+                label="Delivery Date"
+                type="date"
+              />
 
-            <FormField
-              name="deliveryDate"
-              control={control}
-              label="Delivery Date"
-              type="date"
-            />
+              <FormField
+                name="orderStatus"
+                control={control}
+                label="Order Status"
+                type="select"
+                options={[
+                  "Open",
+                  "Pending",
+                  "Processing",
+                  "Completed",
+                  "Cancelled",
+                ]}
+              />
+            </div>
 
-            <FormField
-              name="orderStatus"
-              control={control}
-              label="Order Status"
-              type="select"
-              options={[
-                "Open",
-                "Pending",
-                "Processing",
-                "Completed",
-                "Cancelled",
-              ]}
-            />
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center  gap-3 pb-1">
-            <button
-              type="button"
-              onClick={() => {
-                setCurrentRoom(emptyRoom());
-                setEditingProduct(null);
-                productFormResetRefs.current["currentRoom"]?.();
-                resetField("roomType");
-                resetField("roomName");
-                setShowRoomForm(true);
-              }}
-              className="
+            {/* Actions */}
+            <div className="flex items-center  gap-3 pb-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentRoom(emptyRoom());
+                  setEditingProduct(null);
+                  productFormResetRefs.current["currentRoom"]?.();
+                  resetField("roomType");
+                  resetField("roomName");
+                  setShowRoomForm(true);
+                }}
+                className="
         bg-black
         text-white
         px-4 py-1
@@ -697,21 +629,21 @@ const AddOrder = ({
         hover:scale-105
         transition-all
       "
-            >
-              {/* <FiPlus /> */}
-              Add Room
-            </button>
+              >
+                {/* <FiPlus /> */}
+                Add Room
+              </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                if (hasUnsavedChanges()) {
-                  setShowCancelModal(true);
-                } else {
-                  onCancel();
-                }
-              }}
-              className=" bg-white
+              <button
+                type="button"
+                onClick={() => {
+                  if (hasUnsavedChanges()) {
+                    setShowCancelModal(true);
+                  } else {
+                    onCancel();
+                  }
+                }}
+                className=" bg-white
         border px-2
         md:px-4 py-1
         md:py-2.5
@@ -719,15 +651,15 @@ const AddOrder = ({
         hover:scale-105
         transition-all
       "
-            >
-              Cancel
-            </button>
+              >
+                Cancel
+              </button>
 
-            {(order?._id || rooms.length > 0) && (
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="
+              {(order?._id || rooms.length > 0) && (
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="
       bg-black
       text-white
       md:px-5 px-2 py-1
@@ -738,23 +670,24 @@ const AddOrder = ({
       gap-2
       disabled:opacity-60
     "
-              >
-                {isSaving && (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                )}
+                >
+                  {isSaving && (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  )}
 
-                {isSaving
-                  ? order
-                    ? "Updating Order..."
-                    : "Creating Order..."
-                  : order
-                    ? "update main Order"
-                    : "Save main Order"}
-              </button>
-            )}
+                  {isSaving
+                    ? order
+                      ? "Updating Order..."
+                      : "Creating Order..."
+                    : order
+                      ? "update main Order"
+                      : "Save main Order"}
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
       {showRoomForm && (
         <>
           <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -792,10 +725,11 @@ const AddOrder = ({
             hideRemove
           />
           {canShowSaveProduct && (
-            <button
-              type="button"
-              onClick={handleAddProduct}
-              className="
+            <div className="mb-2">
+              <button
+                type="button"
+                onClick={handleAddProduct}
+                className="
       mt-0
       bg-black
       text-white
@@ -810,9 +744,10 @@ const AddOrder = ({
       hover:scale-105
       cursor-pointer
     "
-            >
-              {editingProduct ? "Update Product" : "Save Product"}
-            </button>
+              >
+                {editingProduct ? "Update Product" : "Save Product"}
+              </button>
+            </div>
           )}
         </>
       )}
@@ -829,8 +764,8 @@ const AddOrder = ({
             >
               {/* Room Header */}
               <div className="mb-1  border-b pb-1 w-1/4">
-                <div className="flex items-center gap-2 bg-gradient-to-r  from-gray-900 to-black border-b text-white px-4 py-2 rounded-2xl shadow-sm">
-                  <span className="text-lg">🏠</span>
+                <div className="flex items-center gap-2 bg-[#467B89]  text-white px-4 py-2 rounded-2xl shadow-sm">
+                  {/* <span className="text-lg">🏠</span> */}
                   <span className="font-bold text-sm sm:text-base tracking-wide">
                     {room.roomType || "Room"} -
                   </span>
@@ -846,7 +781,7 @@ const AddOrder = ({
                 {room.products.map((product) => (
                   <div
                     key={product.id}
-                    className="border  border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md transition mb-4 bg-white"
+                    className="border  border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md transition mb-4 "
                   >
                     {/* HEADER */}
                     <div className="flex justify-between items-center gap-2 mb-3 b">
@@ -866,7 +801,7 @@ const AddOrder = ({
                           <i
                             className="fas fa-edit  transition-all
     duration-200
-    hover:scale-125 text-yellow-600"
+    hover:scale-125 text-green-600"
                           />
                         </button>
 
@@ -887,7 +822,7 @@ const AddOrder = ({
                       {/* LEFT */}
                       <div className="w-full lg:w-[30%] space-y-3">
                         <div className="grid md:grid-cols-2 gap-2">
-                          <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+                          <div className="bg-white px-3 py-2 border border-gray-200 rounded-xl">
                             <p className="text-[11px] text-gray-500  mb-1">
                               Company Name
                             </p>
@@ -897,7 +832,7 @@ const AddOrder = ({
                             </p>
                           </div>
 
-                          <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+                          <div className="bg-white px-3 py-2 border border-gray-200 rounded-xl">
                             <p className="text-[11px] text-gray-500  mb-1">
                               Collection Name
                             </p>
@@ -908,7 +843,7 @@ const AddOrder = ({
                           </div>
                         </div>
 
-                        <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+                        <div className="bg-white px-3 py-2 border border-gray-200 rounded-xl">
                           <p className="text-[11px] text-gray-500  mb-1">
                             Serial Number
                           </p>
@@ -919,7 +854,7 @@ const AddOrder = ({
                         </div>
 
                         {/* Attachments */}
-                        <div className="bg-gray-50 px-3 py-2 border border-gray-200 rounded-xl">
+                        <div className="bg-white px-3 py-2 border border-gray-200 rounded-xl">
                           <p className="text-[11px] text-gray-500  mb-2">
                             Attachments ({product.attachments?.length || 0})
                           </p>
@@ -1059,65 +994,6 @@ const AddOrder = ({
         </div>
       )}
 
-      {/* <div className="flex flex-col sm:flex-row gap-4 p-1">
-        <button
-          type="button"
-          disabled={isSaving}
-          onClick={() => {
-            if (hasUnsavedChanges()) {
-              setShowCancelModal(true);
-            } else {
-              onCancel();
-            }
-          }}
-          className="border transition-all
-    duration-200
-    hover:scale-105 cursor-pointer px-6 py-3 rounded-xl disabled:opacity-50"
-        >
-          Cancel
-        </button>
-
-        {(order?._id || rooms.length > 0) && (
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="
-    bg-black
-    text-white
-    px-6
-    py-3
-    rounded-xl
-    disabled:opacity-60
-    disabled:cursor-not-allowed
-    flex
-    items-center
-    gap-2
-  "
-          >
-            {isSaving && (
-              <div
-                className="
-        w-4 h-4
-        border-2
-        border-white
-        border-t-transparent
-        rounded-full
-        animate-spin
-      "
-              />
-            )}
-
-            {isSaving
-              ? order
-                ? "Updating Order..."
-                : "Creating Order..."
-              : order
-                ? "Update Order"
-                : "Save Order"}
-          </button>
-        )}
-      </div> */}
-
       {/* ======================================================
           CANCEL MODAL
       ====================================================== */}
@@ -1190,7 +1066,7 @@ const AddOrder = ({
   ) : isEditMode ? (
     // UPDATE UI
     <div className=" py-0 rounded-2xl relative">
-      <button
+      {/* <button
         type="button"
         onClick={() => {
           if (hasUnsavedChanges()) {
@@ -1215,7 +1091,7 @@ const AddOrder = ({
     "
       >
         <FiX size={22} />
-      </button>
+      </button> */}
 
       {content}
     </div>

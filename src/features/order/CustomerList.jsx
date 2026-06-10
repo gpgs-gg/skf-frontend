@@ -309,7 +309,7 @@ const CustomerList = ({
                         </td>
                         {/* actions */}
                         <td className="text-center align-middle">
-                          <div className="flex items-center justify-center gap-4 py-3">
+                          <div className="flex items-center justify-center gap-4 py-3 ">
                             <button
                               onClick={() => onViewOrders(customer)}
                               className="cursor-pointer"
@@ -318,14 +318,14 @@ const CustomerList = ({
                             </button>
 
                             <button
-                              className="text-lg"
+                              className="text-lg text-green-600"
                               onClick={() => onViewOrders(customer)}
                             >
                               <i className="fas fa-edit cursor-pointer"></i>
                             </button>
 
                             <button
-                              className="rounded-md text-xl cursor-pointer hover:bg-gray-50 transition"
+                              className="rounded-md text-xl cursor-pointer text-red-500 hover:bg-gray-50 transition"
                               onClick={() => {
                                 setCustomerToDelete(customer);
                                 setShowDeleteModal(true);

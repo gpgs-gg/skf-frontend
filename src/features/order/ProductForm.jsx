@@ -248,7 +248,7 @@ const ProductForm = ({
   }, [selectedCategory, setValue, getValues]);
 
   return (
-    <div id="product-form" className=" rounded-xl  ">
+    <div id="product-form" className=" rounded-xl   ">
       <div className="flex justify-between items-center ">
         {/* <h5 className="font-bold text-lg">Product Details</h5> */}
         {!hideRemove && onRemove && (

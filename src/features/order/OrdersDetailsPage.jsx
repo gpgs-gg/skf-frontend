@@ -321,7 +321,7 @@ const OrderDetailsPage = ({
   };
 
   const handleUpdateProductInline = (updatedProduct) => {
-    console.log("✅ Updated Product From Form:", updatedProduct);
+    // console.log("✅ Updated Product From Form:", updatedProduct);
 
     setEditingProductState(updatedProduct);
   };
@@ -466,7 +466,7 @@ const OrderDetailsPage = ({
    */
   return (
     <div className="overflow-hidden">
-      <div className="w-full min-h-screen bg-gray-50">
+      <div className="w-full  bg-gray-50">
         <CustomerSnapshot
           filteredOrders={filteredOrders}
           selectedCustomer={selectedCustomer}
