@@ -129,6 +129,10 @@ const AddOrder = ({
   title = "Add Order",
   editingRoomState,
   editingProductState,
+  onDirtyChange,
+  tempRooms = [],
+  onTempRoomAdd,
+  onRoomsChange,
 }) => {
   // ======================================================
   // FORM
@@ -162,6 +166,7 @@ const AddOrder = ({
   useEffect(() => {
     setValue("customerId", selectedCustomerId || order?.customer || "");
   }, [selectedCustomerId, order]);
+
   // ======================================================
   // STATE
   // ======================================================
@@ -171,7 +176,13 @@ const AddOrder = ({
 
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  const [rooms, setRooms] = useState([]);
+  // Replace the rooms state initialization
+  const [rooms, setRooms] = useState(() => {
+    if (order?._id && tempRooms.length > 0) {
+      return tempRooms;
+    }
+    return [];
+  });
   const [currentRoom, setCurrentRoom] = useState(emptyRoom());
   const canShowSaveProduct =
     currentRoom?.currentProduct?.category &&
@@ -183,15 +194,48 @@ const AddOrder = ({
   const [editingProduct, setEditingProduct] = useState(null);
   const [previewAttachment, setPreviewAttachment] = useState(null);
   const isEditMode = !!order?._id;
+  const [roomMode, setRoomMode] = useState(null);
+  // null | "add" | "edit"
   // ======================================================
   // INITIAL SNAPSHOT
   // ======================================================
-
+  // Add this useEffect in AddOrder
+  useEffect(() => {
+    if (order?._id && onTempRoomAdd && rooms.length > 0) {
+      onTempRoomAdd(rooms);
+    }
+  }, [rooms, order?._id]);
   useEffect(() => {
     initialDataRef.current = JSON.stringify({
       form: getValues(),
       rooms,
     });
+  }, []);
+
+  useEffect(() => {
+    const draft = {
+      form: getValues(),
+      rooms,
+    };
+
+    localStorage.setItem("order_draft", JSON.stringify(draft));
+  }, [rooms]);
+  useEffect(() => {
+    if (order?._id && onRoomsChange) {
+      onRoomsChange(rooms);
+    }
+  }, [rooms]);
+  useEffect(() => {
+    const saved = localStorage.getItem("order_draft");
+
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setRooms(parsed.rooms || []);
+
+      Object.keys(parsed.form || {}).forEach((key) => {
+        setValue(key, parsed.form[key]);
+      });
+    }
   }, []);
   const handleEditProduct = (room, product) => {
     setShowRoomForm(true);
@@ -616,6 +660,7 @@ const AddOrder = ({
                   resetField("roomType");
                   resetField("roomName");
                   setShowRoomForm(true);
+                  setRoomMode("add");
                 }}
                 className="
         bg-black

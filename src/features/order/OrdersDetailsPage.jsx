@@ -56,7 +56,8 @@ const OrderDetailsPage = ({
   const [showAddOrderForm, setShowAddOrderForm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [editingOrder, setEditingOrder] = useState(null);
-
+  // Add this with other state declarations (around line 30)
+  const [tempRooms, setTempRooms] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(customer);
 
   // Stores currently editing product + parent order id
@@ -64,7 +65,7 @@ const OrderDetailsPage = ({
   const [editingProductOrderId, setEditingProductOrderId] = useState(null); // Track which order contains the product
 
   // Delete confirmation states
-
+  const [hasOrderDraftChanges, setHasOrderDraftChanges] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [productOrderId, setProductOrderId] = useState(null);
   const [showProductDeleteModal, setShowProductDeleteModal] = useState(false);
@@ -91,6 +92,11 @@ const OrderDetailsPage = ({
   const [roomToDelete, setRoomToDelete] = useState(null);
   const [roomOrderId, setRoomOrderId] = useState(null);
   const [showGlobalCancelModal, setShowGlobalCancelModal] = useState(false);
+  // Add this ref alongside addOrderRef (around line where addOrderRef is defined)
+  const addOrderRoomsRef = useRef([]);
+  // Add this with other state declarations (around line 20-30)
+  const [productEditSource, setProductEditSource] = useState(null); // 'order' or 'room'
+  const [savedRoomContext, setSavedRoomContext] = useState(null); // Store room context when editing product from room
   const deleteRoom = (orderId, roomId) => {
     setRoomOrderId(orderId);
     setRoomToDelete(roomId);
@@ -105,6 +111,11 @@ const OrderDetailsPage = ({
       showAddOrderForm ||
       products?.length > 0
     );
+  };
+
+  // Add this function in OrderDetailsPage component
+  const handleTempRoomAdd = (newRooms) => {
+    setTempRooms(newRooms);
   };
   const confirmDeleteRoom = () => {
     if (onDeleteRoom && roomOrderId && roomToDelete) {
@@ -162,8 +173,11 @@ const OrderDetailsPage = ({
   const startRoomEdit = (orderId, room, index) => {
     // console.log("ROOM EDIT CLICKED", { orderId, room, index });
 
-    // closeAllPanels();
-
+    closeAllPanels();
+    // 👇 force close Add Room form
+    if (addOrderRef?.current) {
+      addOrderRef.current.closeRoomForm?.();
+    }
     setEditingRoomState(room);
     setEditingRoomOrderId(orderId);
     setEditingRoomIndex(index);
@@ -180,15 +194,50 @@ const OrderDetailsPage = ({
       toast.dismiss();
       toast.success("Room updated successfully");
 
+      // ✅ CRITICAL: Update the editingOrder state to reflect room changes
+      if (editingOrder && editingOrder._id === editingRoomOrderId) {
+        const updatedRooms = editingOrder.rooms.map((room) =>
+          room._id === updatedRoom._id ? updatedRoom : room,
+        );
+
+        setEditingOrder({
+          ...editingOrder,
+          rooms: updatedRooms,
+        });
+      }
+
+      // Clear ONLY room editing states, NOT order editing state
       setEditingRoomState(null);
       setEditingRoomOrderId(null);
       setEditingRoomIndex(null);
+
+      // ✅ Do NOT close the order edit mode
+      // The order header should remain hidden and order form should stay open
     } catch (error) {
       console.log(error);
       toast.dismiss();
       toast.error("Failed to update room");
     }
   };
+  // const saveRoomEdit = async (updatedRoom) => {
+  //   try {
+  //     await onUpdateRoom(editingRoomOrderId, updatedRoom._id, {
+  //       roomType: updatedRoom.roomType,
+  //       roomName: updatedRoom.roomName,
+  //       products: updatedRoom.products || [],
+  //     });
+  //     toast.dismiss();
+  //     toast.success("Room updated successfully");
+
+  //     setEditingRoomState(null);
+  //     setEditingRoomOrderId(null);
+  //     setEditingRoomIndex(null);
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.dismiss();
+  //     toast.error("Failed to update room");
+  //   }
+  // };
   const cancelRoomEdit = () => {
     setEditingRoomState(null);
     setEditingRoomOrderId(null);
@@ -306,19 +355,52 @@ const OrderDetailsPage = ({
    * Opens product edit form
    * Closes other panels before opening
    */
-  const startProductEdit = (orderId, roomId, product) => {
+  const startProductEdit = (orderId, roomId, product, source = "order") => {
     if (!roomId) {
       console.error("❌ Missing roomId:", roomId);
       toast.dismiss();
       toast.error("Room ID missing. Cannot edit product.");
       return;
     }
-    // closeAllPanels();
+
+    // If we're coming from room edit, save the room context BEFORE closing
+    if (source === "room" && editingRoomState) {
+      setSavedRoomContext({
+        roomState: editingRoomState,
+        roomOrderId: editingRoomOrderId,
+        roomIndex: editingRoomIndex,
+      });
+    }
+
+    // Close all panels (this will clear editingRoomState)
+    closeAllPanels();
+
+    // 👇 force close Add Room form
+    if (addOrderRef?.current) {
+      addOrderRef.current.closeRoomForm?.();
+    }
 
     setEditingProductState(product);
     setEditingProductOrderId(orderId);
     setEditingProductRoomId(roomId);
+    setProductEditSource(source); // Track the source
   };
+  // const startProductEdit = (orderId, roomId, product) => {
+  //   if (!roomId) {
+  //     console.error("❌ Missing roomId:", roomId);
+  //     toast.dismiss();
+  //     toast.error("Room ID missing. Cannot edit product.");
+  //     return;
+  //   }
+  //   closeAllPanels();
+  //   // 👇 force close Add Room form
+  //   if (addOrderRef?.current) {
+  //     addOrderRef.current.closeRoomForm?.();
+  //   }
+  //   setEditingProductState(product);
+  //   setEditingProductOrderId(orderId);
+  //   setEditingProductRoomId(roomId);
+  // };
 
   const handleUpdateProductInline = (updatedProduct) => {
     // console.log("✅ Updated Product From Form:", updatedProduct);
@@ -345,6 +427,38 @@ const OrderDetailsPage = ({
       );
       toast.dismiss();
       toast.success("Product details updated successfully!");
+
+      // Store source before clearing
+      const source = productEditSource;
+      const savedContext = savedRoomContext;
+
+      // Close only the product edit panel
+      setEditingProductState(null);
+      setEditingProductOrderId(null);
+      setEditingProductRoomId(null);
+
+      // If product was edited from room edit, restore room edit mode
+      if (source === "room" && savedContext) {
+        // Fetch the latest order data to get updated room with new product
+        const updatedOrder = orders.find(
+          (o) => o._id === savedContext.roomOrderId,
+        );
+        if (updatedOrder) {
+          const updatedRoom = updatedOrder.rooms?.find(
+            (r) => r._id === savedContext.roomState._id,
+          );
+          if (updatedRoom) {
+            // Restore room edit mode with updated room data
+            setEditingRoomState(updatedRoom);
+            setEditingRoomOrderId(savedContext.roomOrderId);
+            setEditingRoomIndex(savedContext.roomIndex);
+          }
+        }
+      }
+
+      // Clear tracking states
+      setProductEditSource(null);
+      setSavedRoomContext(null);
     } else {
       console.error("Cannot update product:", {
         hasOnUpdateProduct: !!onUpdateProduct,
@@ -354,12 +468,7 @@ const OrderDetailsPage = ({
       toast.dismiss();
       toast.error("Failed to update product");
     }
-
-    // Close the edit panel
-    setEditingProductState(null);
-    setEditingProductOrderId(null);
   };
-
   const cancelProductEdit = () => {
     if (hasUnsavedProducts()) {
       setShowBackConfirmModal(true);
@@ -368,7 +477,58 @@ const OrderDetailsPage = ({
 
     setEditingProductState(null);
     setEditingProductOrderId(null);
+    setEditingProductRoomId(null);
+
+    // Restore room edit if we came from there and cancelled
+    if (productEditSource === "room" && savedRoomContext) {
+      setEditingRoomState(savedRoomContext.roomState);
+      setEditingRoomOrderId(savedRoomContext.roomOrderId);
+      setEditingRoomIndex(savedRoomContext.roomIndex);
+    }
+
+    setProductEditSource(null);
+    setSavedRoomContext(null);
   };
+  // const saveProductEdit = () => {
+  //   if (
+  //     onUpdateProduct &&
+  //     editingProductOrderId &&
+  //     editingProductRoomId &&
+  //     editingProductState
+  //   ) {
+  //     // Call the parent's update function
+  //     onUpdateProduct(
+  //       editingProductOrderId,
+  //       editingProductRoomId,
+  //       editingProductState._id,
+  //       editingProductState,
+  //     );
+  //     toast.dismiss();
+  //     toast.success("Product details updated successfully!");
+  //   } else {
+  //     console.error("Cannot update product:", {
+  //       hasOnUpdateProduct: !!onUpdateProduct,
+  //       hasOrderId: !!editingProductOrderId,
+  //       hasProduct: !!editingProductState,
+  //     });
+  //     toast.dismiss();
+  //     toast.error("Failed to update product");
+  //   }
+
+  //   // Close the edit panel
+  //   setEditingProductState(null);
+  //   setEditingProductOrderId(null);
+  // };
+
+  // const cancelProductEdit = () => {
+  //   if (hasUnsavedProducts()) {
+  //     setShowBackConfirmModal(true);
+  //     return;
+  //   }
+
+  //   setEditingProductState(null);
+  //   setEditingProductOrderId(null);
+  // };
   /**
    * Debounces search input
    * Prevents expensive filtering on every keystroke
@@ -512,6 +672,8 @@ const OrderDetailsPage = ({
           editingRoomOrderId={editingRoomOrderId}
           editingProductOrderId={editingProductOrderId}
           deleteRoom={deleteRoom}
+          tempRooms={tempRooms}
+          onTempRoomAdd={handleTempRoomAdd}
         />
       </div>
       {/* Product full details modal */}

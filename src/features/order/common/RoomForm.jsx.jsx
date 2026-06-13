@@ -222,7 +222,7 @@ const RoomForm = ({
               </div>
               <div className="md:flex items-center md:gap-4 ">
                 {/* ROOM TYPE */}
-                <div className="">
+                <div className="min-w-[200px]">
                   <label className="text-sm font-semibold text-gray-700 block">
                     Room Type
                   </label>

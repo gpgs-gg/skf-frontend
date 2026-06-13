@@ -63,6 +63,8 @@ const CustomerSnapshot = ({
   editingRoomOrderId,
   editingProductOrderId,
   deleteRoom,
+  tempRooms,
+  onTempRoomAdd,
 }) => {
   // ✅ DECLARE HERE
   const hasActiveEditor =
@@ -77,6 +79,19 @@ const CustomerSnapshot = ({
     { value: "2", label: "Last 2 Years" },
     { value: "3", label: "Last 3 Years" },
   ];
+  const cleanProductForCompare = (product) => ({
+    category: product.category,
+    companyName: product.companyName,
+    collectionName: product.collectionName,
+    productCode: product.productCode,
+    quantity: product.quantity,
+    price: product.price,
+    deliveryDate: product.deliveryDate,
+    orderStatus: product.orderStatus,
+    specialNotes: product.specialNotes,
+    attachments: product.attachments || [],
+    attributes: product.attributes || {},
+  });
   if (!selectedCustomer) {
     return (
       <div className="border border-gray-200 rounded-2xl px-6  text-center">
@@ -92,6 +107,7 @@ const CustomerSnapshot = ({
     type: null,
     id: null,
   });
+  const [hasOrderDraftChanges, setHasOrderDraftChanges] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [orderYearFilter, setOrderYearFilter] = useState("all");
   const filteredOrdersByYear = filteredOrders.filter((order) => {
@@ -108,22 +124,26 @@ const CustomerSnapshot = ({
     useState(false);
 
   const [originalProduct, setOriginalProduct] = useState(null);
+
   const handleStartProductEdit = (orderId, roomId, product) => {
     const copy = JSON.parse(JSON.stringify(product));
-
     setOriginalProduct(copy);
 
-    startProductEdit(orderId, roomId, copy);
+    // Determine if we're in room edit mode
+    const source = editingRoomState ? "room" : "order";
+    startProductEdit(orderId, roomId, copy, source);
   };
+  // const handleStartProductEdit = (orderId, roomId, product) => {
+  //   const copy = JSON.parse(JSON.stringify(product));
+
+  //   setOriginalProduct(copy);
+
+  //   startProductEdit(orderId, roomId, copy);
+  // };
 
   const hasProductChanged = () => {
-    if (!originalProduct || !editingProductState) return false;
-
-    console.log("ORIGINAL", originalProduct);
-    console.log("EDITING", editingProductState);
-
-    const { _id: _, ...original } = originalProduct;
-    const { _id: __, ...editing } = editingProductState;
+    const original = cleanProductForCompare(originalProduct);
+    const editing = cleanProductForCompare(editingProductState);
 
     return JSON.stringify(original) !== JSON.stringify(editing);
   };
@@ -560,6 +580,12 @@ md:gap-3
                       isEditMode={true}
                       editingRoomState={editingRoomState}
                       editingProductState={editingProductState}
+                      onDirtyChange={setHasOrderDraftChanges}
+                      tempRooms={tempRooms}
+                      onTempRoomAdd={onTempRoomAdd}
+                      onRoomsChange={(rooms) => {
+                        onTempRoomAdd(rooms);
+                      }}
                     />
                   </div>
                 )}
@@ -933,6 +959,69 @@ lg:gap-0
                   </div>
                 );
               })}
+              {editingOrder?._id === order._id &&
+                tempRooms?.map((tempRoom, index) => {
+                  // Skip if this temp room already exists in order.rooms (by some matching logic)
+                  const exists = order.rooms?.some(
+                    (r) => r._id === tempRoom._id || r.id === tempRoom.id,
+                  );
+                  if (exists) return null;
+
+                  return (
+                    <div
+                      key={`temp-${tempRoom.id || index}`}
+                      className="border rounded-2xl mt-1 p-1 border-amber-200 bg-amber-50"
+                    >
+                      {/* Room Header */}
+                      <div className="flex justify-between items-center gap-2">
+                        <div className="flex items-center gap-2 bg-[#467B89] text-white px-4 rounded-xl">
+                          <span className="tracking-wide">
+                            {tempRoom.roomType || "Room"} -
+                          </span>
+                          {tempRoom.roomName && (
+                            <span>{tempRoom.roomName}</span>
+                          )}
+                        </div>
+                        <span className="text-xs text-amber-600 font-medium">
+                          Unsaved
+                        </span>
+                      </div>
+
+                      {/* Products */}
+                      {tempRoom.products?.map((product, pIdx) => (
+                        <div
+                          key={product.id || pIdx}
+                          className="border bg-white border-gray-200 rounded-2xl px-3 mt-2"
+                        >
+                          {/* Same product display as existing products */}
+                          <div className="flex justify-between items-center">
+                            <h3 className="text-lg">
+                              {product.category || "Product"}
+                            </h3>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <p className="text-xs text-gray-500">Company</p>
+                              <p>{product.companyName}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500">
+                                Collection
+                              </p>
+                              <p>{product.collectionName}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500">
+                                Serial No.
+                              </p>
+                              <p>{product.productCode}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
             </div>
           );
         })}
