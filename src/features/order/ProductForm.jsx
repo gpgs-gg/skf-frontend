@@ -270,6 +270,7 @@ const ProductForm = ({
             label="Select Product"
             type="select"
             control={control}
+            placeholder="Select Product"
             disabled={!!product?._id}
             options={productsData.map((cat) => ({
               value: cat.slug,

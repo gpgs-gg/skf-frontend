@@ -17,12 +17,12 @@ createRoot(document.getElementById("root")).render(
     <QueryClientProvider client={queryClient}>
       <>
         <BrowserRouter>
-          <AppProvider>
+          <>
             <AuthProvider>
               <ToastContainer className="mt-20" />
               <App />
             </AuthProvider>
-          </AppProvider>
+          </>
         </BrowserRouter>
       </>
     </QueryClientProvider>

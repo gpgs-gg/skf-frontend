@@ -73,7 +73,7 @@ const CurtainMeasurementDiagram = ({ control, index }) => {
         </div>
 
         {/* DETAILS */}
-        <div className="absolute top-12 left-30 w-46">
+        <div className="absolute top-12 left-30 w-45">
           <Controller
             name={`attributes.measurements.${index}.details`}
             control={control}
