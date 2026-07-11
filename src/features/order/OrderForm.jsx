@@ -10,7 +10,7 @@ import ImagePreviewModal from "./common/ImagePreviewModal";
 import { emptyProduct, cleanProductData } from "./orderUtils";
 
 import { generateWorklog, generateCreateWorklog } from "../../utils/worklog";
-
+import SofaDiagramRenderer from "./common/SofaDiagramRenderer";
 import { useCurrentUser } from "../auth/services";
 
 // ======================================================
@@ -279,6 +279,7 @@ const AddOrder = ({
     );
   };
   const openProductForEdit = (room, product) => {
+    console.log("product for editing", product);
     setShowRoomForm(true);
 
     setCurrentRoom((prev) => ({
@@ -437,7 +438,7 @@ const AddOrder = ({
     }
 
     const cleanedProduct = cleanProductData(currentRoom.currentProduct);
-
+    console.log(cleanedProduct);
     if (editingProduct) {
       // UPDATE EXISTING PRODUCT
 
@@ -656,7 +657,7 @@ const AddOrder = ({
           ORDER DETAILS
       ====================================================== */}
       {!editingRoomState && !editingProductState && (
-        <div className="  rounded-xl px-2">
+        <div className="  rounded-xl ">
           {/* <h2 className="text-xl font-semibold mb-1">Order Details</h2> */}
 
           <div className="flex flex-col lg:flex-row lg:items-end gap-1 md:gap-4">
@@ -888,7 +889,7 @@ const AddOrder = ({
       ====================================================== */}
 
       {rooms.length > 0 && (
-        <div className="space-y-2  mt-1">
+        <div className="space-y-2   mt-1">
           {rooms.map((room) => (
             <div
               key={room.id}
@@ -927,10 +928,11 @@ const AddOrder = ({
 
               {/* Products List */}
               <div className="space-y-3  ">
+                {/* temparary products added in the room */}
                 {room.products.map((product) => (
                   <div
                     key={product.id}
-                    className="border  border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md transition mb-4 "
+                    className="border   border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md transition mb-4 "
                   >
                     {/* HEADER */}
                     <div className="flex justify-between items-center gap-2 mb-3 b">
@@ -1046,6 +1048,7 @@ const AddOrder = ({
 
                       {/* RIGHT */}
                       <div className="w-full lg:w-[70%]">
+                        {/* Curtain */}
                         {Array.isArray(product?.attributes?.measurements) &&
                           product.category?.toLowerCase() === "curtains" && (
                             <div className="grid lg:grid-cols-3 gap-4">
@@ -1084,6 +1087,13 @@ const AddOrder = ({
                               ))}
                             </div>
                           )}
+                        <div className="w-full lg:w-[70%]">
+                          {/* Sofa */}
+                          {product.category?.toLowerCase() ===
+                            "sofa-&seating" && (
+                            <SofaDiagramRenderer product={product} />
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

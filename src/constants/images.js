@@ -180,6 +180,28 @@ import CushionCovers from "@/assets/12-HomeEssentials/4-CushionCovers.webp";
 import CushionFillers from "@/assets/12-HomeEssentials/5-CushionFillers.webp";
 import Banner_HomeEssentials from "@/assets/12-HomeEssentials/Banner-HomeEssentials.webp";
 
+// order
+import FoureaterSofa from "@/assets/images/4seatersofa.png";
+import SofaCumBedPullOutDiagram from "@/assets/2-Sofa&Seating/SofaCumBedPullOutDiagram.png";
+import SofaCumBedHydraulic from "@/assets/2-Sofa&Seating/SofaCumBedHydraulicStorage.png";
+
+import ReclinerSofa1Seater from "@/assets/2-Sofa&Seating/ReclinerSofa1Seater.png";
+import ReclinerSofaDiagram3Seater from "@/assets/2-Sofa&Seating/ReclinerSofaDiagram3Seater.png";
+import ChaiseLoungeSofaDiagram from "@/assets/2-Sofa&Seating/ChaiseLoungeSofa.png";
+import DiwanSofaDiagram from "@/assets/2-Sofa&Seating/DiwanSofaDiagram.png";
+import OttomanDiagram from "@/assets/2-Sofa&Seating/OttomanDiagram.png";
+import BenchDiagram from "@/assets/2-Sofa&Seating/BenchDiagram.png";
+import RotatingChairs360Diagram from "@/assets/2-Sofa&Seating/360RotatingChairDiagram.png";
+import OneSeaterSofaDiagram from "@/assets/2-Sofa&Seating/OneSeaterSofaDiagram.png";
+import TwoSeaterSofaDiagram from "@/assets/2-Sofa&Seating/TwoSeaterSofaDiagram.png";
+import ThreeSeaterSofaDiagram from "@/assets/2-Sofa&Seating/ThreeSeaterSofaDiagram.png";
+import LShapeSofaDiagram from "@/assets/2-Sofa&Seating/LShapeSofa.png";
+import UShapeSofaDiagram from "@/assets/2-Sofa&Seating/UShapeSofa.png";
+import CornerSofaDiagram from "@/assets/2-Sofa&Seating/CornerSofaDiagram.png";
+import SectionalModularSofaDiagram from "@/assets/2-Sofa&Seating/SectionalModularSofa.png";
+import LRightShapeSofa from "@/assets/2-Sofa&Seating/1-L-ShapeSofas.webp";
+import LLeftSofaDiagaram from "@/assets/2-Sofa&Seating/LLeftShapeSofaDigram.png";
+
 export const IMAGES = {
   contactUsImg,
   googlePng,
@@ -359,4 +381,25 @@ export const IMAGES = {
   CushionCovers,
   CushionFillers,
   Banner_HomeEssentials,
+
+  // order
+  FoureaterSofa,
+  SofaCumBedPullOutDiagram,
+  SofaCumBedHydraulic,
+  RotatingChairs360Diagram,
+  BenchDiagram,
+  ChaiseLoungeSofaDiagram,
+  DiwanSofaDiagram,
+  OttomanDiagram,
+  ReclinerSofa1Seater,
+  ReclinerSofaDiagram3Seater,
+  OneSeaterSofaDiagram,
+  TwoSeaterSofaDiagram,
+  ThreeSeaterSofaDiagram,
+  LShapeSofaDiagram,
+  UShapeSofaDiagram,
+  CornerSofaDiagram,
+  SectionalModularSofaDiagram,
+  LRightShapeSofa,
+  LLeftSofaDiagaram,
 };

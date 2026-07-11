@@ -97,7 +97,7 @@ export const InputStyles = {
     w-full p-2 mt-1 rounded-lg border border-black bg-white
     focus:outline-none
     focus:ring-0
-    focus:border-black
+    focus:border-black  
     transition-all duration-200
   `,
   error: "border-red-500",

@@ -63,6 +63,7 @@ export const emptyProduct = () => {
   return {
     id: null,
     category: "",
+    subCategory: "",
     collectionName: "",
     attachments: [],
     companyName: "",
@@ -104,6 +105,7 @@ export const cleanProductData = (product) => {
   return {
     id: product._id,
     category: product.category,
+    subCategory: product.subCategory || "",
     name: product.name || `${product.category}_${Date.now()}`,
     companyName: product.companyName || "",
 
