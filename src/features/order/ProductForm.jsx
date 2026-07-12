@@ -286,14 +286,9 @@ const ProductForm = ({
 
   const sofaOptions = [
     {
-      value: "4-seater-sofas",
-      label: "4 Seater Sofas",
-      image: IMAGES.FoureaterSofa,
-    },
-    {
-      value: "3-seater-sofas",
-      label: "3 Seater Sofas",
-      image: IMAGES.ThreeSeaterSofaDiagram,
+      value: "1-seater-sofas",
+      label: "1 Seater Sofas",
+      image: IMAGES.OneSeaterSofaDiagram,
     },
     {
       value: "2-seater-sofas",
@@ -301,9 +296,14 @@ const ProductForm = ({
       image: IMAGES.TwoSeaterSofaDiagram,
     },
     {
-      value: "1-seater-sofas",
-      label: "1 Seater Sofas",
-      image: IMAGES.OneSeaterSofaDiagram,
+      value: "3-seater-sofas",
+      label: "3 Seater Sofas",
+      image: IMAGES.ThreeSeaterSofaDiagram,
+    },
+    {
+      value: "4-seater-sofas",
+      label: "4 Seater Sofas",
+      image: IMAGES.FoureaterSofa,
     },
 
     {
@@ -537,8 +537,8 @@ const ProductForm = ({
           )}
           {selectedCategory === "sofa-&seating" && (
             <>
-              <div className="flex gap-2 items-end max-w-[300px]">
-                <div className="flex-1">
+              <div className="md:flex gap-2  items-end ">
+                <div className=" lg:w-[360px]">
                   <FormField
                     name="subCategory"
                     label="Select Type of Sofa"
@@ -550,8 +550,8 @@ const ProductForm = ({
                   />
                 </div>
 
-                {!product?._id && (
-                  <div className="mb-3">
+                {
+                  <div className="mb-3 ">
                     <button
                       type="button"
                       onClick={() => setIsSofaModalOpen(true)}
@@ -561,7 +561,7 @@ const ProductForm = ({
                       Choose Image
                     </button>
                   </div>
-                )}
+                }
               </div>
 
               {selectedSofaType === "3-seater-sofas" && (

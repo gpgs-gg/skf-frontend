@@ -5,36 +5,32 @@ import { IMAGES } from "@/constants/images";
 const ThreeSeaterSofaDiagram = ({ control }) => {
   return (
     <div className="w-full ">
-      <div className="flex justify-center overflow-hidden ">
-        <div className="relative w-full max-w-[520px] ">
+      <div className="flex justify-center overflow-hidden">
+        <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
-          <div className="absolute left-[-198px] top-[63%] w-[260px] max-w-md  w-[200px] ">
-            <div className="">
-              <Controller
-                name="attributes.measurements.0.notes"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <textarea
-                    {...field}
-                    rows={6}
-                    placeholder="Enter Notes"
-                    className="
-                      w-full
-                      bg-white
-                      border
-                      rounded-md
-                      px-2 xs:px-3
-                      py-1.5 xs:py-2
-                      text-xs xs:text-sm
-                      resize-none
-                      focus:outline-none
-                
-                    "
-                  />
-                )}
-              />
-            </div>
+          <div className="hidden lg:block absolute left-[-198px] top-[63%] md:w-[150px] lg:w-[260px] ">
+            <Controller
+              name="attributes.measurements.0.notes"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <textarea
+                  {...field}
+                  placeholder="Enter Notes"
+                  className="
+                    w-full bg-white
+                    border
+                    rounded-md
+                    px-2 xs:px-3
+                    py-1.5 xs:py-2
+                    text-xs xs:text-sm lg:text-[18px]
+                    resize-none
+                    focus:outline-none
+                    h-36 md:h-36 lg:h-27
+                  "
+                />
+              )}
+            />
           </div>
 
           {/* ================= Sofa Image ================= */}
@@ -84,7 +80,7 @@ const ThreeSeaterSofaDiagram = ({ control }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[20%] right-[10px] md:-left-[70px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[20%] md:right-[10px] md:-left-[74px] w-[60px] md:w-[120px]">
             <Controller
               name="attributes.measurements.0.height"
               control={control}
@@ -123,7 +119,7 @@ const ThreeSeaterSofaDiagram = ({ control }) => {
           </div>
 
           {/* ================= Depth ================= */}
-          <div className="absolute top-[68%] right-[0px] md:right-[-5px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[73%] right-[0px] md:right-[-0px] w-[60px] md:w-[120px]">
             <Controller
               name="attributes.measurements.1.depth"
               control={control}
@@ -161,6 +157,29 @@ const ThreeSeaterSofaDiagram = ({ control }) => {
             />
           </div>
         </div>
+      </div>
+
+      {/* ================= Notes for md and small devices ================= */}
+      <div className="lg:hidden md:mx-22">
+        <Controller
+          name="attributes.measurements.0.notes"
+          control={control}
+          defaultValue=""
+          render={({ field }) => (
+            <textarea
+              {...field}
+              placeholder="Enter Notes"
+              className="
+                w-full bg-white border rounded-md
+                px-3 py-2
+                text-sm md:text-base
+                resize-none
+                focus:outline-none
+                h-20
+              "
+            />
+          )}
+        />
       </div>
     </div>
   );

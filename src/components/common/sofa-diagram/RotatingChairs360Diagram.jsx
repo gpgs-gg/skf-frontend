@@ -8,7 +8,7 @@ const RotatingChairs360Diagram = ({ control }) => {
       <div className="flex justify-center overflow-hidden">
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
-          <div className=" absolute top-[5%]  ml-[50px] md:ml-[100px] lg:ml-[80px] w-[260px]">
+          <div className=" absolute top-[5%]  ml-[20px] md:ml-[100px] lg:ml-[80px] w-[260px]">
             <div className="w-full max-w-md">
               <Controller
                 name="attributes.measurements.0.notes"
@@ -42,7 +42,7 @@ const RotatingChairs360Diagram = ({ control }) => {
           <img
             src={IMAGES.RotatingChairs360Diagram}
             alt="360 Rotating Chair Diagram"
-            className="w-[300px] h-[400px] md:w-[450px] md:h-[400px]"
+            className="w-[300px] h-[400px]  md:w-[450px] md:h-[400px]"
           />
 
           {/* ================= Width ================= */}

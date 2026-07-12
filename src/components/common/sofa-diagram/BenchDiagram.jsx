@@ -9,7 +9,7 @@ const BenchDiagram = ({ control }) => {
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
           {/* ================= Notes ================= */}
-          <div className="absolute left-[-198px] top-[60%] w-[260px] max-w-md  w-[200px] ">
+          <div className=" hidden lg:block absolute left-[-198px] top-[42%] w-[260px] max-w-md  w-[200px] ">
             <div className="  ">
               <Controller
                 name="attributes.measurements.0.notes"
@@ -74,7 +74,7 @@ const BenchDiagram = ({ control }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[38%] left-[454px] w-[120px]">
+          <div className="absolute top-[38%] left-[230px] md:left-[454px] w-[60px] md:w-[120px]">
             <Controller
               name="attributes.measurements.0.height"
               control={control}
@@ -105,6 +105,28 @@ const BenchDiagram = ({ control }) => {
 
           {/* ================= Notes ================= */}
         </div>
+      </div>
+      {/* notes for md and small devices */}
+      <div className="lg:hidden md:mx-22">
+        <Controller
+          name="attributes.measurements.0.notes"
+          control={control}
+          defaultValue=""
+          render={({ field }) => (
+            <textarea
+              {...field}
+              placeholder="Enter Notes"
+              className="
+                      w-full bg-white border rounded-md
+                      px-3 py-2
+                      text-sm md:text-base
+                      resize-none
+                      focus:outline-none
+                      h-20
+                    "
+            />
+          )}
+        />
       </div>
     </div>
   );

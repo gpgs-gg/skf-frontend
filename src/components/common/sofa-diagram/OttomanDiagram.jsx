@@ -7,9 +7,7 @@ const OttomanDiagram = ({ control }) => {
       <div className="flex justify-center overflow-hidden">
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
-          {/* ================= Notes ================= */}
-          {/* ================= Notes ================= */}
-          <div className="absolute left-[-248px] top-[60%] w-[260px] max-w-md  w-[200px] ">
+          <div className="hidden lg:block absolute left-[-248px] top-[40%] w-[260px] max-w-md  w-[200px] ">
             <div className="  ">
               <Controller
                 name="attributes.measurements.0.notes"
@@ -41,7 +39,7 @@ const OttomanDiagram = ({ control }) => {
           <img
             src={IMAGES.OttomanDiagram}
             alt="Ottoman Diagram"
-            className="w-[300px] h-[400px] md:w-[450px] md:h-[400px]"
+            className="w-[300px] h-[400px]  md:w-[450px] md:h-[400px]"
           />
 
           {/* ================= Width ================= */}
@@ -115,6 +113,28 @@ const OttomanDiagram = ({ control }) => {
                       e.target.value === "" ? "" : Number(e.target.value),
                     )
                   }
+                />
+              )}
+            />
+          </div>
+          {/* notes for md and small devices */}
+          <div className=" absolute w-[260px] lg:hidden left-[25px] md:left-[120px] top-[75%] ">
+            <Controller
+              name="attributes.measurements.0.notes"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <textarea
+                  {...field}
+                  placeholder="Enter Notes"
+                  className="
+                      w-full bg-white border rounded-md
+                      px-3 py-2
+                      text-sm md:text-base
+                      resize-none
+                      focus:outline-none
+                      h-20
+                    "
                 />
               )}
             />

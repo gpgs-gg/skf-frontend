@@ -5,46 +5,44 @@ import { IMAGES } from "@/constants/images";
 const CornerSofaDiagram = ({ control }) => {
   return (
     <div className="w-full">
+      {/* ================= Front View ================= */}
       <div className="flex justify-center overflow-hidden">
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
-          <div className="absolute left-[-198px] top-[60%] w-[260px] max-w-md  w-[200px] ">
-            <div className="  ">
-              <Controller
-                name="attributes.measurements.0.notes"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <textarea
-                    {...field}
-                    rows={4}
-                    placeholder="Enter Notes  "
-                    className="
-                           w-full bg-white
-                           border
-                           rounded-md
-                           px-2 xs:px-3
-                           py-1.5 xs:py-2
-                           text-xs xs:text-sm lg:text-[18px]
-                           resize-none
-                           focus:outline-none
-                         
-                         "
-                  />
-                )}
-              />
-            </div>
+          <div className="hidden lg:block absolute left-[-198px] top-[60%] md:w-[150px] lg:w-[260px] max-w-md">
+            <Controller
+              name="attributes.measurements.0.notes"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <textarea
+                  {...field}
+                  placeholder="Enter Notes"
+                  className="
+                    w-full bg-white
+                    border
+                    rounded-md
+                    px-2 xs:px-3
+                    py-1.5 xs:py-2
+                    text-xs xs:text-sm lg:text-[18px]
+                    resize-none
+                    focus:outline-none
+                    h-36 md:h-36 lg:h-27
+                  "
+                />
+              )}
+            />
           </div>
 
           {/* ================= Sofa Image ================= */}
           <img
             src={IMAGES.CornerSofaDiagram}
             alt="Corner Sofa Diagram"
-            className="w-[300px] h-[400px] md:w-[450px] md:h-[400px]"
+            className="w-[300px] h-[400px] mt-2 md:w-[450px] md:h-[400px]"
           />
 
           {/* ================= Width ================= */}
-          <div className="absolute top-[11%] left-[90px] md:left-[140px] w-[120px]">
+          <div className="absolute top-[2%] md:top-[0%] left-[90px] md:left-[140px] w-[120px]">
             <Controller
               name="attributes.measurements.0.width"
               control={control}
@@ -54,23 +52,14 @@ const CornerSofaDiagram = ({ control }) => {
                   type="number"
                   placeholder="Enter Width"
                   className="
-                    w-full
-                    border
-                    rounded-md
-                    px-2
-                    py-1
-                    text-center
-                    bg-white/90
-                    backdrop-blur-sm
-                    shadow-sm
-                    font-bold
-                    text-[14px]
-                    sm:text-[16px]
-                    md:text-[18px]
+                    w-full border rounded-md px-2 py-1
+                    text-center bg-white/90 backdrop-blur-sm
+                    font-bold text-[14px] sm:text-[16px] md:text-[18px]
                     placeholder:font-normal
                     placeholder:text-[10px]
                     sm:placeholder:text-[11px]
                     md:placeholder:text-[13px]
+                    shadow-sm
                   "
                   onChange={(e) =>
                     field.onChange(
@@ -83,7 +72,7 @@ const CornerSofaDiagram = ({ control }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[52%] left-[10px] md:left-[400px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[47%] left-[249px] md:left-[406px] w-[60px] md:w-[120px]">
             <Controller
               name="attributes.measurements.0.height"
               control={control}
@@ -93,23 +82,14 @@ const CornerSofaDiagram = ({ control }) => {
                   type="number"
                   placeholder="Height"
                   className="
-                    w-full
-                    border
-                    rounded-md
-                    px-2
-                    py-1
-                    text-center
-                    bg-white/90
-                    backdrop-blur-sm
-                    shadow-sm
-                    font-bold
-                    text-[14px]
-                    sm:text-[16px]
-                    md:text-[18px]
+                    w-full border rounded-md px-2 py-1
+                    text-center bg-white/90 backdrop-blur-sm
+                    font-bold text-[14px] sm:text-[16px] md:text-[18px]
                     placeholder:font-normal
                     placeholder:text-[10px]
                     sm:placeholder:text-[11px]
                     md:placeholder:text-[13px]
+                    shadow-sm
                   "
                   onChange={(e) =>
                     field.onChange(
@@ -122,7 +102,7 @@ const CornerSofaDiagram = ({ control }) => {
           </div>
 
           {/* ================= Depth ================= */}
-          <div className="absolute top-[90%] right-[10px] md:right-[185px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[89%] right-[98px] md:right-[185px] w-[60px] md:w-[120px]">
             <Controller
               name="attributes.measurements.1.depth"
               control={control}
@@ -132,24 +112,15 @@ const CornerSofaDiagram = ({ control }) => {
                   type="number"
                   placeholder="Depth"
                   className="
-                            w-full
-                            border
-                            rounded-md
-                            px-2
-                            py-1
-                            text-center
-                            bg-white/90
-                            backdrop-blur-sm
-                            shadow-sm
-                            font-bold
-                            text-[14px]
-                            sm:text-[16px]
-                            md:text-[18px]
-                            placeholder:font-normal
-                            placeholder:text-[10px]
-                            sm:placeholder:text-[11px]
-                            md:placeholder:text-[13px]
-                          "
+                    w-full border rounded-md px-2 py-1
+                    text-center bg-white/90 backdrop-blur-sm
+                    font-bold text-[14px] sm:text-[16px] md:text-[18px]
+                    placeholder:font-normal
+                    placeholder:text-[10px]
+                    sm:placeholder:text-[11px]
+                    md:placeholder:text-[13px]
+                    shadow-sm
+                  "
                   onChange={(e) =>
                     field.onChange(
                       e.target.value === "" ? "" : Number(e.target.value),
@@ -160,6 +131,29 @@ const CornerSofaDiagram = ({ control }) => {
             />
           </div>
         </div>
+      </div>
+
+      {/* ================= Notes for md & small devices ================= */}
+      <div className="lg:hidden md:mx-22">
+        <Controller
+          name="attributes.measurements.0.notes"
+          control={control}
+          defaultValue=""
+          render={({ field }) => (
+            <textarea
+              {...field}
+              placeholder="Enter Notes"
+              className="
+                w-full bg-white border rounded-md
+                px-3 py-2
+                text-sm md:text-base
+                resize-none
+                focus:outline-none
+                h-20
+              "
+            />
+          )}
+        />
       </div>
     </div>
   );

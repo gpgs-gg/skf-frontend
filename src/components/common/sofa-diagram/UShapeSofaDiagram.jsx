@@ -8,7 +8,7 @@ const UShapeSofaDiagram = ({ control }) => {
       <div className="flex justify-center overflow-hidden">
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
-          <div className="absolute left-[-268px] top-[60%] w-[260px] max-w-md  w-[200px] ">
+          <div className="hidden lg:block absolute left-[-268px] top-[60%] w-[260px] max-w-md  w-[200px] ">
             <div className="  ">
               <Controller
                 name="attributes.measurements.0.notes"
@@ -40,11 +40,11 @@ const UShapeSofaDiagram = ({ control }) => {
           <img
             src={IMAGES.UShapeSofaDiagram}
             alt="U Shape Sofa Diagram"
-            className="w-[300px] h-[400px] md:w-[450px] md:h-[400px]"
+            className="w-[300px] h-[400px] md:w-[450px] md:h-[400px] mt-2"
           />
 
           {/* ================= Width ================= */}
-          <div className="absolute top-[11%] left-[90px] md:left-[144px] w-[120px]">
+          <div className="absolute top-[0%] left-[90px] md:left-[144px] w-[120px]">
             <Controller
               name="attributes.measurements.0.width"
               control={control}
@@ -83,7 +83,7 @@ const UShapeSofaDiagram = ({ control }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[48%] left-[10px] md:left-[440px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[48%] left-[238px] md:left-[440px] w-[70px] md:w-[120px]">
             <Controller
               name="attributes.measurements.0.height"
               control={control}
@@ -160,6 +160,28 @@ const UShapeSofaDiagram = ({ control }) => {
             />
           </div>
         </div>
+      </div>
+      {/* ================= Notes for md & small devices ================= */}
+      <div className="lg:hidden mt-2 md:mx-22">
+        <Controller
+          name="attributes.measurements.0.notes"
+          control={control}
+          defaultValue=""
+          render={({ field }) => (
+            <textarea
+              {...field}
+              placeholder="Enter Notes"
+              className="
+                w-full bg-white border rounded-md
+                px-3 py-2
+                text-sm md:text-base
+                resize-none
+                focus:outline-none
+                h-20
+              "
+            />
+          )}
+        />
       </div>
     </div>
   );
