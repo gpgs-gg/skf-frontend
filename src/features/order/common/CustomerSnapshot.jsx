@@ -802,7 +802,7 @@ lg:gap-0
                                           {/* LEFT - 30% */}
                                           <div className=" lg:w-[30%] lg:border-r lg:pr-6 lg:border-gray-800 space-y-3">
                                             {/* Company / Collection / Status */}
-                                            <div className="space-y-3  w-[307px] md:w-[540px]">
+                                            <div className="space-y-3  ">
                                               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                 <div className="bg-white px-3 py-2 border border-gray-200   rounded-xl shadow-sm hover:shadow-md transition">
                                                   <p className="text-[14px] text-gray-500 mb-1">
