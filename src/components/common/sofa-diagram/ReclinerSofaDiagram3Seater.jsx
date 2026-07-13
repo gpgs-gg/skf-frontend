@@ -74,7 +74,7 @@ const ReclinerSofaDiagram3Seater = ({ control }) => {
 
           {/* ================= Height ================= */}
           {/* LG/Desktop position kept exactly the same */}
-          <div className="absolute top-[39%] left-[477px] w-[120px]">
+          <div className="absolute top-[39%] left-[230px] md:left-[10px] lg:left-[477px] w-[60px] lg:w-[120px]">
             <Controller
               name="attributes.measurements.0.height"
               control={control}

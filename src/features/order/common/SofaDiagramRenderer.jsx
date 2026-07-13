@@ -16,6 +16,7 @@ import DiwanSofaDiagramDisplay from "../../../components/common/sofa-diagram/Diw
 import OttomanDiagramDisplay from "../../../components/common/sofa-diagram/OttomanDiagramDisplay";
 import BenchDiagramDisplay from "../../../components/common/sofa-diagram/BenchDiagramDisplay";
 import RotatingChairs360DiagramDisplay from "../../../components/common/sofa-diagram/RotatingChairs360DiagramDisplay";
+import FourSeaterSofaDiagram from "../../../components/common/sofa-diagram/FourSeaterSofaDiagram";
 const SofaDiagramRenderer = ({ product }) => {
   switch (product.subCategory) {
     case "1-seater-sofas":
@@ -27,6 +28,8 @@ const SofaDiagramRenderer = ({ product }) => {
     case "3-seater-sofas":
       return <ThreeSeaterSofaDisplay product={product} />;
 
+    // case "4-seater-sofas":
+    //   return <FourSeaterSofaDiagram product={product} isView />;
     case "4-seater-sofas":
       return <FourSeaterSofaDisplay product={product} />;
 

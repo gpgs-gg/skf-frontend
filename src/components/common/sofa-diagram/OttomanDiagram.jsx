@@ -81,7 +81,7 @@ const OttomanDiagram = ({ control }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[49%] left-[10px] md:left-[415px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[49%] left-[250px] md:left-[415px] w-[60px] md:w-[120px]">
             <Controller
               name="attributes.measurements.0.height"
               control={control}
