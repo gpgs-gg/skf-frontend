@@ -43,7 +43,7 @@ const OttomanDiagram = ({ control }) => {
           />
 
           {/* ================= Width ================= */}
-          <div className="absolute top-[17%] left-[70px] md:left-[265px] w-[120px]">
+          <div className="absolute top-[17%] left-[50px] md:left-[265px] w-[60px] lg:w-[120px]">
             <Controller
               name="attributes.measurements.0.width"
               control={control}

@@ -52,7 +52,7 @@ const ReclinerSofaDiagram3SeaterDisplay = ({ product }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[39%] left-[477px] w-[120px]">
+          <div className="absolute top-[39%] left-[230px] md:left-[-300px] lg:left-[477px] w-[60px] lg:w-[120px]">
             <div
               className="
                 w-full border rounded-md px-2 py-1

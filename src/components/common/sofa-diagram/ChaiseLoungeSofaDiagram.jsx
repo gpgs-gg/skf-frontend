@@ -5,7 +5,7 @@ import { IMAGES } from "@/constants/images";
 const ChaiseLoungeSofaDiagram = ({ control }) => {
   return (
     <div className="w-full px-2">
-      <div className="flex justify-center overflow-hidden">
+      <div className="flex justify-center overflow-hidden pb-2 md:pb-0">
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
           {/* ================= Notes ================= */}
@@ -100,7 +100,7 @@ const ChaiseLoungeSofaDiagram = ({ control }) => {
         </div>
       </div>
       {/* notes for md and small devices */}
-      <div className="lg:hidden md:mx-22 mt-8">
+      <div className="lg:hidden md:mx-22 pt-6">
         <Controller
           name="attributes.measurements.0.notes"
           control={control}

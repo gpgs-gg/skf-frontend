@@ -8,7 +8,7 @@ const ChaiseLoungeSofaDiagramDisplay = ({ product }) => {
 
   return (
     <div className="w-full px-2">
-      <div className="flex justify-center overflow-hidden">
+      <div className="flex justify-center overflow-hidden pb-2 md:pb-0">
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes (Desktop) ================= */}
           <div className="hidden lg:block absolute top-[5%] ml-[50px] md:ml-[100px] lg:ml-[150px] w-[260px]">
