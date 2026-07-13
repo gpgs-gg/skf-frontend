@@ -225,17 +225,17 @@ export const useUpdateOrderProduct = () => {
 
   return useMutation({
     mutationFn: ({ orderId, roomId, productId, data }) => {
-      console.log("=== MUTATION DATA ===");
-      console.log(data);
-      console.log("attachments:", data?.attachments);
+      // console.log("=== MUTATION DATA ===");
+      // console.log(data);
+      // console.log("attachments:", data?.attachments);
 
       data?.attachments?.forEach((file, index) => {
-        console.log(
-          `Attachment ${index}:`,
-          file,
-          file instanceof File,
-          file?.name,
-        );
+        // console.log(
+        //   `Attachment ${index}:`,
+        //   file,
+        //   file instanceof File,
+        //   file?.name,
+        // );
       });
 
       return updateOrderProduct(orderId, roomId, productId, data);

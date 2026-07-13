@@ -254,12 +254,12 @@ const ShowroomCRM = () => {
     updatedProduct,
   ) => {
     try {
-      console.log("Updating product:", {
-        orderId,
-        roomId,
-        productId,
-        updatedProduct,
-      });
+      // console.log("Updating product:", {
+      //   orderId,
+      //   roomId,
+      //   productId,
+      //   updatedProduct,
+      // });
 
       await updateProductMutation.mutateAsync({
         orderId,

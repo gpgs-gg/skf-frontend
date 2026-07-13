@@ -242,8 +242,8 @@ const ProductForm = ({
     };
 
     reset(flatProduct);
-    console.log("subCategory:", getValues("subCategory"));
-    console.log("measurements:", getValues("attributes.measurements"));
+    //console.log("subCategory:", getValues("subCategory"));
+    //console.log("measurements:", getValues("attributes.measurements"));
     requestAnimationFrame(() => {
       isUpdatingFromProp.current = false;
     });

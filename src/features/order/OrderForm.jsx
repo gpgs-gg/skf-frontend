@@ -889,7 +889,7 @@ const AddOrder = ({
       ====================================================== */}
 
       {rooms.length > 0 && (
-        <div className="space-y-2   mt-1">
+        <div className="space-y-2 mt-1">
           {rooms.map((room) => (
             <div
               key={room.id}
@@ -1047,7 +1047,7 @@ const AddOrder = ({
                       </div>
 
                       {/* RIGHT */}
-                      <div className="w-full lg:w-[70%]">
+                      <div className="w-full    lg:w-[70%]">
                         {/* Curtain */}
                         {Array.isArray(product?.attributes?.measurements) &&
                           product.category?.toLowerCase() === "curtains" && (
@@ -1087,11 +1087,13 @@ const AddOrder = ({
                               ))}
                             </div>
                           )}
-                        <div className="w-full lg:w-[70%]">
+                        <div className="">
                           {/* Sofa */}
                           {product.category?.toLowerCase() ===
                             "sofa-&seating" && (
-                            <SofaDiagramRenderer product={product} />
+                            <div className="">
+                              <SofaDiagramRenderer product={product} />
+                            </div>
                           )}
                         </div>
                       </div>

@@ -446,34 +446,34 @@ const AddCustomer = ({
       </form>
 
       {/* Input Styles */}
-      <style jsx>{`
-        .input {
-          width: 100%;
-          padding: 12px 14px;
-          border-radius: 12px;
-          border: 1px solid #e5e7eb;
-          background: #ffffff;
-          transition: all 0.2s ease;
-          font-size: 14px;
-          min-height: 48px;
-        }
+      <style>{`
+  .input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    min-height: 48px;
+  }
 
-        @media (min-width: 640px) {
-          .input {
-            font-size: 15px;
-          }
-        }
+  @media (min-width: 640px) {
+    .input {
+      font-size: 15px;
+    }
+  }
 
-        .input:focus {
-          outline: none;
-          border-color: #111827;
-          box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
-        }
+  .input:focus {
+    outline: none;
+    border-color: #111827;
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+  }
 
-        .input::placeholder {
-          color: #9ca3af;
-        }
-      `}</style>
+  .input::placeholder {
+    color: #9ca3af;
+  }
+`}</style>
     </div>
   );
 };

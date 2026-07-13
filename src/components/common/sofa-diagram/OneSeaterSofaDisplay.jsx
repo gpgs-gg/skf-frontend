@@ -32,11 +32,13 @@ const OneSeaterSofaDisplay = ({ product }) => {
           </div>
 
           {/* ================= Sofa Image ================= */}
-          <img
-            src={IMAGES.OneSeaterSofaDiagram}
-            alt="One Seater Sofa Diagram"
-            className="w-[300px] h-[400px] md:w-[450px] md:h-[400px]"
-          />
+          <div className=" flex lg:block justify-center items-center">
+            <img
+              src={IMAGES.OneSeaterSofaDiagram}
+              alt="One Seater Sofa Diagram"
+              className="w-[300px] h-[400px] md:w-[450px] md:h-[400px]"
+            />
+          </div>
 
           {/* ================= Width ================= */}
           <div className="absolute top-[52%] md:top-[48%] lg:top-[52%] left-[90px] md:left-[170px] w-[120px]">

@@ -497,7 +497,7 @@ md:gap-3
                 >
                   {/* Order No */}
                   <div className="flex justify-between">
-                    <div className="bg-gradient-to-r tracking-[2px]  from-gray-900 to-black border-bs text-white lg:text-xl rounded-xl px-4 lg:px-8 py-2 whitespace-nowrap ">
+                    <div className="bg-[#EB0100] text-white lg:text-xl rounded-xl px-4 lg:px-8 py-2 whitespace-nowrap ">
                       <span className=" ">Order No:</span>{" "}
                       <span className=" ">{order.orderNo}</span>
                     </div>
@@ -601,7 +601,10 @@ md:gap-3
                 }
 
                 return (
-                  <div className="">
+                  <div
+                    className=""
+                    key={`${order._id}-${room._id}-${roomIndex}`}
+                  >
                     <div
                       key={`${order._id}-${room._id}-${roomIndex}`}
                       className={`   ${

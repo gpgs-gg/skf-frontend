@@ -8,8 +8,8 @@ const ThreeSeaterSofaDisplay = ({ product }) => {
 
   return (
     <div className="w-full">
-      <div className="flex justify-center overflow-hidden">
-        <div className="relative w-full max-w-[520px]">
+      <div className="flex justify-center items-center ">
+        <div className="relative w-full max-w-[520px] ">
           {/* ================= Notes (Desktop) ================= */}
           <div className="hidden lg:block absolute left-[-198px] top-[63%] md:w-[150px] lg:w-[260px]">
             <div
@@ -30,11 +30,13 @@ const ThreeSeaterSofaDisplay = ({ product }) => {
           </div>
 
           {/* ================= Sofa Image ================= */}
-          <img
-            src={IMAGES.ThreeSeaterSofaDiagram}
-            alt="Three Seater Sofa Diagram"
-            className="w-[300px] h-[400px] md:w-[450px] md:h-[400px]"
-          />
+          <div className=" flex justify-center items-center">
+            <img
+              src={IMAGES.ThreeSeaterSofaDiagram}
+              alt="Three Seater Sofa Diagram"
+              className="w-[300px] h-[400px] md:w-[450px] md:h-[400px] "
+            />
+          </div>
 
           {/* ================= Width ================= */}
           <div className="absolute top-[51%] left-[90px] md:left-[170px] w-[120px]">

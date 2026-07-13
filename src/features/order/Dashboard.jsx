@@ -248,7 +248,7 @@ const Dashboard = ({ orders = [], customers = [], loading = false }) => {
         <div className="bg-white rounded-2xl shadow-sm border p-5">
           <h2 className="text-lg font-semibold mb-4">Order Status</h2>
 
-          <div className="h-[320px]">
+          <div className="h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie

@@ -41,9 +41,9 @@ const App = () => {
         {/* ADMIN PROTECTED ROUTES */}
         <Route element={<ProtectedRoute allowedRole="admin" />}>
           <Route path="/skf-action" element={<SkfAction />} />
-          {/* ORDERS */}
-          <Route path="/skf-action/orders" element={<ShowroomCRM />} />
         </Route>
+        {/* ORDERS */}
+        <Route path="/skf-action/orders" element={<ShowroomCRM />} />
         {/* USERS */}
         <Route path="/skf-action/users" element={<UsersPage />} />
         {/* PRODUCTS */}
