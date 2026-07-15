@@ -107,7 +107,7 @@ const SectionalModularSofaDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[40%] left-[240px] md:left-[420px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[40%] left-[280px] md:left-[420px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -150,7 +150,7 @@ const SectionalModularSofaDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Depth ================= */}
-          <div className="absolute top-[79%] right-[67px] md:right-[138px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[79%] right-[101px] md:right-[138px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="

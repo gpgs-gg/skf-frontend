@@ -59,7 +59,7 @@ const OttomanDiagram = ({ control, product, isView = false }) => {
             className="w-[300px] h-[400px] md:w-[450px] md:h-[400px]"
           />
           {/* ================= Width ================= */}
-          <div className="absolute top-[17%] left-[50px] md:left-[265px] w-[60px] lg:w-[120px]">
+          <div className="absolute top-[17%] left-[180px] md:left-[285px] lg:left-[265px] w-[60px] lg:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -119,7 +119,7 @@ const OttomanDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[49%] left-[250px] md:left-[415px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[49%] left-[274px] md:left-[415px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -178,7 +178,7 @@ const OttomanDiagram = ({ control, product, isView = false }) => {
             )}
           </div>
           {/* ================= Notes for md & small devices ================= */}
-          <div className="absolute w-[260px] lg:hidden left-[25px] md:left-[120px] top-[75%]">
+          <div className="absolute w-[260px] lg:hidden left-[45px] md:left-[120px] top-[75%]">
             {isView ? (
               <div
                 className="

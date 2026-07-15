@@ -107,7 +107,7 @@ const SofaCumBedPullOutDiagram = ({ control, product, isView = false }) => {
 
           {/* ================= Height ================= */}
           {/* LG position kept same */}
-          <div className="absolute top-[24%] left-[250px] md:left-[386px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[24%] left-[262px] md:left-[386px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -151,7 +151,7 @@ const SofaCumBedPullOutDiagram = ({ control, product, isView = false }) => {
 
           {/* ================= Bed Length / Depth ================= */}
           {/* LG position kept same */}
-          <div className="absolute top-[56%] right-[10px] md:right-[12px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[56%] right-[22px] md:right-[12px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="

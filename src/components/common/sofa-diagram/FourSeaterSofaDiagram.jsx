@@ -108,7 +108,7 @@ const FourSeaterSofaDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* Height */}
-          <div className="absolute top-[20%] md:right-[10px] left-[-2px] md:-left-[70px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[20%] md:right-[10px] left-[-0px] md:-left-[70px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -150,7 +150,7 @@ const FourSeaterSofaDiagram = ({ control, product, isView = false }) => {
             )}
           </div>
           {/* Depth */}
-          <div className="absolute top-[68%] right-[0px] md:right-[-5px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[68%] right-[8px] md:right-[-5px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="

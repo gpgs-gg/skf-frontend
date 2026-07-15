@@ -107,7 +107,7 @@ const CornerSofaDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[47%] left-[249px] md:left-[406px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[47%] left-[275px] md:left-[406px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -150,7 +150,7 @@ const CornerSofaDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Depth ================= */}
-          <div className="absolute top-[89%] right-[98px] md:right-[185px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[89%] right-[130px] md:right-[185px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="

@@ -102,7 +102,7 @@ const ReclinerSofaDiagram3Seater = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[39%] left-[230px] md:left-[10px] lg:left-[477px] w-[60px] lg:w-[120px]">
+          <div className="absolute top-[39%] right-[0px] lg:right-[-80px] md:right-[-20px] w-[60px] lg:w-[120px]">
             {isView ? (
               <div
                 className="

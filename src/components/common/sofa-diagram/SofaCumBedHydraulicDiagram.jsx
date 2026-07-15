@@ -107,7 +107,7 @@ const SofaCumBedHydraulicDiagram = ({ control, product, isView = false }) => {
 
           {/* ================= Height ================= */}
           {/* LG position kept same */}
-          <div className="absolute top-[40%] left-[234px] md:left-[412px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[40%] left-[267px] md:left-[412px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="

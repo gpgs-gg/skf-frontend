@@ -12,50 +12,42 @@ const RotatingChairs360Diagram = ({ control, product, isView = false }) => {
       <div className="flex justify-center overflow-hidden">
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
-          <div className="absolute top-[5%] ml-[20px] md:ml-[100px] lg:ml-[80px] w-[260px]">
-            <div className="w-full max-w-md">
-              {isView ? (
-                <div
-                  className="
-                    w-full
-                    bg-white
-                    border
-                    rounded-md
-                    px-2 xs:px-3
-                    py-1.5 xs:py-2
-                    text-xs xs:text-sm
-                    whitespace-pre-wrap
-                    overflow-y-auto
-                  "
-                >
-                  {notes}
-                </div>
-              ) : (
-                <Controller
-                  name="attributes.measurements.0.notes"
-                  control={control}
-                  defaultValue=""
-                  render={({ field }) => (
-                    <textarea
-                      {...field}
-                      rows={2}
-                      placeholder="Enter Notes"
-                      className="
-                        w-full
-                        bg-white
-                        border
-                        rounded-md
-                        px-2 xs:px-3
-                        py-1.5 xs:py-2
-                        text-xs xs:text-sm
-                        resize-none
-                        focus:outline-none
-                      "
-                    />
-                  )}
-                />
-              )}
-            </div>
+          <div className="hidden lg:block absolute top-[0%] left-[275px] -translate-x-1/2 w-[260px]">
+            {isView ? (
+              <div
+                className="
+                            w-full bg-white border rounded-md
+                            px-2 py-2
+                            text-xs sm:text-sm
+                            whitespace-pre-wrap overflow-y-auto
+                            min-h-[70px]
+                          "
+              >
+                {notes}
+              </div>
+            ) : (
+              <Controller
+                name="attributes.measurements.0.notes"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <textarea
+                    {...field}
+                    rows={2}
+                    placeholder="Enter Notes"
+                    className="
+                                w-full bg-white
+                                border
+                                rounded-md
+                                px-2 py-2
+                                text-xs sm:text-sm
+                                resize-none
+                                focus:outline-none
+                              "
+                  />
+                )}
+              />
+            )}
           </div>
 
           {/* ================= Diagram Image ================= */}
@@ -126,7 +118,7 @@ const RotatingChairs360Diagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[40%] md:-left-[100px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[40%] md:left-[-70px] lg:-left-[100px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="

@@ -13,20 +13,20 @@ const RightLShapeSofaDiagram = ({ control, product, isView = false }) => {
       <div className="flex justify-center overflow-hidden">
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
-          <div className="hidden lg:block absolute left-[-198px] top-[60%] md:w-[150px] lg:w-[260px] max-w-md">
+          <div className="hidden bg-amber-500 lg:block absolute left-[-198px] top-[60%] md:w-[150px] lg:w-[260px] max-w-md">
             {isView ? (
               <div
                 className="
-      w-full bg-white
-      border
-      rounded-md
-      px-2 xs:px-3
-      py-1.5 xs:py-2
-      text-xs xs:text-sm lg:text-[18px]
-      h-36 md:h-36 lg:h-27
-      whitespace-pre-wrap
-      overflow-y-auto
-    "
+                          w-full bg-white
+                          border
+                          rounded-md
+                          px-2 xs:px-3
+                          py-1.5 xs:py-2
+                          text-xs xs:text-sm lg:text-[18px]
+                          h-36 md:h-36 lg:h-27
+                          whitespace-pre-wrap
+                          overflow-y-auto
+                        "
               >
                 {notes}
               </div>
@@ -40,31 +40,30 @@ const RightLShapeSofaDiagram = ({ control, product, isView = false }) => {
                     {...field}
                     placeholder="Enter Notes"
                     className="
-          w-full bg-white
-          border
-          rounded-md
-          px-2 xs:px-3
-          py-1.5 xs:py-2
-          text-xs xs:text-sm lg:text-[18px]
-          resize-none
-          focus:outline-none
-          h-36 md:h-36 lg:h-27
-        "
+                              w-full bg-white
+                              border
+                              rounded-md
+                              px-2 xs:px-3
+                              py-1.5 xs:py-2
+                              text-xs xs:text-sm lg:text-[18px]
+                              resize-none
+                              focus:outline-none
+                              h-36 md:h-36 lg:h-27
+                            "
                   />
                 )}
               />
             )}
           </div>
-
           {/* ================= Sofa Image ================= */}
           <img
             src={IMAGES.LShapeSofaDiagram}
             alt="Right L Shape Sofa Diagram"
-            className="w-[300px] h-[400px] md:w-[450px] md:h-[400px]"
+            className="w-[300px] h-[400px] md:w-[450px] md:h-[400px] "
           />
 
           {/* ================= Width ================= */}
-          <div className="absolute top-[1%] left-[90px] md:left-[165px] w-[120px]">
+          <div className="absolute top-[10px] md:top-[1%] left-[90px] md:left-[165px] w-[120px]">
             {isView ? (
               <div
                 className="
@@ -107,7 +106,7 @@ const RightLShapeSofaDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[42%] right-[10px] lg:right-[-12px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[42%] right-[10px] md:right-[-16px] lg:right-[-12px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -150,7 +149,7 @@ const RightLShapeSofaDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Depth ================= */}
-          <div className="absolute top-[80%] md:top-[82%] right-[64px] md:right-[132px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[80%] md:top-[82%] right-[96px] md:right-[132px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -195,7 +194,7 @@ const RightLShapeSofaDiagram = ({ control, product, isView = false }) => {
       </div>
 
       {/* ================= Notes for md & small devices ================= */}
-      <div className="lg:hidden md:mx-22">
+      <div className="lg:hidden md:mx-22 ">
         {isView ? (
           <div
             className="

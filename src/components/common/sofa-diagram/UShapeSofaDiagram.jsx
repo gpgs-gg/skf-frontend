@@ -12,50 +12,48 @@ const UShapeSofaDiagram = ({ control, product, isView = false }) => {
       <div className="flex justify-center overflow-hidden">
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
-          <div className="hidden lg:block absolute left-[-268px] top-[60%] w-[260px] max-w-md  w-[200px] ">
-            <div className="  ">
-              {isView ? (
-                <div
-                  className="
-      w-full bg-white
-      border
-      rounded-md
-      px-2 xs:px-3
-      py-1.5 xs:py-2
-      text-xs xs:text-sm lg:text-[18px]
-      whitespace-pre-wrap
-      overflow-y-auto
-    "
-                >
-                  {notes}
-                </div>
-              ) : (
-                <Controller
-                  name="attributes.measurements.0.notes"
-                  control={control}
-                  defaultValue=""
-                  render={({ field }) => (
-                    <textarea
-                      {...field}
-                      rows={4}
-                      placeholder="Enter Notes"
-                      className="
-          w-full bg-white
-          border
-          rounded-md
-          px-2 xs:px-3
-          py-1.5 xs:py-2
-          text-xs xs:text-sm lg:text-[18px]
-          resize-none
-          focus:outline-none
-        "
-                    />
-                  )}
-                />
-              )}
-            </div>
+          <div className="hidden lg:block absolute left-[-288px] top-[60%] md:w-[150px] lg:w-[260px] max-w-md">
+            {isView ? (
+              <div
+                className="
+                           w-full bg-white
+                           border
+                           rounded-md
+                           px-2 xs:px-3
+                           py-1.5 xs:py-2
+                           text-xs xs:text-sm lg:text-[18px]
+                           h-36 md:h-36 lg:h-27
+                           whitespace-pre-wrap
+                           overflow-y-auto
+                         "
+              >
+                {notes}
+              </div>
+            ) : (
+              <Controller
+                name="attributes.measurements.0.notes"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <textarea
+                    {...field}
+                    placeholder="Enter Notes"
+                    className="
+                               w-full bg-white
+                               border
+                               rounded-md
+                               px-2 xs:px-3
+                               py-1.5 xs:py-2
+                               text-xs xs:text-sm lg:text-[18px]
+                               resize-none
+                               focus:outline-none
+                               h-36 md:h-36 lg:h-27
+                             "
+                  />
+                )}
+              />
+            )}
           </div>
-
           {/* ================= Sofa Image ================= */}
           <img
             src={IMAGES.UShapeSofaDiagram}
@@ -117,7 +115,7 @@ const UShapeSofaDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[48%] left-[238px] md:left-[440px] w-[70px] md:w-[120px]">
+          <div className="absolute top-[48%] left-[272px] md:left-[440px] w-[70px] md:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -178,7 +176,7 @@ const UShapeSofaDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Depth ================= */}
-          <div className="absolute top-[91%] right-[60px] md:right-[110px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[91%] right-[86px] md:right-[110px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="

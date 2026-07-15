@@ -13,7 +13,7 @@ const ReclinerSofa1SeaterDiagram = ({ control, product, isView = false }) => {
       <div className="flex justify-center overflow-hidden">
         <div className="relative w-full max-w-[620px]">
           {/* ================= Notes ================= */}
-          <div className="hidden lg:block absolute left-[-242px] top-[60%] md:w-[150px] lg:w-[260px] max-w-md">
+          <div className="hidden lg:block absolute left-[-162px] top-[60%] md:w-[150px] lg:w-[260px] max-w-md">
             {isView ? (
               <div
                 className="
@@ -62,7 +62,7 @@ const ReclinerSofa1SeaterDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Width ================= */}
-          <div className="absolute top-[76%] left-[50px] w-[60px] md:left-[100px] lg:left-[66px] lg:w-[120px]">
+          <div className="absolute top-[76%] left-[77px] w-[60px] md:left-[180px] lg:left-[154px] lg:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -105,7 +105,7 @@ const ReclinerSofa1SeaterDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[40%] left-0 md:left-[-26px] lg:left-[-92px] w-[60px] lg:w-[120px]">
+          <div className="absolute top-[40%] left-0 md:left-[49px] lg:left-[-6px] w-[60px] lg:w-[120px]">
             {isView ? (
               <div
                 className="
@@ -147,7 +147,7 @@ const ReclinerSofa1SeaterDiagram = ({ control, product, isView = false }) => {
             )}
           </div>
           {/* ================= Depth ================= */}
-          <div className="absolute top-[76%] left-[180px] w-[60px] md:left-[290px] lg:left-[266px] lg:w-[120px]">
+          <div className="absolute top-[76%] left-[210px] w-[60px] md:left-[380px] lg:left-[355px] lg:w-[120px]">
             {isView ? (
               <div
                 className="

@@ -12,17 +12,17 @@ const BenchDiagram = ({ control, product, isView = false }) => {
       <div className="flex justify-center overflow-hidden">
         <div className="relative w-full max-w-[520px]">
           {/* ================= Notes ================= */}
-          <div className="hidden lg:block absolute left-[-198px] top-[42%] w-[260px] max-w-md">
+          <div className="hidden lg:block absolute left-[-248px] top-[40%] w-[260px] max-w-md">
             {isView ? (
               <div
                 className="
-                  w-full bg-white border rounded-md
-                  px-2 xs:px-3
-                  py-1.5 xs:py-2
-                  text-xs xs:text-sm lg:text-[18px]
-                  whitespace-pre-wrap
-                  overflow-y-auto
-                "
+                          w-full bg-white border rounded-md
+                          px-2 xs:px-3
+                          py-1.5 xs:py-2
+                          text-xs xs:text-sm lg:text-[18px]
+                          whitespace-pre-wrap overflow-y-auto
+                          min-h-[120px]
+                        "
               >
                 {notes}
               </div>
@@ -37,15 +37,15 @@ const BenchDiagram = ({ control, product, isView = false }) => {
                     rows={4}
                     placeholder="Enter Notes"
                     className="
-                      w-full bg-white
-                      border
-                      rounded-md
-                      px-2 xs:px-3
-                      py-1.5 xs:py-2
-                      text-xs xs:text-sm lg:text-[18px]
-                      resize-none
-                      focus:outline-none
-                    "
+                              w-full bg-white
+                              border
+                              rounded-md
+                              px-2 xs:px-3
+                              py-1.5 xs:py-2
+                              text-xs xs:text-sm lg:text-[18px]
+                              resize-none
+                              focus:outline-none
+                            "
                   />
                 )}
               />
@@ -102,7 +102,7 @@ const BenchDiagram = ({ control, product, isView = false }) => {
           </div>
 
           {/* ================= Height ================= */}
-          <div className="absolute top-[38%] left-[230px] md:left-[454px] w-[60px] md:w-[120px]">
+          <div className="absolute top-[38%] left-[260px] md:left-[454px] w-[60px] md:w-[120px]">
             {isView ? (
               <div
                 className="
